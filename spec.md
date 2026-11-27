@@ -33,9 +33,123 @@ Data BTC cấp đã dùng (nếu có — không commit nguyên file): __
 - [sản phẩm / tính năng gần giống]: một điều đáng học · một điều đáng né · mình khác gì
 
 ## §4. Thiết kế *(guide 2.2, 3.2)*
-- **Lát cắt MỘT CÂU** (1 người dùng · 1 việc · 1 quyết định AI · 1 kết quả):
+- **Lát cắt MỘT CÂU** (1 người dùng · 1 việc · 1 quyết định AI · 1 kết quả): Người tiêu dùng phổ thông cần lựa chọn tai nghe, chuột hoặc bàn phím được AI Agent nghiên cứu và quyết định xếp hạng tối đa 3 sản phẩm phù hợp nhất với nhu cầu và ngân sách, kèm lý do đề xuất, ưu điểm, hạn chế và bằng chứng từ Amazon Reviews 2023.
 - Không làm (≥3 điều):
-- **Sơ đồ** (ảnh / Mermaid / draw.io): [chèn ở đây]
+  Không hỗ trợ ngành hàng ngoài tai nghe, chuột và bàn phím.
+  Không thực hiện giao dịch, đặt hàng, thanh toán và vận chuyển.
+  Không cập nhật giá, khuyến mãi và tồn kho theo thời gian thực.
+  Không thu thập dữ liệu sản phẩm và review từ nguồn ngoài Amazon Reviews 2023.
+  Không tự ý thay đổi ngân sách hoặc điều kiện bắt buộc khi chưa được người dùng đồng ý.
+  Không đưa ra nhận định, thông số hoặc đánh giá sản phẩm thiếu bằng chứng.
+  Không xây dựng hệ thống quản lý người bán và tài khoản khách hàng dài hạn.
+- **Sơ đồ** (ảnh / Mermaid / draw.io):
+```mermaid
+flowchart TD
+    U["Người tiêu dùng"] <--> UI["Website SmartBuy"]
+    UI <--> BE["Backend ứng dụng"]
+    BE <--> CTX["Quản lý phiên và ngữ cảnh mua sắm"]
+
+    subgraph AGENT["TẦNG AI AGENT"]
+        direction TB
+        INT["Phân tích mục tiêu và nhu cầu"]
+        PLAN["Lập kế hoạch và lựa chọn công cụ"]
+        ACT["Thực hiện nghiên cứu sản phẩm"]
+        EVAL["Đánh giá mức độ phù hợp"]
+        REF["Kiểm tra lại kết quả nghiên cứu"]
+        DEC{"Kết quả đã đủ phù hợp và có căn cứ?"}
+        LLM["Mô hình ngôn ngữ lớn - LLM"]
+
+        INT --> PLAN
+        PLAN --> ACT
+        ACT --> EVAL
+        EVAL --> REF
+        REF --> DEC
+        DEC -->|Cần nghiên cứu thêm trong giới hạn| PLAN
+
+        LLM -.- INT
+        LLM -.- PLAN
+        LLM -.- EVAL
+        LLM -.- REF
+    end
+
+    BE --> INT
+    CTX -.-> INT
+
+    subgraph TOOLS["TẦNG CÔNG CỤ VÀ LOGIC NGHIỆP VỤ"]
+        direction TB
+        SEARCH["Tìm kiếm sản phẩm"]
+        FILTER["Kiểm tra điều kiện bắt buộc"]
+        META["Truy xuất thông tin sản phẩm"]
+        REVIEW["Truy xuất bằng chứng đánh giá"]
+        RANK["Tính điểm và xếp hạng sản phẩm"]
+        VALID["Kiểm tra tính hợp lệ của kết quả"]
+    end
+
+    ACT <--> SEARCH
+    ACT <--> FILTER
+    ACT <--> META
+    ACT <--> REVIEW
+
+    EVAL --> RANK
+    RANK --> REF
+
+    DEC -->|Đủ điều kiện| VALID
+    DEC -->|Không thể cải thiện thêm| STOP["Xác định trạng thái kết quả"]
+
+    STOP --> CHANGE{"Cần điều chỉnh điều kiện bắt buộc?"}
+    CHANGE -->|Có| HITL["Yêu cầu người dùng xác nhận"]
+    HITL -->|Đồng ý| CTX
+    CTX -->|Nghiên cứu lại theo nhu cầu mới| INT
+    HITL -->|Từ chối| KEEP["Giữ nguyên điều kiện ban đầu"]
+
+    CHANGE -->|Không| VALID
+    KEEP --> VALID
+
+    subgraph DATA["TẦNG DỮ LIỆU"]
+        RAW["Bộ dữ liệu Amazon Reviews 2023"]
+        PIPE["Trích xuất, làm sạch, chuẩn hóa và kiểm tra chất lượng"]
+        CAT[("Danh mục sản phẩm đã kiểm duyệt")]
+        EVD[("Kho đánh giá và bằng chứng")]
+        FX["Tỷ giá quy đổi tham khảo"]
+
+        RAW --> PIPE
+        PIPE --> CAT
+        PIPE --> EVD
+    end
+
+    SEARCH <--> CAT
+    FILTER --> CAT
+    FILTER --> FX
+    META <--> CAT
+    REVIEW <--> EVD
+
+    VALID --> OUT["Kết quả tư vấn có căn cứ"]
+    OUT --> BE
+
+    subgraph CONTROL["TẦNG KIỂM SOÁT VÀ GIÁM SÁT"]
+        GR["Ràng buộc và kiểm soát nghiệp vụ"]
+        LOG["Nhật ký thực thi Agent"]
+        QA["Đánh giá và giám sát hệ thống"]
+    end
+
+    GR -.-> FILTER
+    GR -.-> VALID
+    GR -.-> PLAN
+    AGENT -.-> LOG
+    LOG --> QA
+
+    classDef ai fill:#EFF6FF,stroke:#1E40AF,color:#1E3A8A
+    classDef data fill:#F0FDF4,stroke:#15803D,color:#166534
+    classDef control fill:#FFF7ED,stroke:#EA580C,color:#9A3412
+    classDef service fill:#F8FAFC,stroke:#64748B,color:#0F172A
+    classDef output fill:#DBEAFE,stroke:#1E40AF,color:#1E3A8A
+
+    class INT,PLAN,ACT,EVAL,REF,DEC,LLM ai
+    class RAW,PIPE,CAT,EVD,FX data
+    class GR,LOG,QA,HITL,VALID,CHANGE control
+    class BE,CTX,SEARCH,FILTER,META,REVIEW,RANK service
+    class OUT output
+```
 - **Hình dạng:** [ ] workflow cố định · [ ] một agent · [ ] nhiều agent — 2 dòng lý do, và vì sao **không** chọn hình dạng phức tạp hơn:
 - **AI dựa vào đâu** — mỗi công cụ (khớp `codebase/tools.py`):
 
@@ -72,7 +186,7 @@ Data BTC cấp đã dùng (nếu có — không commit nguyên file): __
 
 ## §7. Đánh giá & chuẩn "đạt" *(guide 2.4, 4.1)*
 - Data card: `data/DATA_CARD.md` · bộ câu thử: `eval/benchmark.csv` — __ câu (thuong __ · kho __ · tu_choi __) · metric: `eval/metric_spec.yaml` (__ metric)
-- **Chuẩn "đạt"** (chốt **trước 19:30 Thứ Sáu 27/11**, giữ nguyên đến 23:59 Thứ Bảy 28/11): "Đạt khi ≥ __% câu qua, và __"
+- **Chuẩn "đạt"** (chốt **trước 19:30 Thứ Sáu 27/11**, giữ nguyên đến 23:59 Thứ Bảy 28/11): "Đạt khi ≥ 80% câu qua, và 100% câu kiểm thử ràng buộc bắt buộc, từ chối đúng phạm vi phải đạt; không đề xuất sản phẩm vi phạm ngân sách hoặc điều kiện bắt buộc, không bịa thông tin sản phẩm và review, mọi nhận định thực tế về sản phẩm đều có bằng chứng truy xuất được từ Amazon Reviews 2023. "
 - Kết quả: lượt 1 __/__ (__%) · lượt 2 __/__ (__%) — run ID: __ / __ → chi tiết `eval/report.md`, hồ sơ `eval/README.md`
 
 ## §8. Chi phí khi dùng thật *(guide 4.2)*
