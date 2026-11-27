@@ -95,7 +95,8 @@ Data BTC cấp đã dùng (nếu có — không commit nguyên file): __
 
 | Thời điểm | Đổi gì | Vì sao (trỏ về câu thử / lỗi / bằng chứng nào) |
 |---|---|---|
-|  |  |  |
+| 27/11 tối (sau CP2) | Backend: agent + web đọc chung `data/catalog.json` (Amazon Reviews 2023 — bản xuất v2: 422 sản phẩm, 5.890 review) thay data giả lập; nối model thật (`ai.py`); điều kiện cứng chỉ khớp khi thuộc tính đã xác minh; thêm nhánh giải thích / mâu thuẫn / so sánh / nhiều lượt / từ chối bịa dữ liệu; không còn tự hỏi ngân sách. Chi tiết `docs/backend-log.md` | Lượt thử cũ B01 xếp tai nghe có dây lên đầu dù người dùng đòi Bluetooth; B02/B06/B07/B14 cấm tự đặt ngân sách; metric `trich_dung_nguon` đòi nguồn Amazon Reviews 2023. Không sửa câu thử / metric / chuẩn "đạt" |
+| 28/11 rạng sáng | Thay `data/amazon_raw` bằng bản xuất v4 (cùng 441 sản phẩm / 6.135 review, thêm ảnh đủ cỡ + ảnh review) và dựng lại `data/catalog.json` → `amz23-electronics-20261128-n419`: 419 sản phẩm, 5.867 review. Bỏ trường `videos`; loại 3 mũ len gắn tai nghe; bỏ giá Sony MDR-W08L ($138.2); che 1 email trong review. Chi tiết `docs/backend-log.md` mục 10 | Rà soát data: ~3/4 video là video gợi ý của sản phẩm khác; giá Sony lệch hẳn giá review kể ($7–13); email người viết là dữ liệu cá nhân (AGENTS.md). Không sửa câu thử / metric / chuẩn "đạt" / kết quả các lượt đã chạy |
 
 **Sau CP4 (đến 23:59 Thứ Bảy 28/11)** (sửa theo góp ý — không sửa chuẩn "đạt", câu thử, số bằng chứng, kết quả các lượt đã chạy)
 

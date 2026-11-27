@@ -166,6 +166,16 @@ EXPORT_TITLE_REQUIRED = {
     "keyboard": r"key ?board|keypad",
 }
 
+# ───────── Rà soát tay bản xuất v4 (28/11) — lý do ghi ở docs/backend-log.md ─────────
+# Mũ len gắn loa Bluetooth: tiêu đề có "Headphones" nhưng là đồ thời trang, không phải tai nghe người dùng tìm → loại.
+NOT_PRODUCT_TITLE = r"\bbeanie\b|\bhats?\b"
+# Giá niêm yết lệch hẳn giá review kể (người bán bên thứ ba đẩy giá) → bỏ giá (coi như thiếu giá). KHÔNG tự điền số khác.
+SUSPECT_PRICE = {
+    "B00005N6KG": "Sony MDR-W08L ghi $138.2 nhưng review kể giá $7–13 và than người bán đẩy lên $30–40",
+}
+# Email người viết lẫn trong nội dung review → che (dữ liệu cá nhân, AGENTS.md).
+EMAIL_RX = re.compile(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)+")
+
 
 def from_export(m):
     """Bản ghi xuất từ Colab (data/colab_export_cell.py) → khuôn metadata gốc mà phần dưới đọc.
@@ -198,7 +208,9 @@ def export_category(m):
     noun = re.search(EXPORT_TITLE_REQUIRED[cat], title)
     if not noun:
         return None, "tiêu đề không có từ của loại %s (nhãn sai ở bản xuất)" % cat
-    acc = [mm.start() for mm in (re.search(rx, title) for rx in CATEGORY_RULES[cat]["exclude_title"]) if mm]
+    if re.search(NOT_PRODUCT_TITLE, title):
+        return None, "mũ / đồ thời trang gắn tai nghe (không phải sản phẩm chính)"
+    acc =[mm.start() for mm in (re.search(rx, title) for rx in CATEGORY_RULES[cat]["exclude_title"]) if mm]
     if acc and min(acc) < noun.start():
         return None, "phụ kiện / combo (từ phụ kiện đứng trước tên loại)"
     if re.search("(%s)%s" % (EXPORT_TITLE_REQUIRED[cat], ACCESSORY_AFTER_NOUN), title):
@@ -491,13 +503,13 @@ ASIN_RX = re.compile(r'"parent_asin":\s*"([^"]+)"')
 
 def slim_review(r):
     text = re.sub(r"<br\s*/?>", " ", str(r.get("text") or ""), flags=re.I)
-    text = re.sub(r"<[^>]+>", "", text).strip()
+    text = EMAIL_RX.sub("[email đã ẩn]", re.sub(r"<[^>]+>", "", text).strip())
     imgs = []
     for im in (r.get("images") or [])[:2]:
         if isinstance(im, dict):
             imgs.append({k: im.get(k) for k in ("small_image_url", "medium_image_url", "large_image_url") if im.get(k)})
     return collections.OrderedDict([
-        ("rating", r.get("rating")), ("title", str(r.get("title") or "")[:160]), ("text", text[:900] + ("…" if len(text) > 900 else "")),
+        ("rating", r.get("rating")), ("title", EMAIL_RX.sub("[email đã ẩn]", str(r.get("title") or ""))[:160]), ("text", text[:900] + ("…" if len(text) > 900 else "")),
         ("images", imgs), ("asin", r.get("asin")), ("parent_asin", r.get("parent_asin")), ("timestamp", r.get("timestamp")),
         ("helpful_vote", int(r.get("helpful_vote") or 0)), ("verified_purchase", bool(r.get("verified_purchase"))),
     ])  # user_id bị bỏ có chủ đích (AC-OPS-04)
@@ -641,12 +653,19 @@ def main(argv=None):
             warn["kết nối chưa xác minh (vẫn công bố, không khớp bộ lọc kết nối)"] += 1
         rec = collections.OrderedDict((k, m.get(k)) for k in ("parent_asin", "main_category", "title", "store", "average_rating",
                                                                "rating_number", "price", "features", "description", "images",
-                                                               "videos", "categories", "details", "bought_together"))
+                                                               "categories", "details", "bought_together"))
+        # bỏ `videos`: ~3/4 là video gợi ý của sản phẩm KHÁC trên trang Amazon, không phải video của chính sản phẩm
         rec["details"] = details
         rec["price"] = as_price(m.get("price"))
+        data_flags = []
+        if pid in SUSPECT_PRICE and rec["price"] is not None:
+            data_flags.append("đã bỏ giá $%s: %s" % (rec["price"], SUSPECT_PRICE[pid]))
+            rec["price"] = None
+            warn["bỏ giá đáng ngờ"] += 1
         rec["reviews"] = reviews
         rec["smartbuy"] = collections.OrderedDict([
             ("category", cat), ("status", status), ("pending_reasons", why if status != "APPROVED" else []),
+            ("data_flags", data_flags),
             ("attributes", attrs), ("reviews_total", total.get(pid, 0)), ("rating_hist", dict(hist.get(pid, {}))),
             ("insights", insights(cat, reviews)),
             ("insights_method", "Đếm theo từ khoá + số sao trong %d review hữu ích nhất — không phải AI, chưa kiểm định" % args.max_reviews),
