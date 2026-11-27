@@ -53,7 +53,8 @@ CATEGORY_RULES = {
         "exclude_leaf": ["headphone accessories", "earpads", "cases", "headphone amplifiers", "headphone extension cords", "adapters"],
         "exclude_segment": ["accessories & supplies > audio & video accessories > cables"],
         "exclude_title": [r"\bcases?\b", r"\bear ?pads?\b", r"\bear ?cushions?\b", r"replacement", r"\bcover\b", r"\bstand\b",
-                          r"\bhanger\b", r"\badapter\b", r"\bsplitter\b", r"\bear ?tips?\b", r"\bextension cable\b"],
+                          r"\bhanger\b", r"\badapter\b", r"\bsplitter\b", r"\bear ?tips?\b", r"\bextension cable\b",
+                          r"clean(er|ing)? kit", r"battery pack", r"\bfurniture\b", r"kitty ears", r"\bears for\b"],
         "filters": {"connectivity": {"bluetooth": "Bluetooth", "wired": "Có dây"},
                     "wear_type": {"over-ear": "Trùm tai", "on-ear": "Áp tai", "in-ear": "Nhét tai"}},
         "compare": ["connectivity", "wear_type", "microphone", "anc", "battery", "weight"],
@@ -64,7 +65,8 @@ CATEGORY_RULES = {
         "exclude_leaf": ["mouse pads", "mouse pads & wrist rests", "keyboard & mouse combos", "mice & keyboard combos"],
         "exclude_segment": [],
         "exclude_title": [r"\bmouse ?pad\b", r"\bcombo\b", r"keyboard (and|&) mouse", r"mouse (and|&) keyboard", r"\bskins?\b",
-                          r"\bgrip tape\b", r"\bskates\b", r"\bmouse feet\b", r"\bbungee\b"],
+                          r"\bgrip tape\b", r"\bskates\b", r"\bmouse feet\b", r"\bbungee\b",
+                          r"\b(hard )?case\b", r"\breplacement\b"],
         "filters": {"connectivity": {"bluetooth": "Bluetooth", "wireless-2.4": "2.4 GHz", "wired": "Có dây"}},
         "compare": ["connectivity", "dpi", "buttons", "weight", "battery", "shape"],
     },
@@ -152,6 +154,56 @@ def detect_category(cats, title):
                 return None, "phụ kiện / combo (theo tiêu đề)"
             return key, None
     return None, "ngoài 3 ngành hàng"
+
+
+EXPORT_CATEGORY = {"Headphones": "headphones", "Mouse": "mouse", "Keyboard": "keyboard"}
+# Bản xuất Colab chưa kiểm tay (manifest: audit_status PENDING) và có lẫn hàng sai loại (vd "Outdoor End Table" gắn
+# nhãn Headphones) → tiêu đề phải chứa ít nhất một từ của đúng loại.
+EXPORT_TITLE_REQUIRED = {
+    "headphones": r"head ?phones?|head ?sets?|ear ?buds?|ear ?phones?|in[- ]ear|over[- ]ear|on[- ]ear|ear ?plugs?|monitors?\b"
+                  r"|skullcandy|plantronics|jabra|sennheiser|\bbose\b|\bbeats\b|airpods",  # thương hiệu chỉ làm tai nghe
+    "mouse": r"\bmouse\b|\bmice\b",
+    "keyboard": r"key ?board|keypad",
+}
+
+
+def from_export(m):
+    """Bản ghi xuất từ Colab (data/colab_export_cell.py) → khuôn metadata gốc mà phần dưới đọc.
+    Khác biệt: `category_path` (chuỗi "A > B > C") thay cho `categories`, `price_usd` thay cho `price`."""
+    m = dict(m)
+    if not m.get("categories") and m.get("category_path"):
+        m["categories"] = [s.strip() for s in str(m["category_path"]).split(">") if s.strip()]
+    if m.get("price") in (None, "") and m.get("price_usd") is not None:
+        m["price"] = m["price_usd"]
+    if isinstance(m.get("images"), list):  # bản xuất v2: list link (str) → khuôn gốc list[{"large": url}]
+        m["images"] = [{"large": im} if isinstance(im, str) else im for im in m["images"] if im]
+    m.setdefault("main_category", "Electronics")
+    return m
+
+
+# từ phụ kiện đi LIỀN SAU tên loại → tiêu đề đang tả phụ kiện ("Keyboard Stickers", "AirPods Case", "Mouse Pad")
+ACCESSORY_AFTER_NOUN = r"\s+(stickers?|covers?|cases?|skins?|stands?|pads?|holders?|hangers?|cushions?|tips|adapters?|cleaners?)\b"
+
+
+def export_category(m):
+    """Bản xuất đã gắn smartbuy_category ở notebook (đã lọc theo leaf category); chạy lại kiểm tra theo tiêu đề:
+      1. tiêu đề phải có từ của đúng loại (bắt nhãn sai);
+      2. là phụ kiện khi từ phụ kiện đứng TRƯỚC tên loại ("Case for … Mouse", "Keycaps … for Keyboards")
+         hoặc đi liền sau tên loại ("Keyboard Stickers"). Từ phụ kiện đứng SAU sản phẩm ("Earbuds … Charging Case",
+         "Headphones … soft ear pads") là mô tả sản phẩm thật → giữ. Luật cũ (có từ là loại) loại nhầm ~45 mẫu thật."""
+    cat = EXPORT_CATEGORY.get(m.get("smartbuy_category"))
+    if not cat:
+        return detect_category(m.get("categories"), m.get("title"))
+    title = (m.get("title") or "").lower()
+    noun = re.search(EXPORT_TITLE_REQUIRED[cat], title)
+    if not noun:
+        return None, "tiêu đề không có từ của loại %s (nhãn sai ở bản xuất)" % cat
+    acc = [mm.start() for mm in (re.search(rx, title) for rx in CATEGORY_RULES[cat]["exclude_title"]) if mm]
+    if acc and min(acc) < noun.start():
+        return None, "phụ kiện / combo (từ phụ kiện đứng trước tên loại)"
+    if re.search("(%s)%s" % (EXPORT_TITLE_REQUIRED[cat], ACCESSORY_AFTER_NOUN), title):
+        return None, "phụ kiện (từ phụ kiện liền sau tên loại)"
+    return cat, None
 
 
 # ───────── 2. Trích thuộc tính ─────────
@@ -474,7 +526,9 @@ def insights(cat, reviews):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Dựng data/catalog.json từ Amazon Reviews 2023 (Electronics)")
-    ap.add_argument("--meta", required=True, help="meta_Electronics.jsonl hoặc .jsonl.gz")
+    ap.add_argument("--from-export", metavar="DIR",
+                    help="đọc bản xuất Colab (DIR/products.jsonl + DIR/reviews.jsonl, vd data/amazon_raw) thay cho --meta/--reviews")
+    ap.add_argument("--meta", help="meta_Electronics.jsonl hoặc .jsonl.gz")
     ap.add_argument("--reviews", help="Electronics.jsonl hoặc .jsonl.gz (bỏ trống = không có review)")
     ap.add_argument("--out", default=OUT)
     ap.add_argument("--per-category", type=int, default=60, help="số sản phẩm mỗi ngành (mặc định 60)")
@@ -485,12 +539,18 @@ def main(argv=None):
     ap.add_argument("--fx-source", default="(tự ước tính — thay bằng tỷ giá có nguồn)")
     ap.add_argument("--limit", type=int, default=0, help="chỉ đọc N dòng metadata đầu (thử nhanh)")
     args = ap.parse_args(argv)
+    export = bool(args.from_export)
+    if export:
+        args.meta = args.meta or os.path.join(args.from_export, "products.jsonl")
+        args.reviews = args.reviews or os.path.join(args.from_export, "reviews.jsonl")
+    if not args.meta:
+        ap.error("cần --meta hoặc --from-export")
 
     t0 = time.time()
     reasons = collections.Counter()
     cands = collections.defaultdict(list)
     scanned = 0
-    print("① Đọc metadata:", args.meta)
+    print("① Đọc metadata:", args.meta, "(bản xuất Colab)" if export else "")
     with open_any(args.meta) as f:
         for line in f:
             scanned += 1
@@ -501,7 +561,11 @@ def main(argv=None):
             except ValueError:
                 reasons["dòng JSON lỗi"] += 1
                 continue
-            cat, why = detect_category(m.get("categories"), m.get("title"))
+            if export:
+                m = from_export(m)
+                cat, why = export_category(m)
+            else:
+                cat, why = detect_category(m.get("categories"), m.get("title"))
             if not cat:
                 reasons[why] += 1
                 continue
@@ -564,7 +628,10 @@ def main(argv=None):
         if not m.get("title"):
             why.append("thiếu tiêu đề")
         if not has_image(m.get("images")):
-            why.append("không có ảnh")
+            if export:  # bản xuất Colab đã lọc "có ảnh" nhưng không chép trường images → chỉ cảnh báo
+                warn["bản xuất không kèm ảnh (đã lọc có ảnh ở notebook)"] += 1
+            else:
+                why.append("không có ảnh")
         if int(m.get("rating_number") or 0) < args.min_ratings:
             why.append("ít hơn %d lượt đánh giá" % args.min_ratings)
         status = "APPROVED" if not why else "PENDING"
@@ -608,7 +675,7 @@ def main(argv=None):
         ("source", collections.OrderedDict([
             ("dataset", "McAuley-Lab/Amazon-Reviews-2023"),
             ("url", "https://huggingface.co/datasets/McAuley-Lab/Amazon-Reviews-2023"),
-            ("subset", "raw_meta_Electronics + raw_review_Electronics"),
+            ("subset", ("bản xuất Colab %s (manifest.json)" % os.path.relpath(args.from_export, ROOT).replace(os.sep, "/")) if export else "raw_meta_Electronics + raw_review_Electronics"),
             ("built_with", "codebase/build_catalog.py"),
             ("built_at", datetime.datetime.now().isoformat(timespec="seconds")),
             ("meta_lines", scanned), ("candidates", {k: len(v) for k, v in cands.items()}), ("rejected", dict(reasons.most_common(8))),
@@ -621,9 +688,23 @@ def main(argv=None):
         ("categories", categories),
         ("products", products),
     ])
+    # BR-CAT-06 / AC-DATA-04: catalog mới không đạt thì KHÔNG ghi đè bản đang dùng — ghi ra file tạm, kiểm, rồi mới thay
+    approved = collections.Counter(p["smartbuy"]["category"] for p in products if p["smartbuy"]["status"] == "APPROVED")
+    ids = [p["parent_asin"] for p in products]
+    problems = ["ngành %s không có sản phẩm APPROVED" % c for c in CATEGORY_RULES if not approved.get(c)]
+    if len(ids) != len(set(ids)):
+        problems.append("trùng parent_asin")
+    if problems:
+        print("✗ Không ghi %s — catalog mới không đạt: %s. Giữ nguyên bản đang dùng." % (
+            os.path.relpath(args.out, ROOT), "; ".join(problems)))
+        return 1
     os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
-    with open(args.out, "w", encoding="utf-8") as f:
+    tmp = args.out + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False)
+    with open(tmp, encoding="utf-8") as f:
+        json.load(f)  # đọc lại được mới thay — lỗi ghi giữa chừng không làm hỏng bản đang dùng
+    os.replace(tmp, args.out)
     size = os.path.getsize(args.out) / 1e6
     print("⑤ Ghi %s (%.1f MB) · %d sản phẩm · PENDING: %s" % (os.path.relpath(args.out, ROOT), size, len(products), dict(pend) or "0"))
     print("   Cảnh báo:", dict(warn) or "—")

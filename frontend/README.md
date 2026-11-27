@@ -20,7 +20,7 @@ Font Be Vietnam Pro được dùng thống nhất cho tiêu đề, nội dung, n
 |---|---|---|
 | Duyệt, tìm, lọc, sắp xếp, so sánh | **Thật**, chạy trên backend | `codebase/catalog.py`, không gọi AI (UC-02) |
 | Gọi trợ lý từ ô soạn | **Thật** | Gọi `answer()` trong `codebase/agent.py`, đo trace bằng `tracing.py` |
-| Catalog | **Minh họa** | `frontend/demo/catalog.synthetic.json`: 24 sản phẩm, thương hiệu và review **hư cấu**. Có `data/catalog.json` thì server tự dùng file đó. |
+| Catalog | **Thật** (`data/catalog.json`) | 422 sản phẩm Amazon Reviews 2023 (có link ảnh), dựng bằng `codebase/build_catalog.py --from-export data/amazon_raw` (xem `docs/backend-log.md`). Agent đọc cùng file. Chưa có file đó thì server dùng `frontend/demo/catalog.synthetic.json` (24 sản phẩm **hư cấu**). |
 | Tỷ giá 25.400đ/USD | **Minh họa** | *(tự ước tính)*. Thay bằng tỷ giá có nguồn trong file catalog |
 | "Kịch bản minh họa giao diện" | **Minh họa** | `js/scenarios.js`: dữ liệu dựng sẵn để xem đủ ST-01…ST-09. Chỉ chạy khi bấm chọn, luôn gắn nhãn "minh họa", không có trace |
 
