@@ -1,0 +1,305 @@
+[
+ {
+  "product_id": "TN01",
+  "category": "tai_nghe",
+  "name": "Tai nghe Mẫu Air S",
+  "price_vnd": 590000,
+  "tags": [
+   "bluetooth",
+   "nhe",
+   "chong_nuoc"
+  ],
+  "specs": {
+   "kieu": "true wireless",
+   "pin_gio": 6,
+   "chong_nuoc": "IPX4"
+  },
+  "rating": 4.4,
+  "rating_count": 1068,
+  "label": "synthetic"
+ },
+ {
+  "product_id": "TN02",
+  "category": "tai_nghe",
+  "name": "Tai nghe Mẫu Bass Pro",
+  "price_vnd": 890000,
+  "tags": [
+   "bluetooth",
+   "bass_manh",
+   "chong_on_chu_dong"
+  ],
+  "specs": {
+   "kieu": "chụp tai",
+   "pin_gio": 30
+  },
+  "rating": 4.1,
+  "rating_count": 937,
+  "label": "synthetic"
+ },
+ {
+  "product_id": "TN03",
+  "category": "tai_nghe",
+  "name": "Tai nghe Mẫu Study",
+  "price_vnd": 250000,
+  "tags": [
+   "co_day",
+   "mic",
+   "nhe"
+  ],
+  "specs": {
+   "kieu": "nhét tai có dây",
+   "jack": "3.5mm"
+  },
+  "rating": 4.5,
+  "rating_count": 1947,
+  "label": "synthetic"
+ },
+ {
+  "product_id": "TN04",
+  "category": "tai_nghe",
+  "name": "Tai nghe Mẫu ANC Max",
+  "price_vnd": 1950000,
+  "tags": [
+   "bluetooth",
+   "chong_on_chu_dong",
+   "pin_trau",
+   "mic"
+  ],
+  "specs": {
+   "kieu": "chụp tai",
+   "pin_gio": 40
+  },
+  "rating": 4.5,
+  "rating_count": 96,
+  "label": "synthetic"
+ },
+ {
+  "product_id": "TN05",
+  "category": "tai_nghe",
+  "name": "Tai nghe Mẫu Sport",
+  "price_vnd": 450000,
+  "tags": [
+   "bluetooth",
+   "chong_nuoc",
+   "the_thao"
+  ],
+  "specs": {
+   "kieu": "móc tai",
+   "pin_gio": 8,
+   "chong_nuoc": "IPX5"
+  },
+  "rating": 4.2,
+  "rating_count": 797,
+  "label": "synthetic"
+ },
+ {
+  "product_id": "TN06",
+  "category": "tai_nghe",
+  "name": "Tai nghe Mẫu Gamer",
+  "price_vnd": 1200000,
+  "tags": [
+   "co_day",
+   "mic",
+   "gaming"
+  ],
+  "specs": {
+   "kieu": "chụp tai",
+   "am_thanh": "giả lập 7.1"
+  },
+  "rating": 4.3,
+  "rating_count": 47,
+  "label": "synthetic"
+ },
+ {
+  "product_id": "TN07",
+  "category": "tai_nghe",
+  "name": "Tai nghe Mẫu NoName",
+  "price_vnd": 350000,
+  "tags": [],
+  "specs": {},
+  "rating": null,
+  "rating_count": 0,
+  "label": "synthetic"
+ },
+ {
+  "product_id": "CH01",
+  "category": "chuot",
+  "name": "Chuột Mẫu Office",
+  "price_vnd": 150000,
+  "tags": [
+   "khong_day",
+   "im_lang"
+  ],
+  "specs": {
+   "ket_noi": "USB 2.4GHz",
+   "dpi": 1200
+  },
+  "rating": 4.5,
+  "rating_count": 940,
+  "label": "synthetic"
+ },
+ {
+  "product_id": "CH02",
+  "category": "chuot",
+  "name": "Chuột Mẫu Ergo",
+  "price_vnd": 690000,
+  "tags": [
+   "khong_day",
+   "cong_thai_hoc"
+  ],
+  "specs": {
+   "ket_noi": "USB 2.4GHz + bluetooth",
+   "dpi": 1600
+  },
+  "rating": 4.5,
+  "rating_count": 2329,
+  "label": "synthetic"
+ },
+ {
+  "product_id": "CH03",
+  "category": "chuot",
+  "name": "Chuột Mẫu Gaming G1",
+  "price_vnd": 450000,
+  "tags": [
+   "co_day",
+   "gaming",
+   "dpi_cao"
+  ],
+  "specs": {
+   "ket_noi": "dây USB",
+   "dpi": 12000
+  },
+  "rating": 4.3,
+  "rating_count": 1089,
+  "label": "synthetic"
+ },
+ {
+  "product_id": "CH04",
+  "category": "chuot",
+  "name": "Chuột Mẫu Travel",
+  "price_vnd": 320000,
+  "tags": [
+   "bluetooth",
+   "nho_gon",
+   "im_lang"
+  ],
+  "specs": {
+   "ket_noi": "bluetooth",
+   "dpi": 1000
+  },
+  "rating": 4.1,
+  "rating_count": 1021,
+  "label": "synthetic"
+ },
+ {
+  "product_id": "CH05",
+  "category": "chuot",
+  "name": "Chuột Mẫu Pro Wireless",
+  "price_vnd": 1490000,
+  "tags": [
+   "khong_day",
+   "gaming",
+   "nhe",
+   "dpi_cao"
+  ],
+  "specs": {
+   "ket_noi": "USB 2.4GHz",
+   "dpi": 26000,
+   "can_nang_g": 63
+  },
+  "rating": 4.7,
+  "rating_count": 1669,
+  "label": "synthetic"
+ },
+ {
+  "product_id": "BP01",
+  "category": "ban_phim",
+  "name": "Bàn phím Mẫu Office",
+  "price_vnd": 290000,
+  "tags": [
+   "co_day",
+   "im_lang"
+  ],
+  "specs": {
+   "layout": "full size",
+   "loai": "màng"
+  },
+  "rating": 4.4,
+  "rating_count": 1737,
+  "label": "synthetic"
+ },
+ {
+  "product_id": "BP02",
+  "category": "ban_phim",
+  "name": "Bàn phím Mẫu Mech 87",
+  "price_vnd": 890000,
+  "tags": [
+   "co_day",
+   "co"
+  ],
+  "specs": {
+   "layout": "TKL 87 phím",
+   "loai": "cơ"
+  },
+  "rating": 4.3,
+  "rating_count": 1285,
+  "label": "synthetic"
+ },
+ {
+  "product_id": "BP03",
+  "category": "ban_phim",
+  "name": "Bàn phím Mẫu Mech Wireless",
+  "price_vnd": 1390000,
+  "tags": [
+   "khong_day",
+   "bluetooth",
+   "co",
+   "hot_swap"
+  ],
+  "specs": {
+   "layout": "75%",
+   "loai": "cơ"
+  },
+  "rating": 4.3,
+  "rating_count": 1223,
+  "label": "synthetic"
+ },
+ {
+  "product_id": "BP04",
+  "category": "ban_phim",
+  "name": "Bàn phím Mẫu Slim BT",
+  "price_vnd": 590000,
+  "tags": [
+   "bluetooth",
+   "mong",
+   "nhieu_thiet_bi",
+   "im_lang"
+  ],
+  "specs": {
+   "layout": "full size mỏng",
+   "loai": "cắt kéo"
+  },
+  "rating": 4.4,
+  "rating_count": 1222,
+  "label": "synthetic"
+ },
+ {
+  "product_id": "BP05",
+  "category": "ban_phim",
+  "name": "Bàn phím Mẫu Gaming RGB",
+  "price_vnd": 650000,
+  "tags": [
+   "co_day",
+   "co",
+   "rgb",
+   "gaming"
+  ],
+  "specs": {
+   "layout": "full size",
+   "loai": "cơ"
+  },
+  "rating": 4.2,
+  "rating_count": 825,
+  "label": "synthetic"
+ }
+]
