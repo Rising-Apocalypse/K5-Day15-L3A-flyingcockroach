@@ -17,3 +17,17 @@
 | Giới hạn             | tên sản phẩm là tên dựng ("… Mẫu …"), giá VND tự đặt, câu đánh giá lặp theo mẫu → **không phải bằng chứng pain**, không phản ánh thị trường thật. Sẽ thay bằng tập con Amazon Reviews 2023 (giữ cấu trúc trường: `product_id, category, name, price_vnd, tags, specs, rating, rating_count` / `review_id, product_id, rating, aspect, text`) |
 
 **Cách sinh:** `python data/make_synthetic.py`. Seed cố định nên chạy lại ra đúng hai file. Người kiểm: ** · số dòng đã kiểm tay: **
+
+## Dataset 2 · Catalog Amazon Reviews 2023 — `data/catalog.json` (agent + web dùng chung, từ 27/11/2026)
+
+|                      |                                                                                                                                                                                                                                  |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Dùng để làm gì       | nguồn DUY NHẤT cho công cụ `search_catalog`, `get_evidence`, `check_shortlist`, `compare_products` (`codebase/tools.py`) và cho giao diện web (`codebase/catalog.py`) — thay Dataset 1                                         |
+| Từ đâu               | McAuley-Lab/Amazon-Reviews-2023 (Hugging Face), Electronics, revision `2b6d039…` — bản xuất Colab v2 ở `data/amazon_raw/` (xem `manifest.json`: quét 100.000 metadata, 2.000.000 review, giữ sản phẩm có ≥5 review → 441 sản phẩm, 6.135 review, ảnh chỉ lưu link)            |
+| Xử lý những bước gì  | `python codebase/build_catalog.py --from-export data/amazon_raw --per-category 500 --max-reviews 20 --min-ratings 10 --usd-vnd 26000 --fx-source "(tự ước tính)"`: loại 13 phụ kiện (từ phụ kiện đứng trước / liền sau tên loại trong tiêu đề) + 6 mẫu sai nhãn (tiêu đề không có từ của loại — trong đó 2 có vẻ là tai nghe thật: Contixo KB-2600, Logitech ClearChat ghi sai "HEASET"); trích thuộc tính VERIFIED / UNKNOWN / CONFLICT kèm mã nguồn (T, D<n>, F<n>); giữ 20 review hữu ích nhất / sản phẩm; bỏ `user_id` |
+| Số dòng / số đoạn    | 422 sản phẩm (319 tai nghe · 58 chuột · 45 bàn phím) · 5.890 review · 422/422 có link ảnh                                                                                                                                                             |
+| Phiên bản / ngày lấy | `amz23-electronics-20261127-n422` · 27/11/2026                                                                                                                                                                                  |
+| Nhãn                 | `data_that` (dữ liệu công khai, đã lọc)                                                                                                                                                                                          |
+| Giới hạn             | giá là giá Amazon Mỹ lúc thu thập, quy đổi 26.000đ/USD *(tự ước tính)*; review tiếng Anh; độ phủ thuộc tính đã xác minh thấp với ANC (8%), switch (38%), pin (18–51%); ảnh là link tới máy chủ Amazon, bản quyền thuộc Amazon / người bán; bản xuất chưa kiểm tay (`audit_status: PENDING`) |
+
+**Cách dựng lại:** lệnh ở dòng "Xử lý" — chạy lại ra cùng nội dung (trừ `built_at`). Người kiểm: __ · số dòng đã kiểm tay: __

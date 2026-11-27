@@ -1,79 +1,109 @@
-"""Công cụ của bài toán — tư vấn chọn tai nghe / chuột / bàn phím (Track D).
+"""Công cụ của bài toán — tư vấn chọn tai nghe / chuột / bàn phím (Track D, SmartBuy).
 
 Mỗi công cụ là một hàm có @tool; docstring ghi: tên · input · output · có tác động ra ngoài không.
-KHÔNG có công cụ nào tác động ra ngoài: không đặt hàng, không thanh toán, không thêm vào giỏ.
+KHÔNG có công cụ nào tác động ra ngoài: không đặt hàng, không thanh toán, không thêm vào giỏ, không sửa catalog.
 
-Dữ liệu: data/products.json + data/reviews.json, sinh bằng một trong hai script (cùng cấu trúc trường):
-  - data/make_synthetic.py   → dữ liệu GIẢ LẬP (seed 2711), nhãn "synthetic"
-  - data/build_from_amazon.py → tập con Amazon Reviews 2023, nhãn "amazon_reviews_2023"
-  Xem data/DATA_CARD.md.
+Nguồn dữ liệu: ĐÚNG catalog mà giao diện web đang dùng (codebase/catalog.py) — website và agent đọc chung một nguồn:
+  1. data/catalog.json — tập con Amazon Reviews 2023 (Electronics), dựng bằng
+        python codebase/build_catalog.py --from-export data/amazon_raw --per-category 500 --max-reviews 20 \
+            --min-ratings 10 --usd-vnd 26000
+  2. frontend/demo/catalog.synthetic.json — catalog DEMO hư cấu, chỉ dùng khi chưa có file 1.
+Mỗi thuộc tính trong catalog có trạng thái VERIFIED / UNKNOWN / CONFLICT và mã nguồn:
+  T = tiêu đề · D<n> = một dòng `details` · F<n> = một dòng `features` · R<n> = một review của chính sản phẩm đó.
 
-Nguyên tắc: điều kiện bắt buộc (loại sản phẩm, ngân sách) đọc và kiểm bằng CODE, không để AI tự cộng / tự lọc.
+Nguyên tắc: điều kiện bắt buộc (loại, ngân sách, thuộc tính cứng) đọc và kiểm bằng CODE, không để AI tự lọc.
+Thuộc tính chưa xác minh (UNKNOWN / CONFLICT) KHÔNG được tính là khớp.
 """
-import json
-import os
 import re
 
+import catalog
 from tracing import tool, TOOLS  # noqa: F401
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATA = os.path.join(ROOT, "data")
-
-CATEGORIES = {"tai_nghe": "tai nghe", "chuot": "chuột", "ban_phim": "bàn phím"}
-
-# Từ người dùng hay gõ → loại sản phẩm được hỗ trợ
+# ───────── từ vựng ─────────
+CATEGORIES = {"headphones": "tai nghe", "mouse": "chuột", "keyboard": "bàn phím"}
 CATEGORY_WORDS = {
-    "tai_nghe": ["tai nghe", "headphone", "headset", "earbud", "earphone", "airpod"],
-    "chuot": ["chuột", "chuot", "mouse"],
-    "ban_phim": ["bàn phím", "ban phim", "keyboard"],
+    "headphones": ["tai nghe", "headphone", "headset", "earbud", "earphone", "airpod"],
+    "mouse": ["chuột", "con chuột", "mouse"],
+    "keyboard": ["bàn phím", "keyboard"],
 }
-# Loại sản phẩm hay bị hỏi nhưng NGOÀI phạm vi lát cắt
 OUT_OF_SCOPE_WORDS = ["điện thoại", "laptop", "máy tính bảng", "ipad", "tivi", "loa", "màn hình", "đồng hồ",
-                      "nồi", "quần", "áo", "giày", "máy giặt", "tủ lạnh", "camera", "máy ảnh"]
-
-# Bộ tag cố định (khớp trường tags trong data) + từ khoá gợi ý. AI chỉ được chọn tag trong bộ này.
-TAG_VOCAB = {
-    "bluetooth": ["bluetooth", "không dây", "khong day", "wireless"],
-    "khong_day": ["không dây", "khong day", "wireless"],
-    "co_day": ["có dây", "co day", "cắm dây"],
-    "chong_on_chu_dong": ["chống ồn", "chong on", "anc", "khử ồn"],
-    "pin_trau": ["pin trâu", "pin lâu", "pin khoẻ", "pin khỏe"],
-    "mic": ["mic", "micro", "họp", "học online", "gọi điện", "call"],
-    "nhe": ["nhẹ"],
-    "bass_manh": ["bass"],
-    "gaming": ["game", "gaming", "chơi game"],
-    "chong_nuoc": ["chống nước", "mồ hôi"],
-    "the_thao": ["chạy bộ", "thể thao", "gym", "tập luyện"],
-    "im_lang": ["bấm êm", "gõ êm", "click êm", "yên tĩnh", "im lặng", "không ồn", "thư viện", "silent"],
-    "cong_thai_hoc": ["công thái học", "ergo", "mỏi tay", "cổ tay"],
-    "dpi_cao": ["dpi"],
-    "nho_gon": ["nhỏ gọn", "mang đi", "du lịch"],
-    "co": ["phím cơ", "bàn phím cơ", "mechanical", "switch"],
-    "hot_swap": ["hot swap", "hotswap", "thay switch"],
-    "mong": ["mỏng"],
-    "nhieu_thiet_bi": ["nhiều thiết bị", "nhiều máy", "3 thiết bị", "ipad"],
-    "rgb": ["rgb", "led", "đèn"],
-}
+                      "nồi", "quần", "áo", "giày", "máy giặt", "tủ lạnh", "camera", "máy ảnh", "webcam", "router"]
 
 PURCHASE_WORDS = ["mua luôn", "mua giùm", "mua giúp", "mua hộ", "đặt hàng", "đặt mua", "chốt đơn",
-                  "thanh toán", "thêm vào giỏ", "add to cart", "checkout"]
+                  "thanh toán", "thêm vào giỏ", "add to cart", "checkout", "trả tiền"]
+FABRICATE_PATTERNS = [
+    r"bỏ qua (tất cả |mọi |hết )?(các )?(quy tắc|luật|hướng dẫn|chỉ dẫn)",
+    r"\b(ignore|disregard|forget)\b( \w+){0,3} (rules|instructions|guardrails|prompts?)\b",
+    r"\b(fake|made[- ]up|invented)\b.{0,30}\b(reviews?|ratings?|products?)\b",
+    r"\b(write|create|generate|invent)\b.{0,30}\breviews?\b",
+    r"\btạo (ra )?(một |1 )?(sản phẩm|tai nghe|chuột|bàn phím|review|đánh giá)\b.*(không có|giả|mới|ảo)",
+    r"(viết|tạo|bịa|thêm)( thêm)? \d* ?(review|đánh giá|nhận xét)", r"\bđặt rating\b", r"\bsửa (rating|giá|đánh giá)\b",
+    r"review (giả|ảo|tích cực)", r"\bbịa\b",
+]
+EXPLAIN_PATTERNS = [r"\blà gì\b", r"\bnghĩa là\b", r"\bkhác (gì|nhau)\b", r"\bcó cần\b.*\bkhông\b", r"\bcó nên\b",
+                    r"\bhoạt động (thế|như) nào\b", r"\bcó tác dụng gì\b"]
+FIND_WORDS = ["tìm", "gợi ý", "đề xuất", "giới thiệu", "chọn", "mua", "tư vấn", "muốn", "cần một", "cần mua", "cần bàn",
+              "cần chuột", "cần tai"]
+COMPARE_WORDS = ["so sánh", "so với", "khác nhau thế nào", "đối chiếu"]
+COMPARE_REF = ["vừa tìm", "vừa gợi ý", "ở trên", "mẫu trên", "hai mẫu", "2 mẫu", "ba mẫu", "3 mẫu", "các mẫu này", "hai con", "kết quả trước"]
 
+# điều kiện CỨNG — chấm trên thuộc tính đã xác minh của catalog
+HARD_WORDS = {
+    "bluetooth": ["bluetooth"],
+    "wireless": ["không dây", "wireless"],
+    "wired": ["có dây", "cắm dây", "dây cắm", "wired"],
+    "anc": ["anc", "chống ồn chủ động", "khử ồn chủ động", "chống ồn", "khử ồn"],
+    "microphone": ["có mic", "kèm mic", "có micro", "kèm micro", "phải có mic"],
+    "numpad": ["bàn phím số", "phím số", "numpad"],
+    "mechanical": ["bàn phím cơ", "phím cơ", "mechanical"],
+}
+HARD_LABEL = {"bluetooth": "Bluetooth", "wireless": "Không dây", "wired": "Có dây", "anc": "Chống ồn chủ động (ANC)",
+              "microphone": "Có micro", "numpad": "Có bàn phím số (full-size)",
+              "mechanical": "Bàn phím cơ"}
+# kiểu đeo tai nghe (tag khớp thuộc tính wear_type của catalog)
+WEAR_WORDS = {"over-ear": ["trùm tai", "chụp tai", "over-ear", "over ear"], "on-ear": ["áp tai", "on-ear", "on ear"],
+              "in-ear": ["nhét tai", "in-ear", "in ear"]}
+WEAR_LABEL = {"over-ear": "Trùm tai", "on-ear": "Áp tai", "in-ear": "Nhét tai"}
+# Thương hiệu: lấy từ catalog; bỏ tên trùng chữ thường hay gặp trong câu hỏi
+BRAND_STOP = {"jam", "soul", "august", "coo", "snug", "senso", "jetta", "cc store", "amazon renewed", "elgin", "trueque"}
+# câu nói về tập sản phẩm đang lọc trên website (Shopping Context 7.5 — "theo bộ lọc")
+FILTER_REF = ["đang lọc", "bộ lọc", "đang xem", "danh sách này", "các mẫu này", "các sản phẩm này", "trong số này",
+              "trong các mẫu", "trong các sản phẩm", "ở đây", "khớp bộ lọc"]
+SWITCH_COLORS = {"red": "red", "đỏ": "red", "brown": "brown", "nâu": "brown", "blue": "blue", "xanh": "blue",
+                 "yellow": "yellow", "vàng": "yellow", "black": "black", "đen": "black"}
 
-def _load(name):
-    with open(os.path.join(DATA, name), encoding="utf-8") as f:
-        return json.load(f)
-
-
-_PRODUCTS = None
-_REVIEWS = None
-
-
-def _db():
-    global _PRODUCTS, _REVIEWS
-    if _PRODUCTS is None:
-        _PRODUCTS = {p["product_id"]: p for p in _load("products.json")}
-        _REVIEWS = _load("reviews.json")
-    return _PRODUCTS, _REVIEWS
+# tiêu chí MỀM — chấm bằng review (từ khoá tiếng Anh vì review gốc tiếng Anh) + thuộc tính nếu có
+SOFT = {
+    "am_thanh": {"label": "Âm thanh", "vi": ["âm thanh", "chất âm", "nghe nhạc", "bass", "âm bass"],
+                 "kw": ["sound", "bass", "audio", "music", "treble", "clarity", "clear"]},
+    "pin": {"label": "Pin", "vi": ["pin", "thời lượng pin"], "kw": ["battery", "charge", "charging", "hours"], "attr": "battery"},
+    "mic": {"label": "Micro", "vi": ["mic", "micro", "thu âm", "gọi điện", "họp online"],
+            "kw": ["mic", "microphone", "call", "calls", "zoom", "meeting"], "attr": "microphone"},
+    "thoai_mai": {"label": "Thoải mái khi dùng lâu", "vi": ["thoải mái", "cầm", "đeo lâu", "mỏi tay", "êm tai", "công thái học"],
+                  "kw": ["comfort", "comfortable", "ergonomic", "fit", "grip", "wrist", "hand", "fits"]},
+    "click_em": {"label": "Tiếng click / gõ êm", "vi": ["click êm", "bấm êm", "gõ êm", "êm", "yên tĩnh", "im lặng", "ít ồn",
+                                                        "tiếng click", "tiếng gõ", "độ ồn"],
+                 "kw": ["quiet", "silent", "noise", "noisy", "loud", "click", "clicky"]},
+    "ben": {"label": "Độ bền", "vi": ["bền", "dùng được lâu", "độ bền"],  # không dùng "dùng lâu": trùng nhãn "Thoải mái khi dùng lâu"
+            "kw": ["durable", "broke", "broken", "stopped working", "sturdy", "lasted", "died", "quit working", "years"]},
+    "go_phim": {"label": "Cảm giác gõ", "vi": ["gõ văn bản", "cảm giác gõ", "đánh máy", "gõ phím", "gõ"],
+                "kw": ["typing", "type", "feel", "keys", "tactile"]},
+    "phim_so": {"label": "Bàn phím số", "vi": ["bàn phím số", "phím số", "numpad"],
+                "kw": ["number pad", "numpad", "numeric keypad", "10-key", "ten key", "number keys"], "attr": "layout"},
+    "chong_on": {"label": "Chống ồn", "vi": ["chống ồn", "khử ồn", "anc"], "kw": ["noise cancel", "anc", "noise-cancel"],
+                 "attr": "anc"},
+    "nho_gon": {"label": "Nhỏ gọn", "vi": ["nhỏ gọn", "gọn nhẹ", "mang đi", "mang theo"],
+                "kw": ["compact", "portable", "small", "travel", "mini"]},
+    "gaming": {"label": "Chơi game", "vi": ["chơi game", "game", "gaming"], "kw": ["gaming", "game", "fps", "latency", "lag"]},
+    "danh_gia": {"label": "Được đánh giá tốt", "vi": ["đánh giá tốt", "rating cao", "nhiều đánh giá", "được đánh giá"], "kw": []},
+}
+PURPOSES = {"học online": "Học online", "học tập": "Học tập", "văn phòng": "Làm việc văn phòng", "làm việc": "Làm việc",
+            "nghe nhạc": "Nghe nhạc", "chơi game": "Chơi game", "gõ văn bản": "Gõ văn bản", "chạy bộ": "Thể thao",
+            "thể thao": "Thể thao", "du lịch": "Du lịch"}
+SOFT_MARKERS_AFTER = ["ưu tiên", "nếu được", "nếu có thể", "càng tốt", "tốt nhất là"]
+SOFT_MARKERS_BEFORE = ["thì tốt", "thì càng tốt", "thì hay", "cũng được", "nếu có"]
+NEGATION = r"(tuyệt đối không|không được|không hỗ trợ|không có|không dùng|không cần|không muốn|không phải|không lấy|loại bỏ|trừ)"
+COUNT_WORDS = {"một": 1, "1": 1, "hai": 2, "2": 2, "ba": 3, "3": 3}
 
 
 def _amount(num, unit):
@@ -86,26 +116,104 @@ def _amount(num, unit):
     return int(v)
 
 
+# Câu gõ KHÔNG DẤU: chỉ áp dụng khi cả câu không có chữ có dấu (tránh đè lên câu có dấu), và chỉ cho cụm không
+# nhập nhằng. Cố ý bỏ "co" đứng một mình ("cơ" / "có" / "cỡ") và "ban phim co".
+UNACCENTED = [
+    ("ban phim so", "bàn phím số"), ("ban phim", "bàn phím"), ("tai nghe", "tai nghe"), ("con chuot", "con chuột"),
+    ("chuot", "chuột"), ("khong day", "không dây"), ("co day", "có dây"), ("chong on", "chống ồn"), ("co mic", "có mic"),
+    ("duoi", "dưới"), ("toi da", "tối đa"), ("khong qua", "không quá"), ("tren", "trên"), ("it nhat", "ít nhất"),
+    ("trieu", "triệu"), ("nghin", "nghìn"), ("ngan", "ngàn"), ("tim", "tìm"), ("goi y", "gợi ý"), ("tu van", "tư vấn"),
+    ("uu tien", "ưu tiên"), ("thoai mai", "thoải mái"), ("click em", "click êm"), ("go em", "gõ êm"), ("ben", "bền"),
+    ("van phong", "văn phòng"), ("hoc online", "học online"), ("hoc tap", "học tập"), ("nghe nhac", "nghe nhạc"),
+    ("choi game", "chơi game"), ("go van ban", "gõ văn bản"), ("am thanh", "âm thanh"), ("so sanh", "so sánh"),
+    ("dat hang", "đặt hàng"), ("thanh toan", "thanh toán"), ("la gi", "là gì"), ("nho gon", "nhỏ gọn"),
+    ("trum tai", "trùm tai"), ("chup tai", "chụp tai"), ("nhet tai", "nhét tai"), ("ap tai", "áp tai"),
+]
+
+
+def _restore_accents(t):
+    if re.search(r"[à-ỹđ]", t):
+        return t
+    for src, dst in sorted(UNACCENTED, key=lambda x: -len(x[0])):
+        t = re.sub(r"(?<![a-z])%s(?![a-z])" % re.escape(src), dst, t)
+    return t
+
+
+def _has(t, words):
+    return any(re.search(r"(?<![a-zà-ỹ])%s(?![a-zà-ỹ])" % re.escape(w), t) for w in words)
+
+
+_BRANDS = {}
+
+
+def _brands():
+    """{tên thường: tên hiển thị} của các hãng trong catalog công bố (bỏ tên quá ngắn / trùng chữ thường)."""
+    if not _BRANDS:
+        for p in catalog.published():
+            b = (p.get("brand") or "").strip()
+            low = b.lower()
+            if (len(low) >= 3 or low in ("hp", "lg")) and low not in BRAND_STOP:
+                _BRANDS.setdefault(low, b)
+    return _BRANDS
+
+
+def _brand_is(p, value):
+    pb, v = (p.get("brand") or "").lower(), (value or "").lower()
+    return pb == v or pb.startswith(v + " ") or v.startswith(pb + " ")
+
+
+def _split_soft(t):
+    """Tách câu thành phần CỨNG và phần MỀM theo dấu hiệu "ưu tiên…", "…thì tốt", "nếu được…"."""
+    hard, soft = [], []
+    for clause in re.split(r"[,.;!?\n]|\bnhưng\b|\btuy nhiên\b", t):
+        clause = clause.strip()
+        if not clause:
+            continue
+        before = [m for m in SOFT_MARKERS_BEFORE if m in clause]
+        if before:
+            soft.append(clause)
+            continue
+        idx = min([clause.find(m) for m in SOFT_MARKERS_AFTER if m in clause] or [-1])
+        if idx >= 0:
+            hard.append(clause[:idx])
+            soft.append(clause[idx:])
+        else:
+            hard.append(clause)
+    return " | ".join(hard), " | ".join(soft)
+
+
+def _soft_order(soft_text):
+    """Ưu tiên mềm theo thứ tự xuất hiện; "A hơn B" → A trước B."""
+    found = []
+    for key, s in SOFT.items():
+        pos = [soft_text.find(w) for w in s["vi"] if _has(soft_text, [w])]
+        if pos:
+            found.append((min(p for p in pos if p >= 0), key))
+    found.sort()
+    return [k for _, k in found]
+
+
 @tool
 def parse_constraints(text: str) -> dict:
-    """parse_constraints — đọc ĐIỀU KIỆN BẮT BUỘC bằng code (không dùng AI).
+    """parse_constraints — đọc ĐIỀU KIỆN BẮT BUỘC và ý định bằng code (không dùng AI).
     Input: tin nhắn người dùng (str).
-    Output: {"categories": [...], "out_of_scope": [...], "min_price": int|None, "max_price": int|None,
-             "tags_hint": [...], "wants_purchase": bool}.
+    Output: {"categories", "out_of_scope", "min_price", "max_price", "hard": [{key, value?, label}], "negated": [...],
+             "soft": [key theo thứ tự ưu tiên], "purpose", "count", "wants_purchase", "fabricate", "explain", "compare",
+             "find", "assume_unknown"}.
     Không tác động ra ngoài."""
-    t = text.lower()
-    cats = [c for c, words in CATEGORY_WORDS.items() if any(w in t for w in words)]
-    oos = [w for w in OUT_OF_SCOPE_WORDS if w in t and not (w == "ipad" and cats)]
+    t = " " + _restore_accents(text.lower().replace("\u00a0", " ")) + " "
+    t = t.replace("cơ bản", "cơbản")  # "bàn phím cơ bản" ≠ bàn phím cơ (dính liền để ranh giới từ không khớp)
+    # "1tr5", "1 triệu 2" → 1,5 / 1,2 triệu (chữ số lẻ ngay sau đơn vị)
+    t = re.sub(r"(\d+)\s*(tr|triệu|củ)\s*(\d)(?![\d.,])", lambda m: " %s.%s triệu " % (m.group(1), m.group(3)), t)
+    cats = [c for c, words in CATEGORY_WORDS.items() if _has(t, words)]
+    oos = [w for w in OUT_OF_SCOPE_WORDS if _has(t, [w]) and not (w in ("ipad", "laptop", "điện thoại") and cats)]
 
     amounts = []
-    # 1tr, 1.5 triệu, 800k, 500 nghìn, 2 củ
     for m in re.finditer(r"(\d+(?:[.,]\d+)?)\s*(triệu|tr|củ|k|nghìn|ngàn)(?![a-zà-ỹ])", t):
         amounts.append(_amount(m.group(1), m.group(2)))
-    # 1.000.000đ, 1,000,000 vnd, 500000
     for m in re.finditer(r"(\d{1,3}(?:[.,]\d{3})+|\d{5,})\s*(đ|vnd|vnđ|đồng)?", t):
         amounts.append(int(re.sub(r"[.,]", "", m.group(1))))
     amounts = sorted(set(a for a in amounts if a >= 10_000))
-
     min_price = max_price = None
     if len(amounts) >= 2:
         min_price, max_price = amounts[0], amounts[-1]
@@ -115,103 +223,367 @@ def parse_constraints(text: str) -> dict:
         else:
             max_price = amounts[0]
 
-    tags = [tag for tag, words in TAG_VOCAB.items() if any(w in t for w in words)]
+    # phủ định: <từ phủ định> … <kết nối> (vd "không dùng Bluetooth", "không có kết nối không dây") → negated
+    negated, t_pos = [], t
+    for m in re.finditer(NEGATION + r"[^,.;|]{0,40}?(kết nối không dây|không dây|wireless|bluetooth|có dây|dây)", t):
+        obj = m.group(2)
+        key = "bluetooth" if obj == "bluetooth" else "wired" if obj in ("có dây", "dây") else "wireless"
+        negated.append(key)
+        t_pos = t_pos.replace(m.group(0), " ")
+    # loại trừ (Shopping Context 7.2): "không lấy nhét tai", "không phải Sony" → điều kiện not_wear / not_brand
+    exclude = []
+    wear_alt = "|".join(re.escape(w) for ws in WEAR_WORDS.values() for w in ws)
+    for m in re.finditer(NEGATION + r"[^,.;|]{0,25}?(%s)" % wear_alt, t_pos):
+        tag = next(k for k, ws in WEAR_WORDS.items() if m.group(2) in ws)
+        exclude.append({"key": "not_wear", "value": tag, "label": "Không lấy loại %s" % WEAR_LABEL[tag].lower()})
+        t_pos = t_pos.replace(m.group(0), " ")
+    brands = _brands()
+    if brands:
+        brand_alt = "|".join(re.escape(b) for b in sorted(brands, key=len, reverse=True))
+        for m in re.finditer(NEGATION + r"[^,.;|]{0,20}?(?<![a-z0-9])(%s)(?![a-z0-9])" % brand_alt, t_pos):
+            exclude.append({"key": "not_brand", "value": brands[m.group(2)], "label": "Không lấy hãng %s" % brands[m.group(2)]})
+            t_pos = t_pos.replace(m.group(0), " ")
+    hard_text, soft_text = _split_soft(t_pos)
+
+    hard = []
+    for key, words in HARD_WORDS.items():
+        if _has(hard_text, words):
+            hard.append({"key": key, "label": HARD_LABEL[key]})
+    for tag, words in WEAR_WORDS.items():
+        if _has(hard_text, words):
+            hard.append({"key": "wear_type", "value": tag, "label": "Kiểu đeo: %s" % WEAR_LABEL[tag]})
+    if brands:
+        for m in re.finditer(r"(?<![a-z0-9])(%s)(?![a-z0-9])" % brand_alt, hard_text):
+            b = brands[m.group(1)]
+            if not any(h.get("value") == b for h in hard):
+                hard.append({"key": "brand", "value": b, "label": "Hãng %s" % b})
+    hard += exclude
+    if any(h["key"] == "bluetooth" for h in hard):
+        hard = [h for h in hard if h["key"] != "wireless" or "không dây" in hard_text.replace("bluetooth", "")]
+    sw = re.search(r"\b(red|brown|blue|yellow|black|đỏ|nâu|xanh|vàng|đen)\s*switch|switch\s*(red|brown|blue|yellow|black|đỏ|nâu|xanh|vàng|đen)\b", t_pos)
+    if sw:
+        color = SWITCH_COLORS[sw.group(1) or sw.group(2)]
+        hard.append({"key": "switch", "value": color, "label": "%s Switch" % color.title()})
+    bat = re.search(r"pin[^,.;|]{0,15}?(ít nhất|tối thiểu|trên|từ|>=?|≥|hơn)\s*(\d{1,4})\s*(giờ|h|tiếng)", t_pos)
+    if bat:
+        hard.append({"key": "battery_min", "value": int(bat.group(2)), "label": "Pin ≥ %s giờ" % bat.group(2)})
+
+    soft = _soft_order(soft_text)
+    if not soft:  # nhu cầu mềm nêu không kèm chữ "ưu tiên" (vd "để gõ văn bản", "nghe nhạc", "dùng được lâu")
+        soft = _soft_order(" ".join(w for w in [hard_text] if w))
+        soft = [k for k in soft if k in ("go_phim", "thoai_mai", "click_em", "ben", "am_thanh", "gaming", "nho_gon")]
+    hard_attrs = {"anc": "anc", "microphone": "microphone", "numpad": "layout", "battery_min": "battery"}
+    taken = {hard_attrs[h["key"]] for h in hard if h["key"] in hard_attrs}
+    soft = [k for k in soft if not SOFT[k].get("attr") or SOFT[k]["attr"] not in taken]
+    purpose = next((v for k, v in PURPOSES.items() if k in t), None)
+    cnt = re.search(r"\b(một|1|hai|2|ba|3)\s+(con|chiếc|mẫu|cái|sản phẩm|lựa chọn|bộ|tai nghe|bàn phím|chuột)\b", t)
+
+    explain = any(re.search(p, t) for p in EXPLAIN_PATTERNS)
+    find = _has(t, FIND_WORDS)
     return {
         "categories": cats,
         "out_of_scope": oos,
         "min_price": min_price,
         "max_price": max_price,
-        "tags_hint": tags,
-        "wants_purchase": any(w in t for w in PURCHASE_WORDS),
+        "hard": hard,
+        "negated": sorted(set(negated)),
+        "soft": soft,
+        "purpose": purpose,
+        "count": COUNT_WORDS[cnt.group(1)] if cnt else None,
+        "wants_purchase": _has(t, PURCHASE_WORDS),
+        "fabricate": any(re.search(p, t) for p in FABRICATE_PATTERNS),
+        "explain": explain and not find,
+        "compare": _has(t, COMPARE_WORDS),
+        "compare_ref": _has(t, COMPARE_REF),
+        "filter_ref": _has(t, FILTER_REF),
+        "question": "?" in text or bool(re.search(r"\bcó\b.{0,40}\b(không|chưa)\s*$|\bbao nhiêu\b|\bthế nào\b|\bra sao\b", t.strip())),
+        "find": find,
+        "assume_unknown": bool(re.search(r"(không ghi|không rõ|chưa rõ|không nêu).{0,40}(mặc định|coi như|cứ cho là|giả sử)", t)),
     }
 
 
-@tool
-def search_products(category: str, max_price: int, min_price: int = 0, tags: list = None, limit: int = 6) -> list:
-    """search_products — tìm sản phẩm trong danh mục theo loại + khoảng giá (lọc cứng) và tag (ưu tiên).
-    Input: category ∈ tai_nghe|chuot|ban_phim, max_price (VND), min_price (VND), tags (list tag phải có), limit.
-    Output: list sản phẩm {product_id, name, price_vnd, tags, specs, rating, rating_count}, xếp theo số tag khớp
-            rồi đến điểm đánh giá. Trả [] nếu không có.
-    Không tác động ra ngoài."""
-    products, _ = _db()
-    tags = tags or []
-    hits = [p for p in products.values()
-            if p["category"] == category
-            and (min_price or 0) <= p["price_vnd"] <= max_price
-            and all(tg in p["tags"] for tg in tags)]
-    hits.sort(key=lambda p: (-(p["rating"] or 0), -p["rating_count"]))
-    return [{k: p[k] for k in ("product_id", "name", "price_vnd", "tags", "specs", "rating", "rating_count")}
-            for p in hits[:limit]]
+# ───────── kiểm điều kiện cứng trên catalog ─────────
+
+def _attr(p, key):
+    return (p.get("attributes") or {}).get(key) or {}
+
+
+def _hours(value):
+    m = re.search(r"(\d+(?:[.,]\d+)?)\s*giờ", str(value or ""))
+    return float(m.group(1).replace(",", ".")) if m else None
+
+
+def check_hard(p, req):
+    """Một điều kiện cứng trên một sản phẩm → {label, result: MATCH|UNKNOWN|MISMATCH, evidence: [mã nguồn], value}."""
+    key = req["key"]
+    out = {"key": key, "label": req["label"], "result": "UNKNOWN", "evidence": [], "value": None}
+    if key in ("bluetooth", "wireless", "wired"):
+        a = _attr(p, "connectivity")
+        if a.get("status") == "VERIFIED":
+            tags = set(a.get("tags") or [])
+            ok = {"bluetooth": "bluetooth" in tags, "wired": "wired" in tags,
+                  "wireless": bool(tags & {"bluetooth", "wireless-2.4"})}[key]
+            out.update(result="MATCH" if ok else "MISMATCH", value=a.get("value"), evidence=[a.get("source")] if a.get("source") else [])
+        else:
+            out.update(value=a.get("note") or a.get("status"))
+        return out
+    if key in ("wear_type", "not_wear"):
+        a = _attr(p, "wear_type")
+        if a.get("status") != "VERIFIED":
+            out["value"] = "chưa xác minh kiểu đeo"
+            return out
+        src = a.get("source")
+        has_tag = req["value"] in (a.get("tags") or [])
+        ok = has_tag if key == "wear_type" else not has_tag
+        # nguồn "categories" (đường dẫn danh mục Amazon) không phải một mã trong evidence → không trích mã
+        out.update(result="MATCH" if ok else "MISMATCH", value=a.get("value"),
+                   evidence=[src] if src and src != "categories" else [])
+        return out
+    if key in ("brand", "not_brand"):
+        b = p.get("brand") or ""
+        if not b:
+            out["value"] = "chưa rõ hãng"
+            return out
+        ev = next((e["id"] for e in p.get("evidence") or [] if e.get("kind") == "detail" and e.get("field") == "Brand"), None)
+        if not ev and b.lower() in (p.get("title") or "").lower():
+            ev = "T"
+        same = _brand_is(p, req["value"])
+        out.update(result="MATCH" if same == (key == "brand") else "MISMATCH", value=b, evidence=[ev] if ev else [])
+        return out
+    if key == "mechanical":  # switch đã xác minh là switch cơ, hoặc tiêu đề ghi "mechanical" (nguồn T)
+        a = _attr(p, "switch")
+        v = str(a.get("value") or "")
+        if a.get("status") == "VERIFIED":
+            mech = not re.search(r"membrane|scissor|màng", v, re.I)
+            out.update(result="MATCH" if mech else "MISMATCH", value=v, evidence=[a.get("source")] if a.get("source") else [])
+        elif re.search(r"\bmechanical\b", p.get("title") or "", re.I):
+            out.update(result="MATCH", value="tiêu đề ghi mechanical", evidence=["T"])
+        else:
+            out["value"] = "chưa xác minh"
+        return out
+    attr_key = {"anc": "anc", "microphone": "microphone", "switch": "switch", "battery_min": "battery", "numpad": "layout"}[key]
+    a = _attr(p, attr_key)
+    if a.get("status") != "VERIFIED":
+        out["value"] = "chưa xác minh" if a.get("status") != "CONFLICT" else "nguồn mâu thuẫn"
+        if a.get("values"):
+            out["evidence"] = [v.get("source") for v in a["values"] if v.get("source")]
+        return out
+    v, src = str(a.get("value") or ""), [a.get("source")] if a.get("source") else []
+    out.update(value=v, evidence=src)
+    if key in ("anc", "microphone"):
+        out["result"] = "MATCH" if v.lower().startswith("có") else "MISMATCH"
+    elif key == "switch":
+        out["result"] = "MATCH" if req["value"] in v.lower() else "MISMATCH"
+    elif key == "numpad":
+        out["result"] = "MATCH" if "full" in (a.get("tags") or []) else "MISMATCH"
+    elif key == "battery_min":
+        h = _hours(v)
+        out["result"] = "UNKNOWN" if h is None else ("MATCH" if h >= req["value"] else "MISMATCH")
+    return out
+
+
+def display_name(p):
+    """Tên ngắn để hiển thị: thương hiệu + model, không lặp thương hiệu (vd "JBL JBL TUNE 500BT" → "JBL TUNE 500BT")."""
+    brand, model = (p.get("brand") or "").strip(), (p.get("model") or "").strip()
+    n = model if brand and model.lower().startswith(brand.lower()) else ("%s %s" % (brand, model)).strip()
+    return n if len(n) <= 70 else n[:69] + "…"
+
+
+def _brief(p):
+    return {k: p.get(k) for k in ("id", "brand", "model", "price_vnd", "price_usd", "rating", "rating_number", "q_score")}
 
 
 @tool
-def cheapest_in_category(category: str) -> dict:
-    """cheapest_in_category — giá thấp nhất hiện có của một loại (để báo khi ngân sách quá thấp).
-    Input: category. Output: {"product_id", "name", "price_vnd"} hoặc {} nếu loại không có.
+def search_catalog(category: str, max_price: int = None, min_price: int = None, hard: list = None) -> dict:
+    """search_catalog — tìm trong catalog đã công bố theo loại + khoảng giá (lọc cứng) + điều kiện cứng đã xác minh.
+    Input: category ∈ headphones|mouse|keyboard, max_price / min_price (VND, None = không lọc), hard (list điều kiện
+           từ parse_constraints).
+    Output: {"matches": [sản phẩm đạt MỌI điều kiện, kèm hard_results], "unverified": [còn điều kiện chưa xác minh],
+             "counts": {category_total, in_budget, mismatch, unverified, matches}, "cheapest": giá thấp nhất của loại,
+             "catalog_version"}. Sản phẩm thiếu giá không được tính là trong ngân sách.
     Không tác động ra ngoài."""
-    products, _ = _db()
-    rows = sorted((p for p in products.values() if p["category"] == category), key=lambda p: p["price_vnd"])
-    return {k: rows[0][k] for k in ("product_id", "name", "price_vnd")} if rows else {}
+    if category not in CATEGORIES:
+        raise ValueError("loại không hỗ trợ: %s" % category)
+    data = catalog.load()
+    items = [p for p in catalog.published(data) if p.get("category") == category]
+    priced = [p for p in items if p.get("price_vnd") is not None]
+    cheapest = min(priced, key=lambda p: p["price_vnd"]) if priced else None
+
+    def in_budget(p):
+        if max_price is None and min_price is None:
+            return True
+        if p.get("price_vnd") is None:
+            return False
+        return (min_price or 0) <= p["price_vnd"] <= (max_price if max_price is not None else 10 ** 12)
+
+    budget = [p for p in items if in_budget(p)]
+    matches, unverified, mismatch = [], [], 0
+    for p in budget:
+        res = [check_hard(p, r) for r in (hard or [])]
+        row = dict(_brief(p), hard_results=res)
+        if any(r["result"] == "MISMATCH" for r in res):
+            mismatch += 1
+        elif any(r["result"] == "UNKNOWN" for r in res):
+            unverified.append(row)
+        else:
+            matches.append(row)
+    matches.sort(key=lambda r: -(r.get("q_score") or 0))
+    unverified.sort(key=lambda r: -(r.get("q_score") or 0))
+    return {
+        "matches": matches,
+        "unverified": unverified,
+        "counts": {"category_total": len(items), "in_budget": len(budget), "mismatch": mismatch,
+                   "unverified": len(unverified), "matches": len(matches)},
+        "cheapest": _brief(cheapest) if cheapest else None,
+        "catalog_version": data.get("catalog_version", "?"),
+    }
+
+
+def _review_hits(p, kws):
+    hits = []
+    for e in p.get("evidence") or []:
+        if e.get("kind") != "review":
+            continue
+        t = ("%s %s" % (e.get("title") or "", e.get("text") or "")).lower()
+        if any(re.search(r"\b%s" % re.escape(k), t) for k in kws):
+            hits.append(e)
+    return hits
 
 
 @tool
-def get_reviews(product_id: str, limit: int = 5) -> list:
-    """get_reviews — lấy đánh giá của một sản phẩm làm bằng chứng.
-    Input: product_id, limit. Output: list {review_id, rating, aspect, text}; [] nếu chưa có đánh giá.
+def get_evidence(product_id: str, soft: list = None, max_reviews: int = 4) -> dict:
+    """get_evidence — bằng chứng của MỘT sản phẩm: thuộc tính đã xác minh, insight review, review theo tiêu chí mềm.
+    Input: product_id (parent_asin trong catalog), soft (list key tiêu chí mềm), max_reviews (số review mỗi tiêu chí).
+    Output: {"id", "name", "price_vnd", "price_usd", "rating", "rating_number", "attributes": {key: {value, source}},
+             "aspects": {soft_key: {pos, neg, n, evidence: [{id, rating, text}]}}, "reviews": [{id, rating, text}]}
+            hoặc {} nếu sản phẩm không có / chưa công bố. Text review rút gọn ≤220 ký tự, giữ nguyên tiếng Anh.
     Không tác động ra ngoài."""
-    _, reviews = _db()
-    rows = [r for r in reviews if r["product_id"] == product_id][:limit]
-    return [{k: r[k] for k in ("review_id", "rating", "aspect", "text")} for r in rows]
+    p = next((x for x in catalog.published() if x["id"] == product_id), None)
+    if not p:
+        return {}
+    short = lambda s: (s or "")[:220] + ("…" if len(s or "") > 220 else "")  # noqa: E731
+    attrs = {k: {"value": a.get("value"), "source": a.get("source")} for k, a in (p.get("attributes") or {}).items()
+             if a.get("status") == "VERIFIED"}
+    aspects = {}
+    for key in soft or []:
+        s = SOFT.get(key)
+        if not s or not s["kw"]:
+            continue
+        hits = _review_hits(p, s["kw"])
+        pos = [e for e in hits if (e.get("rating") or 0) >= 4]
+        neg = [e for e in hits if (e.get("rating") or 0) <= 2]
+        pick = (pos[:2] + neg[:2])[:max_reviews] or hits[:max_reviews]
+        aspects[key] = {"label": s["label"], "n": len(hits), "pos": len(pos), "neg": len(neg),
+                        "evidence": [{"id": e["id"], "rating": e.get("rating"), "text": short(e.get("text"))} for e in pick]}
+    reviews = [e for e in p.get("evidence") or [] if e.get("kind") == "review"]
+    top = sorted(reviews, key=lambda e: -(e.get("helpful") or 0))[:max_reviews]
+    return {"id": p["id"], "name": display_name(p),
+            "title": p.get("title"), "price_vnd": p.get("price_vnd"), "price_usd": p.get("price_usd"),
+            "rating": p.get("rating"), "rating_number": p.get("rating_number"), "q_score": p.get("q_score"),
+            "reviews_collected": len(reviews), "attributes": attrs, "aspects": aspects,
+            "reviews": [{"id": e["id"], "rating": e.get("rating"), "text": short(e.get("text"))} for e in top]}
+
+
+@tool
+def find_product_by_name(text: str) -> dict:
+    """find_product_by_name — tìm sản phẩm cụ thể được nhắc tên trong câu hỏi (vd "JBL TUNE 500BT có mic không?").
+    Input: tin nhắn người dùng. Output: {"id", "name", "category"} của mẫu khớp dài nhất, hoặc {} nếu không chắc.
+    Luật khớp (tránh nhận nhầm): tên model phải có chữ số và dài ≥ 4 ký tự, HOẶC cả hãng lẫn tên model đều có trong câu.
+    Không tác động ra ngoài."""
+    t = " " + re.sub(r"\s+", " ", (text or "").lower()) + " "
+    best, best_len = None, 0
+    for p in catalog.published():
+        model = (p.get("model") or "").lower().strip()
+        brand = (p.get("brand") or "").lower().strip()
+        if len(model) < 4 or not re.search(r"(?<![a-z0-9])%s(?![a-z0-9])" % re.escape(model), t):
+            continue
+        if not re.search(r"\d", model) and not (brand and re.search(r"(?<![a-z0-9])%s(?![a-z0-9])" % re.escape(brand), t)):
+            continue
+        if len(model) > best_len:
+            best, best_len = p, len(model)
+    return {"id": best["id"], "name": display_name(best), "category": best["category"]} if best else {}
 
 
 @tool
 def check_shortlist(shortlist: list, constraints: dict, candidate_ids: list) -> dict:
     """check_shortlist — KIỂM BẰNG CODE danh sách AI đề xuất trước khi đưa cho người dùng.
-    Input: shortlist [{product_id, reason, review_ids}], constraints {category, min_price, max_price},
-           candidate_ids (sản phẩm công cụ đã trả về).
-    Output: {"ok": [mục hợp lệ], "violations": [mô tả lỗi]}. Luật: ≤3 mục · không trùng · có trong danh mục và
-            trong candidate_ids · đúng loại · trong khoảng giá · có ≥1 review_id và mọi review_id thuộc sản phẩm đó.
+    Input: shortlist [{product_id, reason, evidence: [mã R…/D…/F…/T]}], constraints {category, min_price, max_price,
+           hard, count, allowed_evidence?: {product_id: [mã đã đưa cho model]}}, candidate_ids (sản phẩm search_catalog
+           trả về là đạt mọi điều kiện cứng).
+    Output: {"ok": [mục hợp lệ], "violations": [mô tả lỗi]}. Luật: ≤ count (mặc định 3) · không trùng · có trong catalog
+            và trong candidate_ids · đúng loại · trong ngân sách · mọi điều kiện cứng MATCH · có ≥1 mã bằng chứng và mọi mã
+            đều tồn tại trong bằng chứng CỦA CHÍNH sản phẩm đó.
     Không tác động ra ngoài."""
-    products, reviews = _db()
-    owner = {r["review_id"]: r["product_id"] for r in reviews}
+    pub = {p["id"]: p for p in catalog.published()}
+    limit = constraints.get("count") or 3
     ok, bad, seen = [], [], set()
-    for item in shortlist or []:
+    for item in shortlist if isinstance(shortlist, list) else []:
+        if not isinstance(item, dict):  # model trả sai khuôn (chuỗi, số…) → bỏ, không sập
+            bad.append("mục sai khuôn: %r" % (item,))
+            continue
+        evs = item.get("evidence") if isinstance(item.get("evidence"), list) else []
+        item = dict(item, evidence=[e for e in evs if isinstance(e, str)])  # chỉ giữ mã dạng chuỗi
         pid = str(item.get("product_id", ""))
-        p = products.get(pid)
+        p = pub.get(pid)
         why = None
         if pid in seen:
             why = "trùng"
         elif p is None:
-            why = "không có trong danh mục (bịa sản phẩm)"
+            why = "không có trong catalog đã công bố (bịa sản phẩm)"
         elif pid not in candidate_ids:
-            why = "không nằm trong kết quả tìm kiếm"
-        elif p["category"] != constraints.get("category"):
+            why = "không nằm trong kết quả đạt điều kiện"
+        elif p.get("category") != constraints.get("category"):
             why = "sai loại sản phẩm"
-        elif p["price_vnd"] > (constraints.get("max_price") or 0) or p["price_vnd"] < (constraints.get("min_price") or 0):
-            why = "ngoài ngân sách (%d đ)" % p["price_vnd"]
+        elif (constraints.get("max_price") is not None or constraints.get("min_price") is not None) and (
+                p.get("price_vnd") is None or p["price_vnd"] > (constraints.get("max_price") or 10 ** 12)
+                or p["price_vnd"] < (constraints.get("min_price") or 0)):
+            why = "ngoài ngân sách (%s đ)" % p.get("price_vnd")
+        elif any(check_hard(p, r)["result"] != "MATCH" for r in constraints.get("hard") or []):
+            why = "vi phạm / chưa xác minh điều kiện cứng"
         else:
-            rids = item.get("review_ids") or []
-            if not rids:
-                why = "không có bằng chứng đánh giá"
-            elif any(owner.get(r) != pid for r in rids):
-                why = "trích review_id không thuộc sản phẩm"
+            ids = {e["id"] for e in p.get("evidence") or []}
+            ev = [e for e in (item.get("evidence") or []) if isinstance(e, str)]
+            if not ev:
+                why = "không có mã bằng chứng"
+            elif any(e not in ids for e in ev):
+                why = "trích mã bằng chứng không thuộc sản phẩm (%s)" % ", ".join(e for e in ev if e not in ids)
+            elif pid in (constraints.get("allowed_evidence") or {}):
+                allowed = constraints["allowed_evidence"][pid]
+                stray = [e for e in ev if e not in allowed]
+                if stray:  # mã có thật nhưng model không được xem → không đỡ được nhận định: gỡ mã, giữ mục nếu còn mã
+                    item = dict(item, evidence=[e for e in ev if e in allowed])
+                    bad.append("%s: gỡ mã bằng chứng không có trong dữ liệu đã đưa (%s)" % (pid, ", ".join(stray)))
+                    if not item["evidence"]:
+                        why = "không còn mã bằng chứng hợp lệ"
         if why:
             bad.append("%s: %s" % (pid or "?", why))
         else:
             seen.add(pid)
             ok.append(item)
-    if len(ok) > 3:
-        bad.append("quá 3 mục, cắt còn 3")
-        ok = ok[:3]
+    if len(ok) > limit:
+        bad.append("quá %d mục, cắt còn %d" % (limit, limit))
+        ok = ok[:limit]
     return {"ok": ok, "violations": bad}
 
 
-def data_label() -> str:
-    """Nhãn nguồn dữ liệu đang nạp ("synthetic" | "amazon_reviews_2023" | ...) — hàm phụ, không phải công cụ."""
-    labels = {p.get("label", "?") for p in _db()[0].values()}
-    return labels.pop() if len(labels) == 1 else "mixed"
+@tool
+def compare_products(product_ids: list, soft: list = None) -> dict:
+    """compare_products — so sánh 2–3 sản phẩm cùng loại theo cùng bộ tiêu chí (thuộc tính đã xác minh + review).
+    Input: product_ids (2–3 id trong catalog), soft (list key tiêu chí mềm, vd thoai_mai, click_em, ben).
+    Output: {"items": [get_evidence của từng sản phẩm], "rows": [{key, label}], "problems": [...]}.
+            Thiếu bằng chứng cho một tiêu chí thì để n=0 — người gọi phải báo "chưa có dữ liệu", không suy đoán.
+    Không tác động ra ngoài."""
+    base = catalog.compare(product_ids)
+    items = [get_evidence.__wrapped__(p["id"], soft or [], 2) for p in base["items"]]
+    rows = [{"key": k, "label": SOFT[k]["label"]} for k in soft or [] if k in SOFT]
+    return {"items": items, "rows": rows, "attr_rows": base["rows"], "problems": base["problems"]}
+
+
+def catalog_info() -> dict:
+    """Phiên bản / nguồn / tỷ giá của catalog đang nạp — hàm phụ, không phải công cụ."""
+    return catalog.meta()
 
 
 def product(product_id: str) -> dict:
-    """Tra nhanh 1 sản phẩm để in kết quả (hàm phụ, không phải công cụ của agent)."""
-    return _db()[0].get(product_id, {})
+    """Tra nhanh 1 sản phẩm đã công bố (hàm phụ để in kết quả, không phải công cụ của agent)."""
+    return next((x for x in catalog.published() if x["id"] == product_id), {})

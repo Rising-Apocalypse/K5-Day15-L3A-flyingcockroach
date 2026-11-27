@@ -3,28 +3,26 @@
   "url": "https://huggingface.co/datasets/McAuley-Lab/Amazon-Reviews-2023",
   "revision": "2b6d039ed471f2ba5fd2acb718bf33b0a7e5598e",
   "citation": "Hou, Li, He, Yan, Chen, McAuley (2024). Bridging Language and Items for Retrieval and Recommendation. arXiv:2403.03952",
-  "exported_at_utc": "2026-11-27T12:09:48+00:00",
+  "exported_at_utc": "2026-11-27T12:27:13+00:00",
+  "export_version": 2,
   "filters": {
     "metadata_scanned": 100000,
     "reviews_scanned": 2000000,
     "max_reviews_per_product": 20,
-    "min_reviews_per_product": 10,
-    "target_per_category": {
-      "Headphones": 120,
-      "Mouse": 70,
-      "Keyboard": 150
-    },
-    "sample_random_state": 42,
-    "steps": "regex tên/danh mục → leaf category hợp lệ → loại phụ kiện/combo → có giá USD + ảnh + details → đánh giá có chữ, sao 1–5, bỏ trùng → giữ SP có ≥10 đánh giá → lấy mẫu theo loại"
+    "min_reviews_per_product": 5,
+    "sampling": "không lấy mẫu — xuất mọi sản phẩm đạt ngưỡng",
+    "steps": "regex tên/danh mục → leaf category hợp lệ → loại phụ kiện/combo → có giá USD + ảnh + details → đánh giá có chữ, sao 1–5, bỏ trùng → giữ SP có ≥5 đánh giá"
   },
+  "images": "link ảnh trên máy chủ ảnh của Amazon (tối đa 2 / sản phẩm, ưu tiên cỡ large) — chỉ lưu link, không tải file ảnh; bản quyền ảnh thuộc Amazon / người bán",
   "audit_status": "PENDING (chưa kiểm tay is_correct_product / is_accessory / is_combo)",
   "counts": {
-    "products": 197,
-    "reviews": 3475,
+    "products": 441,
+    "products_with_image": 441,
+    "reviews": 6135,
     "products_by_category": {
-      "Headphones": 120,
-      "Mouse": 45,
-      "Keyboard": 32
+      "Headphones": 328,
+      "Mouse": 61,
+      "Keyboard": 52
     }
   },
   "privacy": "đã bỏ user_id; review_id là sha256(parent_asin, asin, user_id, timestamp, text) do notebook tạo"

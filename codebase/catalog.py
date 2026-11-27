@@ -76,8 +76,8 @@ def as_dict(value):
 
 def as_images(value):
     """`images` là list[dict] (JSONL gốc) hoặc dict các list (bản thư viện datasets) → list[dict]."""
-    if isinstance(value, list):
-        return [im for im in value if isinstance(im, dict)]
+    if isinstance(value, list):  # list[dict] (JSONL gốc) hoặc list[str] link ảnh (bản xuất Colab v2)
+        return [im if isinstance(im, dict) else {"large": im} for im in value if isinstance(im, (dict, str)) and im]
     if isinstance(value, dict):
         keys = [k for k in ("thumb", "large", "hi_res", "variant") if isinstance(value.get(k), list)]
         n = max((len(value[k]) for k in keys), default=0)
@@ -124,7 +124,8 @@ mac new upgraded 2023 2022 2021""".split())
 
 def short_name(title, brand):
     """Tên ngắn từ tiêu đề Amazon: ưu tiên token có số (mã model: WH-1000XM4, M720, K2), bỏ chữ chung chung."""
-    t = re.split(r"[,(|–—]| - ", title or "")[0]
+    t = re.sub(r"[\[(][^\])]*[\])]", " ", title or "")      # bỏ cụm trong ngoặc: "[2022 Upgraded]", "(CE)"
+    t = re.split(r"[,(\[|–—]| - ", t)[0]
     if brand and t.lower().startswith(brand.lower()):
         t = t[len(brand):]
     words = [w.strip(".,;:") for w in t.split() if w.strip(".,;:")]
@@ -137,6 +138,20 @@ def short_name(title, brand):
     keep = [w for w in words if w.lower() not in GENERIC and w.lower() not in ("dpi", "mah", "hz")
             and not re.fullmatch(r"\d+(\.\d+)?%?", w)]
     return " ".join((keep or words)[:3]) or (title or "")[:30]
+
+
+def clean_model(model, brand, title):
+    """Model để giao diện in "<brand> <model>": bỏ tên hãng lặp ở đầu ("JBL" + "JBL TUNE 500BT"), bỏ đoạn ngoặc
+    cắt dở ("Pack Apple [Apple"); rỗng / quá dài thì lấy tên ngắn từ tiêu đề."""
+    m = re.split(r"[\[(]", str(model or ""))[0].strip(" -,")
+    if brand and m.lower().startswith(brand.lower() + " "):
+        m = m[len(brand):].strip()
+    if not m or len(m) > 40 or (brand and m.lower() == brand.lower()):
+        m = short_name(title, brand)
+    m = re.split(r"[\[(]| - ", m)[0].strip(" -,")                # tên ngắn từ tiêu đề cũng có thể cắt dở ngoặc
+    if brand and m.lower().startswith(brand.lower() + " "):
+        m = m[len(brand):].strip()
+    return m or (title or "")[:30]
 
 
 def _hist(reviews):
@@ -197,7 +212,7 @@ def normalize(raw):
         "category": sb.get("category"),
         "brand": brand,
         "store": raw.get("store") or "",
-        "model": sb.get("model") or details.get("Model Name") or short_name(raw.get("title"), brand),
+        "model": clean_model(sb.get("model") or details.get("Model Name"), brand, raw.get("title")),
         "title": raw.get("title") or "",
         "main_category": raw.get("main_category") or "",
         "categories": raw.get("categories") or [],
