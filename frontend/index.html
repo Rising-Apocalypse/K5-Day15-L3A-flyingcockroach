@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="vi" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>SmartBuy — spec//lab · nghiên cứu trước khi mua gear</title>
+  <meta name="description" content="Trợ lý nghiên cứu tai nghe, chuột, bàn phím trên dữ liệu Amazon Reviews 2023: tối đa ba lựa chọn, có lý do, đánh đổi và nguồn.">
+  <meta name="theme-color" content="#0A0B0D">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230A0B0D'/%3E%3Crect x='9' y='9' width='14' height='14' rx='2' fill='%23FF6B2C'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Chakra+Petch:wght@500;600;700&family=Doto:ROND,wght@0..100,500..900&family=JetBrains+Mono:wght@400..700&display=swap">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/app.css">
+  <script>
+    /* Tối là mặc định (dân công nghệ); nhớ lựa chọn của người dùng. Đặt trước khi vẽ để không nháy. */
+    (function () {
+      var t = "dark";
+      try { t = localStorage.getItem("smartbuy.theme") || "dark"; } catch (e) {}
+      document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
+  <script type="module" src="js/main.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Bỏ qua, tới nội dung chính</a>
+
+  <div class="app" id="app">
+    <header class="topbar">
+      <div class="brand">
+        <a class="wordmark" href="#/" aria-label="SmartBuy — về danh mục"><span class="wordmark__mark" aria-hidden="true"></span>SmartBuy</a>
+        <span class="brand__tag" aria-hidden="true">spec<span class="slash">//</span>lab</span>
+      </div>
+
+      <nav class="views" id="views" aria-label="Khu vực làm việc"></nav>
+
+      <form class="search" role="search" id="search-form" autocomplete="off">
+        <label class="visually-hidden" for="q">Lọc danh mục theo tên, thương hiệu, ASIN</label>
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input class="input" id="q" type="search" placeholder="Lọc tên, hãng, ASIN…" enterkeyhint="search">
+        <span class="search__keys"><button type="button" data-action="open-palette" aria-label="Mở bảng lệnh"><kbd data-mod>Ctrl</kbd><kbd>K</kbd></button></span>
+      </form>
+
+      <div class="tools" id="tools"></div>
+    </header>
+
+    <div class="workspace" id="workspace">
+      <aside class="filters" id="filters" aria-label="Bộ lọc danh mục"></aside>
+      <main class="stage" id="main" tabindex="-1"></main>
+      <aside class="agent" id="agent" aria-label="Trợ lý nghiên cứu"></aside>
+    </div>
+
+    <nav class="tabbar" id="tabbar" aria-label="Điều hướng chính"></nav>
+  </div>
+
+  <div id="tray-root"></div>
+  <div id="layer-root"></div>
+  <div class="toasts" id="toasts" role="status" aria-live="polite" aria-atomic="false"></div>
+  <div class="visually-hidden" id="announcer" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <noscript>
+    <p style="padding:24px;font:16px/1.5 system-ui;color:#ECEDEF;background:#0A0B0D">SmartBuy cần JavaScript để chạy. Bật JavaScript rồi tải lại trang.</p>
+  </noscript>
+</body>
+</html>
