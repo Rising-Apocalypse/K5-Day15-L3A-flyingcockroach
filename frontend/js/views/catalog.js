@@ -2,7 +2,7 @@
 import { state, emit, save, DEFAULT_FILTERS, activeFilterCount } from "../store.js";
 import { api } from "../api.js";
 import { html, render, announce } from "../util.js";
-import { icon } from "../icons.js";
+import { icon, categoryIcon } from "../icons.js";
 import { plate } from "../plates.js";
 import * as fmt from "../fmt.js";
 import { priceBlock, stars, specToken, segm, CARD_KEYS, SHORT, ledFor, attrLabel, catLabel, fxInfo, emptyState, errorNotice } from "../parts.js";
@@ -17,11 +17,11 @@ const PRESETS = [
   { label: ">2tr", min: 2000000, max: null },
 ];
 const SORTS = [
-  ["relevance", "sort: Q (Bayes)"],
-  ["price_asc", "sort: giá ↑"],
-  ["price_desc", "sort: giá ↓"],
-  ["rating", "sort: sao ↓"],
-  ["reviews", "sort: lượt đánh giá ↓"],
+  ["relevance", "Độ phù hợp"],
+  ["price_asc", "Giá tăng dần"],
+  ["price_desc", "Giá giảm dần"],
+  ["rating", "Số sao cao nhất"],
+  ["reviews", "Nhiều đánh giá"],
 ];
 const pad2 = (n) => (n == null ? "—" : String(n).padStart(2, "0"));
 const pct = (x) => (x == null || !isFinite(x) ? "—" : Math.round(x * 100) + "%");
@@ -84,18 +84,23 @@ function catMeta() {
 function masthead() {
   const meta = catMeta();
   const cats = (meta && meta.categories) || { headphones: { label: "Tai nghe" }, mouse: { label: "Chuột" }, keyboard: { label: "Bàn phím" } };
-  const ds = (meta && meta.dataset) || {};
   return html`<header class="cat-head">
-    <div class="cat-head__meta">
-      <span class="kicker"><span class="slash">//</span> 01 catalog · <b>${ds.dataset || "dataset"}</b>${meta ? html` · ${meta.version} · ${meta.published} items` : ""}</span>
-      ${meta && meta.synthetic ? html`<button class="data-flag" data-action="explain-data">${icon("alert")} demo data</button>` : ""}
+    <div class="catalog-intro">
+      <div><h1>Khám phá sản phẩm</h1><p>Tìm thiết bị phù hợp qua thông số và đánh giá từ Amazon.</p></div>
+      <button type="button" class="btn advisor-cta" data-action="focus-agent">${icon("sparkles")}Hỏi trợ lý</button>
     </div>
+    <section class="catalog-controls" aria-label="Tìm kiếm và chọn ngành hàng">
+      <form class="catalog-search" role="search" id="search-form">
+        ${icon("search", { size: 20 })}
+        <input id="q" type="search" aria-label="Lọc danh mục theo tên, thương hiệu, ASIN" placeholder="Tìm tên sản phẩm, thương hiệu hoặc ASIN…" value="${state.filters.q}" autocomplete="off" enterkeyhint="search">
+        <kbd aria-hidden="true">/</kbd>
+      </form>
     <div class="keycaps" role="group" aria-label="Ngành hàng — phím tắt 1, 2, 3">
       ${Object.entries(cats).map(([k, c], i) => html`<button class="keycap" aria-pressed="${k === state.category ? "true" : "false"}" data-action="set-category" data-cat="${k}" aria-keyshortcuts="${i + 1}">
-        <span class="keycap__legend" aria-hidden="true">${i + 1}</span><span class="led" aria-hidden="true"></span>
+        <span class="keycap__icon">${icon(categoryIcon(k), { size: 22 })}</span>
         <span class="keycap__name">${c.label}</span><span class="keycap__count" data-count="${k}">${c.count != null ? pad2(c.count) : ""}</span></button>`)}
     </div>
-    <p class="cat-head__deck">Thông số trích từ <span class="mono">details</span> / <span class="mono">features</span> của Amazon, có mã nguồn và trạng thái kiểm định. Muốn nhanh hơn: <button type="button" data-action="focus-agent">giao nhu cầu cho agent</button> — nó trả tối đa 3 lựa chọn kèm lý do và trích dẫn.</p>
+    </section>
     <div class="kpis" data-kpis>${kpis()}</div>
   </header>`;
 }
@@ -122,12 +127,15 @@ function kpis() {
   items.forEach((p) => Object.values(p.attributes || {}).forEach((a) => { tot++; if (a.status === "VERIFIED") ver++; }));
   const prices = items.map((p) => p.price_vnd).filter((v) => v != null).sort((a, b) => a - b);
   const mid = prices.length ? (prices.length % 2 ? prices[(prices.length - 1) / 2] : (prices[prices.length / 2 - 1] + prices[prices.length / 2]) / 2) : null;
-  const tile = (label, value, sub, title = "") => html`<div class="kpi" title="${title}"><span class="kicker">${label}</span><span class="kpi__v led-num">${value}</span><span class="kpi__s">${sub}</span></div>`;
+  const tile = (symbol, label, value, sub, title = "") => html`<div class="kpi kpi--${symbol}" title="${title || sub}">
+    <span class="metric-icon">${icon(symbol, { size: 23 })}</span>
+    <div><strong class="kpi__v led-num">${value}</strong><span class="kpi__label">${label}</span><span class="visually-hidden">${sub}</span></div>
+  </div>`;
   return [
-    tile("items", pad2(n), `/ ${d.category_total} trong ngành`),
-    tile("có review", pad2(withRev), n ? `${pct(withRev / n)} số item` : "—"),
-    tile("spec verified", tot ? pct(ver / tot) : "—", `${ver}/${tot} trường`, "Tỉ lệ thông số có trạng thái VERIFIED (có nguồn)"),
-    tile("giá trung vị", mid != null ? fmt.vndShort(mid).replace(" ", "") : "—", prices.length < n ? `${n - prices.length} price: null` : "≈ từ USD"),
+    tile("grid", "Sản phẩm", pad2(n), `/ ${d.category_total} trong ngành`),
+    tile("message", "Có đánh giá", pad2(withRev), n ? `${pct(withRev / n)} số item` : "—"),
+    tile("shield", "Thông số xác minh", tot ? pct(ver / tot) : "—", `${ver}/${tot} trường`, "Tỉ lệ thông số có trạng thái VERIFIED (có nguồn)"),
+    tile("wallet", "Giá trung vị", mid != null ? fmt.vndShort(mid).replace(" ", "") : "—", prices.length < n ? `${n - prices.length} price: null` : "≈ từ USD"),
   ];
 }
 
@@ -162,12 +170,14 @@ function toolbar() {
   const n = activeFilterCount();
   const chips = activeChips();
   const mode = state.catalogView === "table" ? "table" : "grid";
+  const meta = catMeta();
   const count = d
-    ? html`<p class="toolbar__count"><b>${d.total}</b>${d.total === d.category_total ? " items" : html` / ${d.category_total} khớp`}</p>`
+    ? html`<h2 class="toolbar__count">${catLabel(state.category)} <span>${d.total}</span></h2>`
     : html`<p class="toolbar__count"><span class="skel" style="display:inline-block;width:90px;height:16px"></span></p>`;
   return html`<div class="toolbar">
     ${count}
-    <div class="toolbar__chips">${chips}${chips.length > 1 ? html`<button class="btn btn--quiet btn--sm" data-action="clear-filters">clear all</button>` : ""}</div>
+    ${meta?.synthetic ? html`<button class="data-flag" data-action="explain-data">${icon("info")}Dữ liệu minh họa</button>` : ""}
+    <div class="toolbar__chips">${chips}${chips.length > 1 ? html`<button class="btn btn--quiet btn--sm" data-action="clear-filters">Xóa bộ lọc</button>` : ""}</div>
     <div class="toolbar__right">
       <button class="btn btn--sm filters-open" data-action="open-filters" aria-label="Mở bộ lọc${n ? `, đang dùng ${n}` : ""}">${icon("sliders", { size: 15 })} Lọc ${n ? html`<span class="badge">${n}</span>` : ""}</button>
       <div class="seg" role="group" aria-label="Kiểu hiển thị">
@@ -224,23 +234,24 @@ export function card(p, i = 0) {
   const keys = CARD_KEYS[p.category] || [];
   const name = `${p.brand} ${p.model}`;
   return html`<article class="card" style="--i:${Math.min(i, 12)}">
-    ${plate(p)}
-    <div class="card__actions">
-      <button class="toggle-compare" data-action="toggle-compare" data-id="${p.id}" aria-pressed="${inCmp ? "true" : "false"}" aria-label="${inCmp ? "Bỏ khỏi so sánh" : "Thêm vào so sánh"}: ${name}">
-        ${icon(inCmp ? "check" : "plus")}<span class="lbl">${inCmp ? "đã chọn" : "so sánh"}</span>
-      </button>
+    <div class="product-heading">
+      ${plate(p, { variant: "thumb" })}
+      <div><span class="card__store">${p.brand}</span><h3 class="card__title"><a href="#/sp/${p.id}">${p.model}</a></h3></div>
+      ${icon("chevron-right", { size: 16 })}
     </div>
     <div class="card__body">
-      <span class="card__store">${p.brand} · ${p.id}</span>
-      <h3 class="card__title"><a href="#/sp/${p.id}">${p.model}</a></h3>
-      <p class="card__listing">${p.title}</p>
       <div class="specs">${keys.map((k) => specToken(p, k))}</div>
     </div>
     <div class="card__foot">
       ${priceBlock(p)}
       <div class="card__rating">${stars(p.rating, p.rating_number)}<small>${fmt.int(p.rating_number)} lượt</small></div>
     </div>
-    <button class="card__ask" data-action="ask-product" data-id="${p.id}" aria-label="Hỏi agent về ${name}">${icon("terminal")}ask agent<span class="ask-more"> về mẫu này</span></button>
+    <div class="product-actions">
+      <button class="toggle-compare" data-action="toggle-compare" data-id="${p.id}" aria-pressed="${String(inCmp)}" aria-label="${inCmp ? "Bỏ khỏi so sánh" : "Thêm vào so sánh"}: ${name}">
+        ${icon(inCmp ? "check" : "plus")}<span>${inCmp ? "Đã chọn" : "So sánh"}</span>
+      </button>
+      <button class="card__ask" data-action="ask-product" data-id="${p.id}" aria-label="Hỏi trợ lý về ${name}">${icon("sparkles")}Hỏi trợ lý</button>
+    </div>
   </article>`;
 }
 
@@ -309,12 +320,12 @@ export function filtersHtml(prefix = "f") {
   const gate = d && d.gate != null ? d.gate : 0.8;
   return html`
     <div class="filters__head">
-      <h2 class="filters__title">Bộ lọc</h2>
+      <h2 class="filters__title">${icon("sliders", { size: 17 })}Bộ lọc</h2>
       ${activeFilterCount() ? html`<button class="btn btn--quiet btn--sm" data-action="clear-filters">reset</button>` : ""}
     </div>
 
     <section class="fgroup" aria-labelledby="${prefix}-price">
-      <div class="fgroup__title"><h3 class="kicker kicker--ink" id="${prefix}-price">ngân sách</h3><span class="kicker">VNĐ</span></div>
+      <div class="fgroup__title"><h3 class="kicker kicker--ink" id="${prefix}-price">${icon("wallet", { size: 15 })}Ngân sách</h3><span class="kicker">VNĐ</span></div>
       <div class="presets" role="group" aria-label="Khoảng giá nhanh">
         ${PRESETS.map((p, i) => html`<button type="button" class="preset" aria-pressed="${presetOn(p) ? "true" : "false"}" data-action="price-preset" data-i="${i}">${p.label}</button>`)}
       </div>
@@ -330,7 +341,7 @@ export function filtersHtml(prefix = "f") {
     </section>
 
     <section class="fgroup" aria-labelledby="${prefix}-brand">
-      <div class="fgroup__title"><h3 class="kicker kicker--ink" id="${prefix}-brand">store / brand</h3></div>
+      <div class="fgroup__title"><h3 class="kicker kicker--ink" id="${prefix}-brand">${icon("layers", { size: 15 })}Thương hiệu</h3></div>
       ${brands.length ? brands.map((b) => html`<label class="check ${b.count === 0 && !f.brands.includes(b.name) ? "check--zero" : ""}">
           <input type="checkbox" data-change="brand" value="${b.name}" ${f.brands.includes(b.name) ? "checked" : ""}>
           <span>${b.name}</span><span class="check__count">${b.count}</span></label>`)
@@ -338,7 +349,7 @@ export function filtersHtml(prefix = "f") {
     </section>
 
     <section class="fgroup" aria-labelledby="${prefix}-rating">
-      <div class="fgroup__title"><h3 class="kicker kicker--ink" id="${prefix}-rating">average_rating</h3></div>
+      <div class="fgroup__title"><h3 class="kicker kicker--ink" id="${prefix}-rating">${icon("star", { size: 15 })}Đánh giá</h3></div>
       <div class="seg" role="group" aria-labelledby="${prefix}-rating">
         ${[[null, "all"], [4, "≥4.0"], [4.5, "≥4.5"]].map(([v, l]) => html`<button type="button" aria-pressed="${(f.minRating || null) === v ? "true" : "false"}" data-action="set-rating" data-v="${v == null ? "" : v}">${l}</button>`)}
       </div>

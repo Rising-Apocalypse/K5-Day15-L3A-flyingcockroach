@@ -118,7 +118,7 @@ export function updateHead() {
   const m = h && h.model;
   render(el, html`
     <div>
-      <h2 class="agent__title">Agent <em>// research</em></h2>
+      <h2 class="agent__title">${icon("sparkles", { size: 20 })}Agent <em>// research</em></h2>
       <p class="agent__sub">
         ${statePill(currentState())}
         ${m ? (m.fake

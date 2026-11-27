@@ -19,7 +19,6 @@ import { openTrace } from "./views/trace.js";
 import { openPalette } from "./palette.js";
 
 const stage = () => document.getElementById("main");
-const mqTablet = matchMedia("(max-width: 1100px)");
 const mqMobile = matchMedia("(max-width: 767px)");
 const isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
 const CATS = ["headphones", "mouse", "keyboard"];
@@ -51,7 +50,7 @@ function onHash() {
 function route() {
   const r = parse();
   if (r.product) {
-    if (state.agentOpen && mqMobile.matches) closeAgent();
+    if (state.agentOpen) closeAgent();
     openProduct(r.product, { onClose: (reason) => { if (reason !== "route" && reason !== "replace") leaveProduct(); } });
     if (!stage().childElementCount) setView("catalog", { quiet: true });
     return;
@@ -61,10 +60,9 @@ function route() {
   if (r.view === "agent") {
     if (!stage().childElementCount) setView(state.view || "catalog", { quiet: true });
     focusComposer();
-    if (!mqTablet.matches) history.replaceState(null, "", lastViewHash);
     return;
   }
-  if (state.agentOpen && mqMobile.matches) closeAgent();
+  if (state.agentOpen) closeAgent();
   lastViewHash = location.hash || "#/";
   setView(r.view);
 }
@@ -95,32 +93,26 @@ function setView(view, { quiet = false } = {}) {
 /* ───────── Vùng cố định ───────── */
 function renderChrome() {
   const rep = latestReport();
-  const cur = (v) => (state.view === v && !(state.agentOpen && mqMobile.matches) ? html`aria-current="page"` : "");
-  render($("#views"), html`
-    <a href="#/" ${cur("catalog")}><span class="n">01</span>Danh mục</a>
-    <a href="#/bao-cao" ${cur("report")}><span class="n">02</span>Báo cáo${rep ? html`<span class="badge badge--dot" title="Có báo cáo"></span><span class="visually-hidden">(có báo cáo)</span>` : ""}</a>
-    <a href="#/so-sanh" ${cur("compare")}><span class="n">03</span>So sánh${state.compare.length ? html`<span class="badge">${state.compare.length}</span><span class="visually-hidden">sản phẩm</span>` : ""}</a>`);
-  const dark = document.documentElement.getAttribute("data-theme") !== "light";
+  const agentOn = state.agentOpen;
+  const navLink = (view, href, symbol, label, badge = "") => html`<a href="${href}" title="${label}" ${!agentOn && state.view === view ? html`aria-current="page"` : ""}>${icon(symbol)}<span>${label}</span>${badge}</a>`;
+  const catalog = navLink("catalog", "#/", "grid", "Danh mục");
+  const report = navLink("report", "#/bao-cao", "report", "Báo cáo", rep ? html`<span class="badge badge--dot" aria-label="Có báo cáo"></span>` : "");
+  const compare = navLink("compare", "#/so-sanh", "columns", "So sánh", state.compare.length ? html`<span class="badge">${state.compare.length}</span>` : "");
+  const agent = html`<a href="#/tro-ly" data-action="tab-agent" aria-controls="agent" aria-expanded="${String(agentOn)}" title="Trợ lý" ${agentOn ? html`aria-current="page"` : ""}>${icon("sparkles")}<span>Trợ lý</span></a>`;
+  render($("#views"), html`${catalog}${agent}${compare}${report}`);
+  render($("#tabbar"), html`${catalog}${agent}${compare}${report}`);
+
+  const dark = document.documentElement.dataset.theme !== "light";
   render($("#tools"), html`
-    <button class="btn btn--quiet btn--sm session-btn" data-action="session-menu" aria-haspopup="dialog" aria-label="Phiên ẩn danh ${state.session.id}">${icon("clock", { size: 14 })}<span class="lbl">${state.session.id}</span></button>
+    <button class="icon-btn" data-action="toggle-theme" aria-label="${dark ? "Chuyển sang giao diện sáng" : "Chuyển sang giao diện tối"}" title="Đổi giao diện">${icon(dark ? "sun" : "moon")}</button>
     <button class="icon-btn" data-action="shortcuts" aria-label="Phím tắt" title="Phím tắt (?)">${icon("keyboardkey")}</button>
-    <button class="icon-btn" data-action="toggle-theme" aria-label="${dark ? "Chuyển sang giao diện sáng" : "Chuyển sang giao diện tối"}">${icon(dark ? "sun" : "moon")}</button>
-    <button class="btn btn--sm btn--pen agent-toggle" data-action="toggle-agent" aria-expanded="${state.agentOpen ? "true" : "false"}" aria-controls="agent">${icon("terminal", { size: 14 })} Agent</button>`);
-  const agentOn = state.agentOpen && mqMobile.matches;
-  const tcur = (v) => (!agentOn && state.view === v ? html`aria-current="page"` : "");
-  render($("#tabbar"), html`
-    <a href="#/" ${tcur("catalog")}>${icon("grid")}Catalog</a>
-    <a href="#/tro-ly" ${agentOn ? html`aria-current="page"` : ""} data-action="tab-agent">${icon("terminal")}Agent</a>
-    <a href="#/bao-cao" ${tcur("report")}>${icon("report")}Report${rep ? html`<span class="badge badge--dot"></span>` : ""}</a>
-    <a href="#/so-sanh" ${tcur("compare")}>${icon("columns")}Diff${state.compare.length ? html`<span class="badge">${state.compare.length}</span>` : ""}</a>`);
-  const tray = state.view === "catalog" && !(state.agentOpen && mqMobile.matches) ? trayHtml() : "";
+    <button class="icon-btn profile-button" data-action="session-menu" aria-haspopup="dialog" aria-label="Phiên ẩn danh ${state.session.id}" title="Phiên làm việc">${icon("user")}</button>`);
+  const tray = state.view === "catalog" && !agentOn ? trayHtml() : "";
   render($("#tray-root"), tray);
   document.body.classList.toggle("has-tray", !!(tray && tray.s));
 }
 
 function renderFilters() {
-  const docked = $("#filters");
-  if (docked) render(docked, filtersHtml("f"));
   if (filtersLayer && !filtersLayer.closed) {
     const holder = filtersLayer.body.querySelector("[data-filters]");
     if (holder) render(holder, filtersHtml("fd"));
@@ -138,8 +130,9 @@ function openFiltersDrawer() {
 function syncAgentOpen() {
   const app = $("#app");
   app.classList.toggle("agent-open", state.agentOpen);
+  for (const el of app.querySelectorAll(".sidebar, .topbar, .stage")) el.inert = state.agentOpen;
   let scrim = $(".agent-scrim");
-  if (state.agentOpen && mqTablet.matches && !mqMobile.matches) {
+  if (state.agentOpen && !mqMobile.matches) {
     if (!scrim) {
       scrim = document.createElement("div");
       scrim.className = "agent-scrim";
@@ -147,8 +140,11 @@ function syncAgentOpen() {
       app.appendChild(scrim);
     }
   } else if (scrim) scrim.remove();
-  if (state.agentOpen && mqTablet.matches) requestAnimationFrame(() => { const t = $("#ask-input"); if (t) t.focus({ preventScroll: true }); });
+  if (state.agentOpen) requestAnimationFrame(() => { const t = $("#ask-input"); if (t) t.focus({ preventScroll: true }); });
   renderChrome();
+  if (!state.agentOpen && document.activeElement?.closest("#agent")) {
+    $(mqMobile.matches ? "#tabbar [data-action='tab-agent']" : "#views [data-action='tab-agent']")?.focus();
+  }
 }
 
 /* ───────── Giao diện sáng / tối ───────── */
@@ -158,7 +154,7 @@ function toggleTheme() {
   document.documentElement.setAttribute("data-theme", next);
   try { localStorage.setItem("smartbuy.theme", next); } catch (e) { /* bỏ qua */ }
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute("content", next === "dark" ? "#0A0B0D" : "#F3F4F6");
+  if (meta) meta.setAttribute("content", next === "dark" ? "#0e192d" : "#f2f5fa");
   renderChrome();
   announce(next === "dark" ? "Đã chuyển sang giao diện tối" : "Đã chuyển sang giao diện sáng");
 }
@@ -320,12 +316,12 @@ const actions = {
     const ids = (el.dataset.ids || "").split(",").filter(Boolean).slice(0, 3);
     if (ids.length < 2) { toast("Cần ít nhất 2 lựa chọn để so sánh."); return; }
     state.compare = ids; save(); emit("compare");
-    if (state.agentOpen && mqTablet.matches) closeAgent();
+    if (state.agentOpen) closeAgent();
     location.hash = "#/so-sanh";
   },
   "open-report": (el) => {
     const focusId = el.dataset.focus;
-    if (state.agentOpen && mqTablet.matches) closeAgent();
+    if (state.agentOpen) closeAgent();
     if (state.view === "report" && location.hash === "#/bao-cao") mountReport(stage(), { focusId });
     else { location.hash = "#/bao-cao"; if (focusId) setTimeout(() => mountReport(stage(), { focusId }), 30); }
   },
@@ -334,9 +330,9 @@ const actions = {
   "play-scenario": (el) => playScenario(el.dataset.key),
   "choose-change": (el) => chooseChange(el.dataset.msg, el.dataset.key),
   "retry-last": () => retryLast(),
-  "browse-catalog": () => { if (state.agentOpen && mqTablet.matches) closeAgent(); location.hash = "#/"; },
+  "browse-catalog": () => { if (state.agentOpen) closeAgent(); location.hash = "#/"; },
   "browse-bt": () => {
-    if (state.agentOpen && mqTablet.matches) closeAgent();
+    if (state.agentOpen) closeAgent();
     if (state.category !== "headphones") setCategory("headphones");
     state.filters.attrs = { ...state.filters.attrs, connectivity: ["bluetooth"] };
     applyFilters();
@@ -358,6 +354,7 @@ const actions = {
 };
 
 document.addEventListener("click", (e) => {
+  if (state.agentOpen && e.target.closest("#tabbar a:not([data-action])")) closeAgent();
   const el = e.target.closest("[data-action]");
   if (!el || el.disabled || (el.getAttribute("aria-disabled") === "true" && el.dataset.action !== "need-more")) return;
   // Hàng bảng bấm được, nhưng liên kết / nút bên trong tự xử lý.
@@ -412,12 +409,18 @@ document.addEventListener("keydown", (e) => {
   }
   if (e.key === "Escape") {
     if (closeTop()) { e.preventDefault(); return; }
-    if (state.agentOpen && mqTablet.matches) { closeAgent(); e.preventDefault(); return; }
+    if (state.agentOpen) { closeAgent(); e.preventDefault(); return; }
     if (a && a.id === "q" && state.filters.q) actions["clear-q"]();
     return;
   }
   if (typing || hasLayers() || e.metaKey || e.ctrlKey || e.altKey) return;
-  if (e.key === "/") { e.preventDefault(); const q = $("#q"); if (q) q.focus(); return; }
+  if (e.key === "/") {
+    e.preventDefault();
+    if (state.agentOpen) closeAgent();
+    if (state.view !== "catalog") location.hash = "#/";
+    requestAnimationFrame(() => $("#q")?.focus());
+    return;
+  }
   if (e.key === "?") { e.preventDefault(); openShortcuts(); return; }
   if (["1", "2", "3"].includes(e.key)) {
     if (state.view !== "catalog") location.hash = "#/";
@@ -432,16 +435,21 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
-/* Ô lọc trên thanh trên cùng */
+/* Ô tìm sản phẩm trong danh mục */
 const searchNow = () => {
-  const v = $("#q").value.trim();
+  const q = $("#q");
+  if (!q) return;
+  const v = q.value.trim();
   if (v === state.filters.q) return;
   state.filters.q = v;
   if (state.view !== "catalog") location.hash = "#/";
   applyFilters();
 };
-$("#q").addEventListener("input", debounce(searchNow, 260));
-$("#search-form").addEventListener("submit", (e) => { e.preventDefault(); e.stopPropagation(); searchNow(); });
+const scheduleSearch = debounce(searchNow, 260);
+document.addEventListener("input", (e) => { if (e.target.id === "q") scheduleSearch(); });
+document.addEventListener("submit", (e) => {
+  if (e.target.id === "search-form") { e.preventDefault(); searchNow(); }
+});
 
 /* ───────── Đồng bộ khi trạng thái đổi ───────── */
 on("catalog", () => {
@@ -472,7 +480,6 @@ on("health", () => {
   updateThread();
   if (state.view === "catalog") updateCatalog();
 });
-mqTablet.addEventListener("change", syncAgentOpen);
 mqMobile.addEventListener("change", syncAgentOpen);
 
 async function loadHealth(retry = true) {

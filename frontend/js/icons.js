@@ -2,6 +2,9 @@
 import { raw, esc } from "./util.js";
 
 const P = {
+  user: '<circle cx="12" cy="12" r="9.3"/><circle cx="12" cy="9" r="2.8"/><path d="M6.4 18.9a5.8 5.8 0 0 1 11.2 0"/>',
+  wallet: '<path d="M20 8V5a2 2 0 0 0-2-2H6a3 3 0 0 0 0 6h14v11H6a3 3 0 0 1-3-3V6"/><path d="M20 12h-4a2 2 0 0 0 0 4h4M16 14h.01"/>',
+  sparkles: '<path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5ZM20 2v4M18 4h4"/>',
   search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
   x: '<path d="M18 6 6 18M6 6l12 12"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',

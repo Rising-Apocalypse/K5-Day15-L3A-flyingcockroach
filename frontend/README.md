@@ -12,7 +12,7 @@ python codebase/web.py --port 8765
 python codebase/web.py --open     # tự mở trình duyệt
 ```
 
-Font (Newsreader, Be Vietnam Pro, IBM Plex Mono) tải từ Google Fonts. Nếu máy demo mất mạng, giao diện tự dùng font hệ thống thay thế.
+Font Be Vietnam Pro được dùng thống nhất cho tiêu đề, nội dung, nhãn và số liệu, tải từ Google Fonts. Nếu máy demo mất mạng, giao diện tự dùng font hệ thống thay thế. Icon SVG cùng bộ nét; hiệu ứng nhẹ và tôn trọng `prefers-reduced-motion`.
 
 ## Phần nào thật, phần nào minh họa
 
@@ -105,12 +105,12 @@ Cùng khuôn với `frontend/demo/catalog.synthetic.json`:
 
 ## Design system
 
-Ẩn dụ: **bàn làm việc của người nghiên cứu**. Giấy ấm, chữ mực, bút xanh cho lời của trợ lý, bút dạ quang cho điểm nhấn. Không gradient tím, không glassmorphism, không icon ✨ cho AI.
+Danh mục mặc định dùng nền xanh pastel, chữ navy, nút xanh cobalt và thẻ trắng bán trong suốt. Trên điện thoại, thanh điều hướng chuyển từ cạnh trái xuống cuối màn hình. Bộ lọc và trợ lý mở theo yêu cầu.
 
 | | |
 |---|---|
-| Chữ | **Newsreader** (tiêu đề, lời trợ lý) · **Be Vietnam Pro** (giao diện, dấu tiếng Việt chuẩn) · **IBM Plex Mono** (mã, số liệu, nhãn) |
-| Màu | Token trong `css/tokens.css`, có chế độ sáng và tối "đọc đêm". Mọi cặp chữ/nền đã đo **≥ 4,5:1** |
+| Chữ | **Be Vietnam Pro** cho toàn bộ giao diện; phân cấp bằng cỡ và độ đậm, số liệu dùng tabular-nums |
+| Màu | Token trong `css/tokens.css`, có chế độ sáng và tối |
 | Trạng thái | Tem `ĐÃ XÁC MINH` / `CHƯA XÁC MINH` (viền đứt) / `MÂU THUẪN`. Luôn có icon + chữ, không dùng màu đơn lẻ |
 | Biểu đồ | Thanh F/Q/E một màu; phân bố sao một màu; thanh khen / trái chiều / chê dùng cặp màu đã chạy validator CVD (ΔE 20) |
 | Chuyển động | 120–320 ms, ease-out; chỉ phần tử mới mới có hiệu ứng; tắt khi `prefers-reduced-motion` |
