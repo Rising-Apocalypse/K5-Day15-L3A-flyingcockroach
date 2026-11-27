@@ -4,20 +4,16 @@
 > Một trang. Mỗi dataset một mục. Dữ liệu chạy thử (bài mẫu, thông báo mẫu, đoạn transcript…) để trong thư mục `data/` này.
 > Không commit nguyên tài liệu khoá, dữ liệu cá nhân thật hay nguyên file data BTC cấp — chỉ đoạn trích ngắn, bản viết lại, hoặc số đã tổng hợp.
 
-## Dataset 1 · [tên]
+## Dataset 1 · Danh mục sản phẩm + đánh giá GIẢ LẬP (bản chạy thử CP2)
 
-| | |
-|---|---|
-| Dùng để làm gì | nguồn cho công cụ `…` · bộ câu thử · đào bằng chứng |
-| Từ đâu | data BTC cấp (`…` trong repo đề) · tài liệu khoá (trích / viết lại) · nhóm tự viết · sinh có seed |
-| Xử lý những bước gì | lọc __ · làm sạch __ · ẩn danh __ · chia __ (script: `…`) |
-| Số dòng / số đoạn | __ |
-| Phiên bản / ngày lấy | __ |
-| Nhãn | thật · `synthetic` |
-| Giới hạn | thiếu gì, lệch về phía nào |
+|                      |                                                                                                                                                                                                                                                                                                                                              |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Dùng để làm gì       | nguồn cho công cụ `search_products`, `get_reviews`, `cheapest_in_category`, `check_shortlist` (`codebase/tools.py`) — chỉ để luồng chạy hết trước khi có data thật                                                                                                                                                                           |
+| Từ đâu               | sinh có seed bằng `data/make_synthetic.py` (seed `2711`) — nhóm tự viết danh sách sản phẩm và câu đánh giá mẫu theo tag                                                                                                                                                                                                                      |
+| Xử lý những bước gì  | không lọc / làm sạch (tự sinh) · không có dữ liệu cá nhân · không chia tập                                                                                                                                                                                                                                                                   |
+| Số dòng / số đoạn    | `data/products.json`: 17 sản phẩm (7 tai nghe, 5 chuột, 5 bàn phím) · `data/reviews.json`: 80 đánh giá (5 / sản phẩm; `TN07` cố ý không có thông số và không có đánh giá)                                                                                                                                                                    |
+| Phiên bản / ngày lấy | v0 · 27/11/2026                                                                                                                                                                                                                                                                                                                              |
+| Nhãn                 | `synthetic`                                                                                                                                                                                                                                                                                                                                  |
+| Giới hạn             | tên sản phẩm là tên dựng ("… Mẫu …"), giá VND tự đặt, câu đánh giá lặp theo mẫu → **không phải bằng chứng pain**, không phản ánh thị trường thật. Sẽ thay bằng tập con Amazon Reviews 2023 (giữ cấu trúc trường: `product_id, category, name, price_vnd, tags, specs, rating, rating_count` / `review_id, product_id, rating, aspect, text`) |
 
-**Data `synthetic` (nhóm tự sinh):** ghi cách sinh (prompt / script), seed, người kiểm, số dòng đã kiểm tay. Data tự dựng **không phải bằng chứng pain**.
-
-## Dataset 2 · [tên]
-
-…
+**Cách sinh:** `python data/make_synthetic.py`. Seed cố định nên chạy lại ra đúng hai file. Người kiểm: ** · số dòng đã kiểm tay: **

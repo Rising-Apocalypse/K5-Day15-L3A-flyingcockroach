@@ -1,0 +1,562 @@
+[
+ {
+  "review_id": "R-TN01-01",
+  "product_id": "TN01",
+  "rating": 5,
+  "aspect": "chong_nuoc",
+  "text": "Ra mồ hôi nhiều vẫn dùng bình thường."
+ },
+ {
+  "review_id": "R-TN01-02",
+  "product_id": "TN01",
+  "rating": 4,
+  "aspect": "nhe",
+  "text": "Nhẹ, dùng cả ngày không thấy mỏi."
+ },
+ {
+  "review_id": "R-TN01-03",
+  "product_id": "TN01",
+  "rating": 5,
+  "aspect": "nhe",
+  "text": "Nhẹ, dùng cả ngày không thấy mỏi."
+ },
+ {
+  "review_id": "R-TN01-04",
+  "product_id": "TN01",
+  "rating": 4,
+  "aspect": "_chung",
+  "text": "Đóng gói cẩn thận, hàng đúng mô tả. Giá này là đáng tiền."
+ },
+ {
+  "review_id": "R-TN01-05",
+  "product_id": "TN01",
+  "rating": 4,
+  "aspect": "_chung",
+  "text": "Đóng gói cẩn thận, hàng đúng mô tả. Giá này là đáng tiền."
+ },
+ {
+  "review_id": "R-TN02-01",
+  "product_id": "TN02",
+  "rating": 4,
+  "aspect": "bass_manh",
+  "text": "Bass mạnh, nghe nhạc điện tử rất đã."
+ },
+ {
+  "review_id": "R-TN02-02",
+  "product_id": "TN02",
+  "rating": 4,
+  "aspect": "_chung",
+  "text": "Đóng gói cẩn thận, hàng đúng mô tả. Giá này là đáng tiền."
+ },
+ {
+  "review_id": "R-TN02-03",
+  "product_id": "TN02",
+  "rating": 5,
+  "aspect": "bass_manh",
+  "text": "Bass mạnh, nghe nhạc điện tử rất đã."
+ },
+ {
+  "review_id": "R-TN02-04",
+  "product_id": "TN02",
+  "rating": 5,
+  "aspect": "bluetooth",
+  "text": "Kết nối bluetooth nhanh, ít khi rớt."
+ },
+ {
+  "review_id": "R-TN02-05",
+  "product_id": "TN02",
+  "rating": 4,
+  "aspect": "bass_manh",
+  "text": "Bass mạnh, nghe nhạc điện tử rất đã."
+ },
+ {
+  "review_id": "R-TN03-01",
+  "product_id": "TN03",
+  "rating": 4,
+  "aspect": "mic",
+  "text": "Mic thu rõ, họp online người kia nghe tốt."
+ },
+ {
+  "review_id": "R-TN03-02",
+  "product_id": "TN03",
+  "rating": 5,
+  "aspect": "_chung",
+  "text": "Đóng gói cẩn thận, hàng đúng mô tả. Giá này là đáng tiền."
+ },
+ {
+  "review_id": "R-TN03-03",
+  "product_id": "TN03",
+  "rating": 5,
+  "aspect": "mic",
+  "text": "Mic thu rõ, họp online người kia nghe tốt."
+ },
+ {
+  "review_id": "R-TN03-04",
+  "product_id": "TN03",
+  "rating": 5,
+  "aspect": "_chung",
+  "text": "Đóng gói cẩn thận, hàng đúng mô tả. Giá này là đáng tiền."
+ },
+ {
+  "review_id": "R-TN03-05",
+  "product_id": "TN03",
+  "rating": 5,
+  "aspect": "_chung",
+  "text": "Đóng gói cẩn thận, hàng đúng mô tả. Giá này là đáng tiền."
+ },
+ {
+  "review_id": "R-TN04-01",
+  "product_id": "TN04",
+  "rating": 5,
+  "aspect": "mic",
+  "text": "Mic thu rõ, họp online người kia nghe tốt."
+ },
+ {
+  "review_id": "R-TN04-02",
+  "product_id": "TN04",
+  "rating": 5,
+  "aspect": "pin_trau",
+  "text": "Pin dùng gần một tuần mới phải sạc."
+ },
+ {
+  "review_id": "R-TN04-03",
+  "product_id": "TN04",
+  "rating": 3,
+  "aspect": "chong_on_chu_dong",
+  "text": "Chống ồn chỉ ở mức tạm, tiếng quạt vẫn lọt vào."
+ },
+ {
+  "review_id": "R-TN04-04",
+  "product_id": "TN04",
+  "rating": 5,
+  "aspect": "pin_trau",
+  "text": "Pin dùng gần một tuần mới phải sạc."
+ },
+ {
+  "review_id": "R-TN04-05",
+  "product_id": "TN04",
+  "rating": 3,
+  "aspect": "mic",
+  "text": "Mic hơi rè khi gọi điện."
+ },
+ {
+  "review_id": "R-TN05-01",
+  "product_id": "TN05",
+  "rating": 1,
+  "aspect": "chong_nuoc",
+  "text": "Dính nước mưa một lần là rè một bên."
+ },
+ {
+  "review_id": "R-TN05-02",
+  "product_id": "TN05",
+  "rating": 2,
+  "aspect": "bluetooth",
+  "text": "Thỉnh thoảng rớt kết nối bluetooth khi để điện thoại xa."
+ },
+ {
+  "review_id": "R-TN05-03",
+  "product_id": "TN05",
+  "rating": 1,
+  "aspect": "bluetooth",
+  "text": "Thỉnh thoảng rớt kết nối bluetooth khi để điện thoại xa."
+ },
+ {
+  "review_id": "R-TN05-04",
+  "product_id": "TN05",
+  "rating": 2,
+  "aspect": "_chung",
+  "text": "Dùng được 2 tháng thì bắt đầu có lỗi nhỏ, chất liệu nhựa hơi rẻ."
+ },
+ {
+  "review_id": "R-TN05-05",
+  "product_id": "TN05",
+  "rating": 2,
+  "aspect": "_chung",
+  "text": "Dùng được 2 tháng thì bắt đầu có lỗi nhỏ, chất liệu nhựa hơi rẻ."
+ },
+ {
+  "review_id": "R-TN06-01",
+  "product_id": "TN06",
+  "rating": 3,
+  "aspect": "co_day",
+  "text": "Dây hơi ngắn so với nhu cầu."
+ },
+ {
+  "review_id": "R-TN06-02",
+  "product_id": "TN06",
+  "rating": 5,
+  "aspect": "mic",
+  "text": "Mic thu rõ, họp online người kia nghe tốt."
+ },
+ {
+  "review_id": "R-TN06-03",
+  "product_id": "TN06",
+  "rating": 4,
+  "aspect": "co_day",
+  "text": "Cắm là dùng, không lo hết pin."
+ },
+ {
+  "review_id": "R-TN06-04",
+  "product_id": "TN06",
+  "rating": 3,
+  "aspect": "co_day",
+  "text": "Dây hơi ngắn so với nhu cầu."
+ },
+ {
+  "review_id": "R-TN06-05",
+  "product_id": "TN06",
+  "rating": 4,
+  "aspect": "mic",
+  "text": "Mic thu rõ, họp online người kia nghe tốt."
+ },
+ {
+  "review_id": "R-CH01-01",
+  "product_id": "CH01",
+  "rating": 5,
+  "aspect": "im_lang",
+  "text": "Bấm rất êm, dùng trong thư viện không phiền ai."
+ },
+ {
+  "review_id": "R-CH01-02",
+  "product_id": "CH01",
+  "rating": 2,
+  "aspect": "khong_day",
+  "text": "Đầu thu USB nhỏ, dễ thất lạc."
+ },
+ {
+  "review_id": "R-CH01-03",
+  "product_id": "CH01",
+  "rating": 2,
+  "aspect": "khong_day",
+  "text": "Đầu thu USB nhỏ, dễ thất lạc."
+ },
+ {
+  "review_id": "R-CH01-04",
+  "product_id": "CH01",
+  "rating": 5,
+  "aspect": "im_lang",
+  "text": "Bấm rất êm, dùng trong thư viện không phiền ai."
+ },
+ {
+  "review_id": "R-CH01-05",
+  "product_id": "CH01",
+  "rating": 5,
+  "aspect": "khong_day",
+  "text": "Không dây nên bàn gọn hẳn."
+ },
+ {
+  "review_id": "R-CH02-01",
+  "product_id": "CH02",
+  "rating": 5,
+  "aspect": "khong_day",
+  "text": "Không dây nên bàn gọn hẳn."
+ },
+ {
+  "review_id": "R-CH02-02",
+  "product_id": "CH02",
+  "rating": 4,
+  "aspect": "khong_day",
+  "text": "Không dây nên bàn gọn hẳn."
+ },
+ {
+  "review_id": "R-CH02-03",
+  "product_id": "CH02",
+  "rating": 4,
+  "aspect": "_chung",
+  "text": "Đóng gói cẩn thận, hàng đúng mô tả. Giá này là đáng tiền."
+ },
+ {
+  "review_id": "R-CH02-04",
+  "product_id": "CH02",
+  "rating": 2,
+  "aspect": "khong_day",
+  "text": "Đầu thu USB nhỏ, dễ thất lạc."
+ },
+ {
+  "review_id": "R-CH02-05",
+  "product_id": "CH02",
+  "rating": 4,
+  "aspect": "khong_day",
+  "text": "Không dây nên bàn gọn hẳn."
+ },
+ {
+  "review_id": "R-CH03-01",
+  "product_id": "CH03",
+  "rating": 5,
+  "aspect": "gaming",
+  "text": "Chơi game phản hồi nhanh, không thấy trễ."
+ },
+ {
+  "review_id": "R-CH03-02",
+  "product_id": "CH03",
+  "rating": 5,
+  "aspect": "_chung",
+  "text": "Đóng gói cẩn thận, hàng đúng mô tả. Giá này là đáng tiền."
+ },
+ {
+  "review_id": "R-CH03-03",
+  "product_id": "CH03",
+  "rating": 4,
+  "aspect": "gaming",
+  "text": "Chơi game phản hồi nhanh, không thấy trễ."
+ },
+ {
+  "review_id": "R-CH03-04",
+  "product_id": "CH03",
+  "rating": 4,
+  "aspect": "gaming",
+  "text": "Chơi game phản hồi nhanh, không thấy trễ."
+ },
+ {
+  "review_id": "R-CH03-05",
+  "product_id": "CH03",
+  "rating": 4,
+  "aspect": "co_day",
+  "text": "Cắm là dùng, không lo hết pin."
+ },
+ {
+  "review_id": "R-CH04-01",
+  "product_id": "CH04",
+  "rating": 4,
+  "aspect": "im_lang",
+  "text": "Bấm rất êm, dùng trong thư viện không phiền ai."
+ },
+ {
+  "review_id": "R-CH04-02",
+  "product_id": "CH04",
+  "rating": 4,
+  "aspect": "im_lang",
+  "text": "Bấm rất êm, dùng trong thư viện không phiền ai."
+ },
+ {
+  "review_id": "R-CH04-03",
+  "product_id": "CH04",
+  "rating": 2,
+  "aspect": "_chung",
+  "text": "Dùng được 2 tháng thì bắt đầu có lỗi nhỏ, chất liệu nhựa hơi rẻ."
+ },
+ {
+  "review_id": "R-CH04-04",
+  "product_id": "CH04",
+  "rating": 1,
+  "aspect": "nho_gon",
+  "text": "Nhỏ quá, tay to cầm lâu bị mỏi."
+ },
+ {
+  "review_id": "R-CH04-05",
+  "product_id": "CH04",
+  "rating": 1,
+  "aspect": "nho_gon",
+  "text": "Nhỏ quá, tay to cầm lâu bị mỏi."
+ },
+ {
+  "review_id": "R-CH05-01",
+  "product_id": "CH05",
+  "rating": 1,
+  "aspect": "khong_day",
+  "text": "Đầu thu USB nhỏ, dễ thất lạc."
+ },
+ {
+  "review_id": "R-CH05-02",
+  "product_id": "CH05",
+  "rating": 4,
+  "aspect": "nhe",
+  "text": "Nhẹ, dùng cả ngày không thấy mỏi."
+ },
+ {
+  "review_id": "R-CH05-03",
+  "product_id": "CH05",
+  "rating": 5,
+  "aspect": "khong_day",
+  "text": "Không dây nên bàn gọn hẳn."
+ },
+ {
+  "review_id": "R-CH05-04",
+  "product_id": "CH05",
+  "rating": 5,
+  "aspect": "dpi_cao",
+  "text": "Cảm biến chính xác, chỉnh DPI được nhiều mức."
+ },
+ {
+  "review_id": "R-CH05-05",
+  "product_id": "CH05",
+  "rating": 5,
+  "aspect": "_chung",
+  "text": "Đóng gói cẩn thận, hàng đúng mô tả. Giá này là đáng tiền."
+ },
+ {
+  "review_id": "R-BP01-01",
+  "product_id": "BP01",
+  "rating": 5,
+  "aspect": "im_lang",
+  "text": "Bấm rất êm, dùng trong thư viện không phiền ai."
+ },
+ {
+  "review_id": "R-BP01-02",
+  "product_id": "BP01",
+  "rating": 4,
+  "aspect": "im_lang",
+  "text": "Bấm rất êm, dùng trong thư viện không phiền ai."
+ },
+ {
+  "review_id": "R-BP01-03",
+  "product_id": "BP01",
+  "rating": 5,
+  "aspect": "_chung",
+  "text": "Đóng gói cẩn thận, hàng đúng mô tả. Giá này là đáng tiền."
+ },
+ {
+  "review_id": "R-BP01-04",
+  "product_id": "BP01",
+  "rating": 5,
+  "aspect": "_chung",
+  "text": "Đóng gói cẩn thận, hàng đúng mô tả. Giá này là đáng tiền."
+ },
+ {
+  "review_id": "R-BP01-05",
+  "product_id": "BP01",
+  "rating": 5,
+  "aspect": "_chung",
+  "text": "Đóng gói cẩn thận, hàng đúng mô tả. Giá này là đáng tiền."
+ },
+ {
+  "review_id": "R-BP02-01",
+  "product_id": "BP02",
+  "rating": 4,
+  "aspect": "co_day",
+  "text": "Cắm là dùng, không lo hết pin."
+ },
+ {
+  "review_id": "R-BP02-02",
+  "product_id": "BP02",
+  "rating": 4,
+  "aspect": "co_day",
+  "text": "Cắm là dùng, không lo hết pin."
+ },
+ {
+  "review_id": "R-BP02-03",
+  "product_id": "BP02",
+  "rating": 5,
+  "aspect": "co",
+  "text": "Gõ phím cơ đã tay, âm thanh vui tai."
+ },
+ {
+  "review_id": "R-BP02-04",
+  "product_id": "BP02",
+  "rating": 5,
+  "aspect": "co",
+  "text": "Gõ phím cơ đã tay, âm thanh vui tai."
+ },
+ {
+  "review_id": "R-BP02-05",
+  "product_id": "BP02",
+  "rating": 2,
+  "aspect": "_chung",
+  "text": "Dùng được 2 tháng thì bắt đầu có lỗi nhỏ, chất liệu nhựa hơi rẻ."
+ },
+ {
+  "review_id": "R-BP03-01",
+  "product_id": "BP03",
+  "rating": 3,
+  "aspect": "bluetooth",
+  "text": "Thỉnh thoảng rớt kết nối bluetooth khi để điện thoại xa."
+ },
+ {
+  "review_id": "R-BP03-02",
+  "product_id": "BP03",
+  "rating": 5,
+  "aspect": "_chung",
+  "text": "Đóng gói cẩn thận, hàng đúng mô tả. Giá này là đáng tiền."
+ },
+ {
+  "review_id": "R-BP03-03",
+  "product_id": "BP03",
+  "rating": 5,
+  "aspect": "_chung",
+  "text": "Đóng gói cẩn thận, hàng đúng mô tả. Giá này là đáng tiền."
+ },
+ {
+  "review_id": "R-BP03-04",
+  "product_id": "BP03",
+  "rating": 4,
+  "aspect": "khong_day",
+  "text": "Không dây nên bàn gọn hẳn."
+ },
+ {
+  "review_id": "R-BP03-05",
+  "product_id": "BP03",
+  "rating": 4,
+  "aspect": "hot_swap",
+  "text": "Thay switch dễ, không cần hàn."
+ },
+ {
+  "review_id": "R-BP04-01",
+  "product_id": "BP04",
+  "rating": 3,
+  "aspect": "mong",
+  "text": "Hành trình phím nông, gõ lâu hơi mỏi."
+ },
+ {
+  "review_id": "R-BP04-02",
+  "product_id": "BP04",
+  "rating": 1,
+  "aspect": "bluetooth",
+  "text": "Thỉnh thoảng rớt kết nối bluetooth khi để điện thoại xa."
+ },
+ {
+  "review_id": "R-BP04-03",
+  "product_id": "BP04",
+  "rating": 5,
+  "aspect": "im_lang",
+  "text": "Bấm rất êm, dùng trong thư viện không phiền ai."
+ },
+ {
+  "review_id": "R-BP04-04",
+  "product_id": "BP04",
+  "rating": 4,
+  "aspect": "nhieu_thiet_bi",
+  "text": "Chuyển qua lại 3 thiết bị rất nhanh."
+ },
+ {
+  "review_id": "R-BP04-05",
+  "product_id": "BP04",
+  "rating": 1,
+  "aspect": "nhieu_thiet_bi",
+  "text": "Đổi thiết bị đôi khi phải bấm 2 lần."
+ },
+ {
+  "review_id": "R-BP05-01",
+  "product_id": "BP05",
+  "rating": 4,
+  "aspect": "co_day",
+  "text": "Cắm là dùng, không lo hết pin."
+ },
+ {
+  "review_id": "R-BP05-02",
+  "product_id": "BP05",
+  "rating": 5,
+  "aspect": "rgb",
+  "text": "Đèn RGB đẹp, nhiều hiệu ứng."
+ },
+ {
+  "review_id": "R-BP05-03",
+  "product_id": "BP05",
+  "rating": 3,
+  "aspect": "co",
+  "text": "Gõ khá ồn, ở văn phòng dễ làm phiền người khác."
+ },
+ {
+  "review_id": "R-BP05-04",
+  "product_id": "BP05",
+  "rating": 4,
+  "aspect": "co_day",
+  "text": "Cắm là dùng, không lo hết pin."
+ },
+ {
+  "review_id": "R-BP05-05",
+  "product_id": "BP05",
+  "rating": 3,
+  "aspect": "gaming",
+  "text": "Phần mềm đi kèm khó dùng."
+ }
+]
