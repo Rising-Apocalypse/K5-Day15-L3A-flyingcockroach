@@ -1,0 +1,3540 @@
+{
+ "schema": "smartbuy.catalog/v2",
+ "catalog_version": "demo-synthetic-v2",
+ "synthetic": true,
+ "source": {
+  "dataset": "McAuley-Lab/Amazon-Reviews-2023",
+  "url": "https://huggingface.co/datasets/McAuley-Lab/Amazon-Reviews-2023",
+  "subset": "raw_meta_Electronics + raw_review_Electronics",
+  "built_with": "demo tự dựng — dữ liệu thật: python codebase/build_catalog.py"
+ },
+ "note": "Catalog DEMO dựng theo đúng schema Amazon Reviews 2023 (parent_asin, store, details, features, categories, reviews…) để xem giao diện. Sản phẩm, thương hiệu, giá, review đều hư cấu; ASIN dạng B0DEMO… không tồn tại. Dữ liệu thật: chạy python codebase/build_catalog.py trên file gốc của dataset → data/catalog.json.",
+ "fx": {
+  "usd_vnd": 25400,
+  "as_of": "2026-11-27",
+  "source": "(tự ước tính — thay bằng tỷ giá có nguồn)"
+ },
+ "attribute_labels": {
+  "connectivity": "Kết nối",
+  "wear_type": "Kiểu đeo",
+  "microphone": "Micro",
+  "anc": "Chống ồn chủ động (ANC)",
+  "battery": "Pin",
+  "weight": "Trọng lượng",
+  "dpi": "Độ phân giải (DPI)",
+  "buttons": "Số nút",
+  "shape": "Kiểu dáng",
+  "layout": "Bố cục",
+  "switch": "Switch",
+  "hot_swap": "Hot-swap",
+  "backlight": "Đèn nền"
+ },
+ "categories": {
+  "headphones": {
+   "label": "Tai nghe",
+   "filters": {
+    "connectivity": {
+     "bluetooth": "Bluetooth",
+     "wired": "Có dây"
+    },
+    "wear_type": {
+     "over-ear": "Trùm tai",
+     "on-ear": "Áp tai",
+     "in-ear": "Nhét tai"
+    }
+   },
+   "compare": [
+    "connectivity",
+    "wear_type",
+    "microphone",
+    "anc",
+    "battery",
+    "weight"
+   ],
+   "coverage": {
+    "connectivity": 0.88,
+    "wear_type": 1.0,
+    "microphone": 0.88,
+    "anc": 0.75,
+    "battery": 0.88,
+    "weight": 0.75
+   },
+   "gate": 0.8,
+   "paths": [
+    "Electronics > Computers & Accessories > Computer Accessories & Peripherals > Audio & Video Accessories > Computer Headsets",
+    "Electronics > Headphones, Earbuds & Accessories > Headphones > Earbud Headphones",
+    "Electronics > Headphones, Earbuds & Accessories > Headphones > On-Ear Headphones",
+    "Electronics > Headphones, Earbuds & Accessories > Headphones > Over-Ear Headphones"
+   ],
+   "filter_candidates": [
+    "connectivity",
+    "wear_type"
+   ]
+  },
+  "mouse": {
+   "label": "Chuột",
+   "filters": {
+    "connectivity": {
+     "bluetooth": "Bluetooth",
+     "wireless-2.4": "2.4 GHz",
+     "wired": "Có dây"
+    }
+   },
+   "compare": [
+    "connectivity",
+    "dpi",
+    "buttons",
+    "weight",
+    "battery",
+    "shape"
+   ],
+   "coverage": {
+    "connectivity": 1.0,
+    "dpi": 1.0,
+    "buttons": 1.0,
+    "weight": 0.88,
+    "battery": 0.75,
+    "shape": 1.0
+   },
+   "gate": 0.8,
+   "paths": [
+    "Electronics > Computers & Accessories > Computer Accessories & Peripherals > Keyboards, Mice & Accessories > Mice"
+   ],
+   "filter_candidates": [
+    "connectivity"
+   ]
+  },
+  "keyboard": {
+   "label": "Bàn phím",
+   "filters": {
+    "connectivity": {
+     "bluetooth": "Bluetooth",
+     "wireless-2.4": "2.4 GHz",
+     "wired": "Có dây"
+    },
+    "layout": {
+     "60": "60%",
+     "65": "65%",
+     "75": "75%",
+     "tkl": "TKL",
+     "96": "96%",
+     "full": "Full-size",
+     "split": "Tách đôi"
+    }
+   },
+   "compare": [
+    "connectivity",
+    "layout",
+    "switch",
+    "hot_swap",
+    "backlight",
+    "battery"
+   ],
+   "coverage": {
+    "connectivity": 1.0,
+    "layout": 1.0,
+    "switch": 0.88,
+    "hot_swap": 0.5,
+    "backlight": 0.75,
+    "battery": 1.0
+   },
+   "gate": 0.8,
+   "paths": [
+    "Electronics > Computers & Accessories > Computer Accessories & Peripherals > Keyboards, Mice & Accessories > Keyboards"
+   ],
+   "filter_candidates": [
+    "connectivity",
+    "layout"
+   ]
+  }
+ },
+ "products": [
+  {
+   "parent_asin": "B0DEMOHP01",
+   "main_category": "All Electronics",
+   "title": "Aurin Halo 2 Wireless Over-Ear Headphones, Bluetooth 5.3, Up to 40H Playtime, Built-in Mic, Foldable",
+   "store": "Aurin",
+   "average_rating": 4.4,
+   "rating_number": 2318,
+   "price": 36.99,
+   "features": [
+    "Bluetooth 5.3 wireless connection",
+    "Up to 40 hours of playtime on a single charge",
+    "Over-ear design",
+    "Built-in microphone for hands-free calls"
+   ],
+   "description": [],
+   "images": [],
+   "videos": [],
+   "categories": [
+    "Electronics",
+    "Headphones, Earbuds & Accessories",
+    "Headphones",
+    "Over-Ear Headphones"
+   ],
+   "details": {
+    "Brand": "Aurin",
+    "Model Name": "Halo 2",
+    "Connectivity Technology": "Bluetooth 5.3",
+    "Ear Placement": "Over Ear",
+    "Item Weight": "245 Grams"
+   },
+   "bought_together": null,
+   "reviews": [
+    {
+     "rating": 5.0,
+     "title": "I wear these for my online classes…",
+     "text": "I wear these for my online classes about three hours a day and the ear pads never hurt. Very light for the size.",
+     "images": [],
+     "asin": "B0DEMOHP01",
+     "parent_asin": "B0DEMOHP01",
+     "timestamp": 1678851000000,
+     "helpful_vote": 18,
+     "verified_purchase": true
+    },
+    {
+     "rating": 4.0,
+     "title": "Mic is clear when I'm in my…",
+     "text": "Mic is clear when I'm in my room. My teacher said I sounded a bit far when the fan was on.",
+     "images": [],
+     "asin": "B0DEMOHP01",
+     "parent_asin": "B0DEMOHP01",
+     "timestamp": 1668483000000,
+     "helpful_vote": 9,
+     "verified_purchase": true
+    },
+    {
+     "rating": 5.0,
+     "title": "Soft cushions",
+     "text": "Soft cushions, they don't get too hot. Great for long study sessions.",
+     "images": [],
+     "asin": "B0DEMOHP01",
+     "parent_asin": "B0DEMOHP01",
+     "timestamp": 1673753400000,
+     "helpful_vote": 6,
+     "verified_purchase": true
+    },
+    {
+     "rating": 4.0,
+     "title": "Battery lasts me the whole week of…",
+     "text": "Battery lasts me the whole week of classes, I charge once on Sunday.",
+     "images": [],
+     "asin": "B0DEMOHP01",
+     "parent_asin": "B0DEMOHP01",
+     "timestamp": 1684121400000,
+     "helpful_vote": 4,
+     "verified_purchase": true
+    },
+    {
+     "rating": 2.0,
+     "title": "Calls from a coffee shop were rough",
+     "text": "Calls from a coffee shop were rough, the other side heard a lot of background noise.",
+     "images": [],
+     "asin": "B0DEMOHP01",
+     "parent_asin": "B0DEMOHP01",
+     "timestamp": 1663212600000,
+     "helpful_vote": 11,
+     "verified_purchase": true
+    },
+    {
+     "rating": 3.0,
+     "title": "Got around 30 hours",
+     "text": "Got around 30 hours, not the 40 advertised. Still fine for me.",
+     "images": [],
+     "asin": "B0DEMOHP01",
+     "parent_asin": "B0DEMOHP01",
+     "timestamp": 1686799800000,
+     "helpful_vote": 3,
+     "verified_purchase": false
+    },
+    {
+     "rating": 3.0,
+     "title": "A bit tight on my head for…",
+     "text": "A bit tight on my head for the first week, it loosened up later.",
+     "images": [],
+     "asin": "B0DEMOHP01",
+     "parent_asin": "B0DEMOHP01",
+     "timestamp": 1681529400000,
+     "helpful_vote": 2,
+     "verified_purchase": true
+    }
+   ],
+   "smartbuy": {
+    "category": "headphones",
+    "status": "APPROVED",
+    "pending_reasons": [],
+    "model": "Halo 2",
+    "shape": "over-ear",
+    "tone": "sand",
+    "attributes": {
+     "connectivity": {
+      "value": "Bluetooth 5.3",
+      "status": "VERIFIED",
+      "source": "D:Connectivity Technology",
+      "tags": [
+       "bluetooth"
+      ]
+     },
+     "wear_type": {
+      "value": "Trùm tai (over-ear)",
+      "status": "VERIFIED",
+      "source": "D:Ear Placement",
+      "tags": [
+       "over-ear"
+      ]
+     },
+     "microphone": {
+      "value": "Có, tích hợp",
+      "status": "VERIFIED",
+      "source": "F4"
+     },
+     "anc": {
+      "value": null,
+      "status": "UNKNOWN"
+     },
+     "battery": {
+      "value": null,
+      "status": "CONFLICT",
+      "values": [
+       {
+        "value": "40 giờ",
+        "source": "F2"
+       },
+       {
+        "value": "≈ 30 giờ",
+        "source": "R6"
+       }
+      ]
+     },
+     "weight": {
+      "value": "245 g",
+      "status": "VERIFIED",
+      "source": "D:Item Weight"
+     }
+    },
+    "reviews_total": 14,
+    "rating_hist": {
+     "5": 8,
+     "4": 3,
+     "3": 1,
+     "2": 1,
+     "1": 1
+    },
+    "insights": [
+     {
+      "aspect": "Đeo lâu",
+      "pos": 7,
+      "mixed": 2,
+      "neg": 1,
+      "summary": "Đa số khen đệm tai mềm, đeo 2–3 giờ không đau; một người thấy hơi kẹp đầu tuần đầu.",
+      "evidence": [
+       "R1",
+       "R3",
+       "R7"
+      ]
+     },
+     {
+      "aspect": "Micro khi gọi",
+      "pos": 4,
+      "mixed": 1,
+      "neg": 2,
+      "summary": "Giọng rõ trong phòng yên tĩnh; kém hơn khi có tiếng ồn xung quanh.",
+      "evidence": [
+       "R2",
+       "R5"
+      ]
+     },
+     {
+      "aspect": "Pin",
+      "pos": 3,
+      "mixed": 1,
+      "neg": 1,
+      "summary": "Đủ dùng cả tuần; một review đo được khoảng 30 giờ, thấp hơn mức 40 giờ hãng ghi.",
+      "evidence": [
+       "R4",
+       "R6"
+      ]
+     }
+    ],
+    "insights_method": "minh họa: đếm review theo từ khoá + số sao — không phải AI"
+   }
+  },
+  {
+   "parent_asin": "B0DEMOHP02",
+   "main_category": "All Electronics",
+   "title": "Nomo Air Lite On-Ear Bluetooth Headphones, Lightweight Foldable Design, Built-in Mic, 25H Battery",
+   "store": "Nomo",
+   "average_rating": 4.2,
+   "rating_number": 1104,
+   "price": 24.5,
+   "features": [
+    "Bluetooth 5.0",
+    "25 hours playtime",
+    "Built-in mic",
+    "Foldable on-ear design"
+   ],
+   "description": [],
+   "images": [],
+   "videos": [],
+   "categories": [
+    "Electronics",
+    "Headphones, Earbuds & Accessories",
+    "Headphones",
+    "On-Ear Headphones"
+   ],
+   "details": {
+    "Brand": "Nomo",
+    "Model Name": "Air Lite",
+    "Connectivity Technology": "Bluetooth 5.0",
+    "Ear Placement": "On Ear",
+    "Battery Life": "25 Hours",
+    "Item Weight": "158 Grams",
+    "Noise Control": "None"
+   },
+   "bought_together": null,
+   "reviews": [
+    {
+     "rating": 5.0,
+     "title": "Super light",
+     "text": "Super light, I forget I'm wearing them.",
+     "images": [],
+     "asin": "B0DEMOHP02",
+     "parent_asin": "B0DEMOHP02",
+     "timestamp": 1676431800000,
+     "helpful_vote": 7,
+     "verified_purchase": true
+    },
+    {
+     "rating": 2.0,
+     "title": "On-ear pressure gets painful after an hour…",
+     "text": "On-ear pressure gets painful after an hour of lectures.",
+     "images": [],
+     "asin": "B0DEMOHP02",
+     "parent_asin": "B0DEMOHP02",
+     "timestamp": 1681529400000,
+     "helpful_vote": 10,
+     "verified_purchase": true
+    },
+    {
+     "rating": 4.0,
+     "title": "Mic works fine on Zoom",
+     "text": "Mic works fine on Zoom, my classmates hear me clearly.",
+     "images": [],
+     "asin": "B0DEMOHP02",
+     "parent_asin": "B0DEMOHP02",
+     "timestamp": 1671075000000,
+     "helpful_vote": 5,
+     "verified_purchase": true
+    },
+    {
+     "rating": 3.0,
+     "title": "Comfortable at first but my ears get…",
+     "text": "Comfortable at first but my ears get sore by the end of class.",
+     "images": [],
+     "asin": "B0DEMOHP02",
+     "parent_asin": "B0DEMOHP02",
+     "timestamp": 1689391800000,
+     "helpful_vote": 2,
+     "verified_purchase": false
+    }
+   ],
+   "smartbuy": {
+    "category": "headphones",
+    "status": "APPROVED",
+    "pending_reasons": [],
+    "model": "Air Lite",
+    "shape": "on-ear",
+    "tone": "mist",
+    "attributes": {
+     "connectivity": {
+      "value": "Bluetooth 5.0",
+      "status": "VERIFIED",
+      "source": "D:Connectivity Technology",
+      "tags": [
+       "bluetooth"
+      ]
+     },
+     "wear_type": {
+      "value": "Áp tai (on-ear)",
+      "status": "VERIFIED",
+      "source": "D:Ear Placement",
+      "tags": [
+       "on-ear"
+      ]
+     },
+     "microphone": {
+      "value": "Có, tích hợp",
+      "status": "VERIFIED",
+      "source": "F3"
+     },
+     "anc": {
+      "value": "Không",
+      "status": "VERIFIED",
+      "source": "D:Noise Control"
+     },
+     "battery": {
+      "value": "25 giờ",
+      "status": "VERIFIED",
+      "source": "D:Battery Life"
+     },
+     "weight": {
+      "value": "158 g",
+      "status": "VERIFIED",
+      "source": "D:Item Weight"
+     }
+    },
+    "reviews_total": 9,
+    "rating_hist": {
+     "5": 4,
+     "4": 2,
+     "3": 1,
+     "2": 2,
+     "1": 0
+    },
+    "insights": [
+     {
+      "aspect": "Đeo lâu",
+      "pos": 2,
+      "mixed": 3,
+      "neg": 2,
+      "summary": "Rất nhẹ, nhưng kiểu áp tai làm vài người đau vành tai sau khoảng một giờ.",
+      "evidence": [
+       "R2",
+       "R4"
+      ]
+     },
+     {
+      "aspect": "Micro khi gọi",
+      "pos": 3,
+      "mixed": 1,
+      "neg": 0,
+      "summary": "Đủ rõ cho gọi video; chưa review nào nhắc tới tiếng ồn nền.",
+      "evidence": [
+       "R3"
+      ]
+     }
+    ],
+    "insights_method": "minh họa: đếm review theo từ khoá + số sao — không phải AI"
+   }
+  },
+  {
+   "parent_asin": "B0DEMOHP03",
+   "main_category": "All Electronics",
+   "title": "Kestrel Audio Studio Q Hybrid Active Noise Cancelling Headphones, Bluetooth 5.2, 30H, Wired Mode",
+   "store": "Kestrel Audio",
+   "average_rating": 4.5,
+   "rating_number": 3890,
+   "price": 49.99,
+   "features": [
+    "Hybrid active noise cancellation",
+    "Bluetooth 5.2",
+    "30 hours with ANC on",
+    "Dual microphones"
+   ],
+   "description": [],
+   "images": [],
+   "videos": [],
+   "categories": [
+    "Electronics",
+    "Headphones, Earbuds & Accessories",
+    "Headphones",
+    "Over-Ear Headphones"
+   ],
+   "details": {
+    "Brand": "Kestrel Audio",
+    "Model Name": "Studio Q",
+    "Connectivity Technology": "Bluetooth 5.2, 3.5mm Jack",
+    "Ear Placement": "Over Ear",
+    "Noise Control": "Active Noise Cancellation",
+    "Battery Life": "30 Hours with ANC on",
+    "Item Weight": "268 Grams"
+   },
+   "bought_together": null,
+   "reviews": [
+    {
+     "rating": 5.0,
+     "title": "The ANC kills the AC hum in…",
+     "text": "The ANC kills the AC hum in my dorm completely.",
+     "images": [],
+     "asin": "B0DEMOHP03",
+     "parent_asin": "B0DEMOHP03",
+     "timestamp": 1678851000000,
+     "helpful_vote": 21,
+     "verified_purchase": true
+    },
+    {
+     "rating": 5.0,
+     "title": "Commuting on the bus is so much…",
+     "text": "Commuting on the bus is so much quieter now.",
+     "images": [],
+     "asin": "B0DEMOHP03",
+     "parent_asin": "B0DEMOHP03",
+     "timestamp": 1684121400000,
+     "helpful_vote": 8,
+     "verified_purchase": true
+    },
+    {
+     "rating": 3.0,
+     "title": "Great sound but my ears get warm…",
+     "text": "Great sound but my ears get warm after two hours.",
+     "images": [],
+     "asin": "B0DEMOHP03",
+     "parent_asin": "B0DEMOHP03",
+     "timestamp": 1676431800000,
+     "helpful_vote": 6,
+     "verified_purchase": true
+    },
+    {
+     "rating": 4.0,
+     "title": "A little heavy",
+     "text": "A little heavy, but the pads are plush.",
+     "images": [],
+     "asin": "B0DEMOHP03",
+     "parent_asin": "B0DEMOHP03",
+     "timestamp": 1665804600000,
+     "helpful_vote": 3,
+     "verified_purchase": true
+    },
+    {
+     "rating": 4.0,
+     "title": "Coworkers say my voice is clear even…",
+     "text": "Coworkers say my voice is clear even with traffic outside.",
+     "images": [],
+     "asin": "B0DEMOHP03",
+     "parent_asin": "B0DEMOHP03",
+     "timestamp": 1686799800000,
+     "helpful_vote": 4,
+     "verified_purchase": true
+    }
+   ],
+   "smartbuy": {
+    "category": "headphones",
+    "status": "APPROVED",
+    "pending_reasons": [],
+    "model": "Studio Q",
+    "shape": "over-ear",
+    "tone": "stone",
+    "attributes": {
+     "connectivity": {
+      "value": "Bluetooth 5.2 + jack 3.5 mm",
+      "status": "VERIFIED",
+      "source": "D:Connectivity Technology",
+      "tags": [
+       "bluetooth",
+       "wired"
+      ]
+     },
+     "wear_type": {
+      "value": "Trùm tai (over-ear)",
+      "status": "VERIFIED",
+      "source": "D:Ear Placement",
+      "tags": [
+       "over-ear"
+      ]
+     },
+     "microphone": {
+      "value": "Có, 2 micro",
+      "status": "VERIFIED",
+      "source": "F4"
+     },
+     "anc": {
+      "value": "Có (hybrid ANC)",
+      "status": "VERIFIED",
+      "source": "D:Noise Control"
+     },
+     "battery": {
+      "value": "30 giờ (bật ANC)",
+      "status": "VERIFIED",
+      "source": "D:Battery Life"
+     },
+     "weight": {
+      "value": "268 g",
+      "status": "VERIFIED",
+      "source": "D:Item Weight"
+     }
+    },
+    "reviews_total": 22,
+    "rating_hist": {
+     "5": 14,
+     "4": 5,
+     "3": 2,
+     "2": 1,
+     "1": 0
+    },
+    "insights": [
+     {
+      "aspect": "Chống ồn",
+      "pos": 12,
+      "mixed": 2,
+      "neg": 1,
+      "summary": "ANC được khen ở môi trường có quạt, xe cộ; giảm tốt tiếng ồn tần số thấp.",
+      "evidence": [
+       "R1",
+       "R2"
+      ]
+     },
+     {
+      "aspect": "Đeo lâu",
+      "pos": 8,
+      "mixed": 3,
+      "neg": 2,
+      "summary": "Đệm êm nhưng hơi nặng; vài người thấy nóng tai sau khoảng hai giờ.",
+      "evidence": [
+       "R3",
+       "R4"
+      ]
+     },
+     {
+      "aspect": "Micro khi gọi",
+      "pos": 5,
+      "mixed": 2,
+      "neg": 1,
+      "summary": "Gọi rõ, lọc ồn ở mức khá khi có tiếng xe bên ngoài.",
+      "evidence": [
+       "R5"
+      ]
+     }
+    ],
+    "insights_method": "minh họa: đếm review theo từ khoá + số sao — không phải AI"
+   }
+  },
+  {
+   "parent_asin": "B0DEMOHP04",
+   "main_category": "All Electronics",
+   "title": "Basswood Pod S True Wireless Earbuds, Bluetooth 5.3, 6H + 24H Charging Case, Touch Control, Mic",
+   "store": "Basswood",
+   "average_rating": 4.1,
+   "rating_number": 5672,
+   "price": 18.99,
+   "features": [
+    "Bluetooth 5.3",
+    "6 hours playtime, 24 hours with charging case",
+    "Built-in mic"
+   ],
+   "description": [],
+   "images": [],
+   "videos": [],
+   "categories": [
+    "Electronics",
+    "Headphones, Earbuds & Accessories",
+    "Headphones",
+    "Earbud Headphones"
+   ],
+   "details": {
+    "Brand": "Basswood",
+    "Model Name": "Pod S",
+    "Connectivity Technology": "Bluetooth 5.3",
+    "Ear Placement": "In Ear",
+    "Battery Life": "6 Hours (+24 Hours with case)",
+    "Item Weight": "4.5 Grams (per earbud)",
+    "Noise Control": "None"
+   },
+   "bought_together": null,
+   "reviews": [
+    {
+     "rating": 5.0,
+     "title": "Battery easily covers my whole school day",
+     "text": "Battery easily covers my whole school day.",
+     "images": [],
+     "asin": "B0DEMOHP04",
+     "parent_asin": "B0DEMOHP04",
+     "timestamp": 1673753400000,
+     "helpful_vote": 9,
+     "verified_purchase": true
+    },
+    {
+     "rating": 3.0,
+     "title": "My ears get sore after about 90…",
+     "text": "My ears get sore after about 90 minutes.",
+     "images": [],
+     "asin": "B0DEMOHP04",
+     "parent_asin": "B0DEMOHP04",
+     "timestamp": 1678851000000,
+     "helpful_vote": 12,
+     "verified_purchase": true
+    },
+    {
+     "rating": 4.0,
+     "title": "Fit is secure",
+     "text": "Fit is secure, they didn't fall out once.",
+     "images": [],
+     "asin": "B0DEMOHP04",
+     "parent_asin": "B0DEMOHP04",
+     "timestamp": 1660534200000,
+     "helpful_vote": 3,
+     "verified_purchase": true
+    },
+    {
+     "rating": 3.0,
+     "title": "Voice is a bit quiet on calls…",
+     "text": "Voice is a bit quiet on calls outdoors.",
+     "images": [],
+     "asin": "B0DEMOHP04",
+     "parent_asin": "B0DEMOHP04",
+     "timestamp": 1684121400000,
+     "helpful_vote": 2,
+     "verified_purchase": false
+    }
+   ],
+   "smartbuy": {
+    "category": "headphones",
+    "status": "APPROVED",
+    "pending_reasons": [],
+    "model": "Pod S",
+    "shape": "in-ear",
+    "tone": "sage",
+    "attributes": {
+     "connectivity": {
+      "value": "Bluetooth 5.3",
+      "status": "VERIFIED",
+      "source": "D:Connectivity Technology",
+      "tags": [
+       "bluetooth"
+      ]
+     },
+     "wear_type": {
+      "value": "Nhét tai (in-ear)",
+      "status": "VERIFIED",
+      "source": "D:Ear Placement",
+      "tags": [
+       "in-ear"
+      ]
+     },
+     "microphone": {
+      "value": "Có, tích hợp",
+      "status": "VERIFIED",
+      "source": "F3"
+     },
+     "anc": {
+      "value": "Không",
+      "status": "VERIFIED",
+      "source": "D:Noise Control"
+     },
+     "battery": {
+      "value": "6 giờ (+24 giờ hộp sạc)",
+      "status": "VERIFIED",
+      "source": "D:Battery Life"
+     },
+     "weight": {
+      "value": "4,5 g mỗi bên",
+      "status": "VERIFIED",
+      "source": "D:Item Weight"
+     }
+    },
+    "reviews_total": 12,
+    "rating_hist": {
+     "5": 5,
+     "4": 3,
+     "3": 2,
+     "2": 1,
+     "1": 1
+    },
+    "insights": [
+     {
+      "aspect": "Đeo lâu",
+      "pos": 3,
+      "mixed": 3,
+      "neg": 2,
+      "summary": "Nhỏ gọn, đeo chắc; một số người mỏi ống tai sau 1–2 giờ.",
+      "evidence": [
+       "R2",
+       "R3"
+      ]
+     },
+     {
+      "aspect": "Micro khi gọi",
+      "pos": 4,
+      "mixed": 2,
+      "neg": 1,
+      "summary": "Đủ dùng cho cuộc gọi ngắn; giọng hơi nhỏ khi ở ngoài đường.",
+      "evidence": [
+       "R4"
+      ]
+     },
+     {
+      "aspect": "Pin",
+      "pos": 5,
+      "mixed": 1,
+      "neg": 0,
+      "summary": "Sáu giờ mỗi lần, hộp sạc nạp thêm được vài lần.",
+      "evidence": [
+       "R1"
+      ]
+     }
+    ],
+    "insights_method": "minh họa: đếm review theo từ khoá + số sao — không phải AI"
+   }
+  },
+  {
+   "parent_asin": "B0DEMOHP05",
+   "main_category": "All Electronics",
+   "title": "Lumen Calm ANC Over-Ear Headphones, Adaptive Noise Cancelling, Bluetooth 5.3 Multipoint, 50H",
+   "store": "Lumen",
+   "average_rating": 4.6,
+   "rating_number": 1530,
+   "price": 68.0,
+   "features": [
+    "Adaptive ANC",
+    "Bluetooth 5.3 multipoint",
+    "50-hour battery",
+    "4 microphones",
+    "250 g"
+   ],
+   "description": [],
+   "images": [],
+   "videos": [],
+   "categories": [
+    "Electronics",
+    "Headphones, Earbuds & Accessories",
+    "Headphones",
+    "Over-Ear Headphones"
+   ],
+   "details": {
+    "Brand": "Lumen",
+    "Model Name": "Calm ANC",
+    "Connectivity Technology": "Bluetooth 5.3, Multipoint",
+    "Ear Placement": "Over Ear",
+    "Noise Control": "Active Noise Cancellation",
+    "Battery Life": "50 Hours",
+    "Item Weight": "250 Grams"
+   },
+   "bought_together": null,
+   "reviews": [
+    {
+     "rating": 5.0,
+     "title": "Open office noise just disappears",
+     "text": "Open office noise just disappears.",
+     "images": [],
+     "asin": "B0DEMOHP05",
+     "parent_asin": "B0DEMOHP05",
+     "timestamp": 1681529400000,
+     "helpful_vote": 6,
+     "verified_purchase": true
+    },
+    {
+     "rating": 5.0,
+     "title": "Lighter than my old ANC pair",
+     "text": "Lighter than my old ANC pair, comfy all day.",
+     "images": [],
+     "asin": "B0DEMOHP05",
+     "parent_asin": "B0DEMOHP05",
+     "timestamp": 1676431800000,
+     "helpful_vote": 4,
+     "verified_purchase": true
+    },
+    {
+     "rating": 3.0,
+     "title": "Pricey",
+     "text": "Pricey, and the companion app is clunky.",
+     "images": [],
+     "asin": "B0DEMOHP05",
+     "parent_asin": "B0DEMOHP05",
+     "timestamp": 1686799800000,
+     "helpful_vote": 2,
+     "verified_purchase": true
+    }
+   ],
+   "smartbuy": {
+    "category": "headphones",
+    "status": "APPROVED",
+    "pending_reasons": [],
+    "model": "Calm ANC",
+    "shape": "over-ear",
+    "tone": "lilac",
+    "attributes": {
+     "connectivity": {
+      "value": "Bluetooth 5.3, multipoint",
+      "status": "VERIFIED",
+      "source": "D:Connectivity Technology",
+      "tags": [
+       "bluetooth"
+      ]
+     },
+     "wear_type": {
+      "value": "Trùm tai (over-ear)",
+      "status": "VERIFIED",
+      "source": "D:Ear Placement",
+      "tags": [
+       "over-ear"
+      ]
+     },
+     "microphone": {
+      "value": "Có, 4 micro",
+      "status": "VERIFIED",
+      "source": "F4"
+     },
+     "anc": {
+      "value": "Có (adaptive ANC)",
+      "status": "VERIFIED",
+      "source": "D:Noise Control"
+     },
+     "battery": {
+      "value": "50 giờ",
+      "status": "VERIFIED",
+      "source": "D:Battery Life"
+     },
+     "weight": {
+      "value": "250 g",
+      "status": "VERIFIED",
+      "source": "D:Item Weight"
+     }
+    },
+    "reviews_total": 7,
+    "rating_hist": {
+     "5": 5,
+     "4": 1,
+     "3": 1,
+     "2": 0,
+     "1": 0
+    },
+    "insights": [
+     {
+      "aspect": "Chống ồn",
+      "pos": 5,
+      "mixed": 1,
+      "neg": 0,
+      "summary": "Khen chống ồn tốt ở văn phòng mở.",
+      "evidence": [
+       "R1"
+      ]
+     },
+     {
+      "aspect": "Đeo lâu",
+      "pos": 4,
+      "mixed": 1,
+      "neg": 0,
+      "summary": "Nhẹ so với các tai nghe chống ồn khác.",
+      "evidence": [
+       "R2"
+      ]
+     }
+    ],
+    "insights_method": "minh họa: đếm review theo từ khoá + số sao — không phải AI"
+   }
+  },
+  {
+   "parent_asin": "B0DEMOHP06",
+   "main_category": "All Electronics",
+   "title": "Aurin Wired One Over-Ear Headphones with 3.5mm Cable and Inline Mic",
+   "store": "Aurin",
+   "average_rating": 4.3,
+   "rating_number": 870,
+   "price": 14.99,
+   "features": [
+    "3.5mm wired connection",
+    "Inline microphone and volume control",
+    "No active noise cancelling"
+   ],
+   "description": [],
+   "images": [],
+   "videos": [],
+   "categories": [
+    "Electronics",
+    "Headphones, Earbuds & Accessories",
+    "Headphones",
+    "Over-Ear Headphones"
+   ],
+   "details": {
+    "Brand": "Aurin",
+    "Model Name": "Wired One",
+    "Connectivity Technology": "Wired, 3.5mm Jack",
+    "Ear Placement": "Over Ear",
+    "Noise Control": "None",
+    "Batteries Required": "No"
+   },
+   "bought_together": null,
+   "reviews": [
+    {
+     "rating": 5.0,
+     "title": "Cheap and comfy",
+     "text": "Cheap and comfy, no battery to worry about.",
+     "images": [],
+     "asin": "B0DEMOHP06",
+     "parent_asin": "B0DEMOHP06",
+     "timestamp": 1676431800000,
+     "helpful_vote": 3,
+     "verified_purchase": true
+    },
+    {
+     "rating": 5.0,
+     "title": "Good for the desktop at home",
+     "text": "Good for the desktop at home.",
+     "images": [],
+     "asin": "B0DEMOHP06",
+     "parent_asin": "B0DEMOHP06",
+     "timestamp": 1671075000000,
+     "helpful_vote": 1,
+     "verified_purchase": true
+    },
+    {
+     "rating": 3.0,
+     "title": "Cable is a bit short for my…",
+     "text": "Cable is a bit short for my setup.",
+     "images": [],
+     "asin": "B0DEMOHP06",
+     "parent_asin": "B0DEMOHP06",
+     "timestamp": 1684121400000,
+     "helpful_vote": 0,
+     "verified_purchase": false
+    }
+   ],
+   "smartbuy": {
+    "category": "headphones",
+    "status": "APPROVED",
+    "pending_reasons": [],
+    "model": "Wired One",
+    "shape": "over-ear",
+    "tone": "clay",
+    "attributes": {
+     "connectivity": {
+      "value": "Có dây, jack 3.5 mm",
+      "status": "VERIFIED",
+      "source": "D:Connectivity Technology",
+      "tags": [
+       "wired"
+      ]
+     },
+     "wear_type": {
+      "value": "Trùm tai (over-ear)",
+      "status": "VERIFIED",
+      "source": "D:Ear Placement",
+      "tags": [
+       "over-ear"
+      ]
+     },
+     "microphone": {
+      "value": "Có, trên dây",
+      "status": "VERIFIED",
+      "source": "F2"
+     },
+     "anc": {
+      "value": "Không",
+      "status": "VERIFIED",
+      "source": "D:Noise Control"
+     },
+     "battery": {
+      "value": "Không dùng pin",
+      "status": "VERIFIED",
+      "source": "D:Batteries Required"
+     },
+     "weight": {
+      "value": null,
+      "status": "UNKNOWN"
+     }
+    },
+    "reviews_total": 3,
+    "rating_hist": {
+     "5": 2,
+     "4": 0,
+     "3": 1,
+     "2": 0,
+     "1": 0
+    },
+    "insights": [],
+    "insights_method": "minh họa: đếm review theo từ khoá + số sao — không phải AI"
+   }
+  },
+  {
+   "parent_asin": "B0DEMOHP07",
+   "main_category": "All Electronics",
+   "title": "Nomo Desk Pro USB-C Headset with Noise-Reducing Boom Mic for Online Classes and Calls",
+   "store": "Nomo",
+   "average_rating": 4.4,
+   "rating_number": 642,
+   "price": 29.99,
+   "features": [
+    "USB-C wired headset",
+    "Noise-reducing boom microphone",
+    "Lightweight 120 g",
+    "No active noise cancelling"
+   ],
+   "description": [],
+   "images": [],
+   "videos": [],
+   "categories": [
+    "Electronics",
+    "Computers & Accessories",
+    "Computer Accessories & Peripherals",
+    "Audio & Video Accessories",
+    "Computer Headsets"
+   ],
+   "details": {
+    "Brand": "Nomo",
+    "Model Name": "Desk Pro",
+    "Connectivity Technology": "Wired USB-C",
+    "Ear Placement": "On Ear",
+    "Noise Control": "None",
+    "Batteries Required": "No",
+    "Item Weight": "120 Grams"
+   },
+   "bought_together": null,
+   "reviews": [],
+   "smartbuy": {
+    "category": "headphones",
+    "status": "APPROVED",
+    "pending_reasons": [],
+    "model": "Desk Pro",
+    "shape": "headset",
+    "tone": "mist",
+    "attributes": {
+     "connectivity": {
+      "value": "Có dây USB-C",
+      "status": "VERIFIED",
+      "source": "D:Connectivity Technology",
+      "tags": [
+       "wired"
+      ]
+     },
+     "wear_type": {
+      "value": "Áp tai (on-ear)",
+      "status": "VERIFIED",
+      "source": "D:Ear Placement",
+      "tags": [
+       "on-ear"
+      ]
+     },
+     "microphone": {
+      "value": "Có, mic cần lọc ồn",
+      "status": "VERIFIED",
+      "source": "F2"
+     },
+     "anc": {
+      "value": "Không",
+      "status": "VERIFIED",
+      "source": "D:Noise Control"
+     },
+     "battery": {
+      "value": "Không dùng pin",
+      "status": "VERIFIED",
+      "source": "D:Batteries Required"
+     },
+     "weight": {
+      "value": "120 g",
+      "status": "VERIFIED",
+      "source": "D:Item Weight"
+     }
+    },
+    "reviews_total": 0,
+    "rating_hist": {},
+    "insights": [],
+    "insights_method": "minh họa: đếm review theo từ khoá + số sao — không phải AI"
+   }
+  },
+  {
+   "parent_asin": "B0DEMOHP08",
+   "main_category": "All Electronics",
+   "title": "Kestrel Audio Wave Wireless Headphones, Deep Bass, Comfortable Over-Ear Fit, 20H Playtime",
+   "store": "Kestrel Audio",
+   "average_rating": 4.0,
+   "rating_number": 410,
+   "price": 27.49,
+   "features": [
+    "Wireless over-ear headphones",
+    "Deep bass",
+    "Up to 20 hours playtime"
+   ],
+   "description": [],
+   "images": [],
+   "videos": [],
+   "categories": [
+    "Electronics",
+    "Headphones, Earbuds & Accessories",
+    "Headphones",
+    "Over-Ear Headphones"
+   ],
+   "details": {
+    "Brand": "Kestrel Audio",
+    "Model Name": "Wave",
+    "Connectivity Technology": "Wireless",
+    "Ear Placement": "Over Ear",
+    "Battery Life": "20 Hours"
+   },
+   "bought_together": null,
+   "reviews": [
+    {
+     "rating": 4.0,
+     "title": "Very comfy pads",
+     "text": "Very comfy pads, the bass is strong.",
+     "images": [],
+     "asin": "B0DEMOHP08",
+     "parent_asin": "B0DEMOHP08",
+     "timestamp": 1678851000000,
+     "helpful_vote": 2,
+     "verified_purchase": true
+    },
+    {
+     "rating": 2.0,
+     "title": "Gets hot after an hour",
+     "text": "Gets hot after an hour.",
+     "images": [],
+     "asin": "B0DEMOHP08",
+     "parent_asin": "B0DEMOHP08",
+     "timestamp": 1684121400000,
+     "helpful_vote": 1,
+     "verified_purchase": true
+    }
+   ],
+   "smartbuy": {
+    "category": "headphones",
+    "status": "APPROVED",
+    "pending_reasons": [],
+    "model": "Wave",
+    "shape": "over-ear",
+    "tone": "sand",
+    "attributes": {
+     "connectivity": {
+      "value": null,
+      "status": "UNKNOWN",
+      "note": "Nguồn chỉ ghi “Wireless”, không nêu chuẩn kết nối — không suy ra là Bluetooth.",
+      "source": "D:Connectivity Technology"
+     },
+     "wear_type": {
+      "value": "Trùm tai (over-ear)",
+      "status": "VERIFIED",
+      "source": "D:Ear Placement",
+      "tags": [
+       "over-ear"
+      ]
+     },
+     "microphone": {
+      "value": null,
+      "status": "UNKNOWN"
+     },
+     "anc": {
+      "value": null,
+      "status": "UNKNOWN"
+     },
+     "battery": {
+      "value": "20 giờ",
+      "status": "VERIFIED",
+      "source": "D:Battery Life"
+     },
+     "weight": {
+      "value": null,
+      "status": "UNKNOWN"
+     }
+    },
+    "reviews_total": 5,
+    "rating_hist": {
+     "5": 2,
+     "4": 2,
+     "3": 0,
+     "2": 1,
+     "1": 0
+    },
+    "insights": [
+     {
+      "aspect": "Đeo lâu",
+      "pos": 3,
+      "mixed": 1,
+      "neg": 1,
+      "summary": "Đệm êm; một người thấy nóng tai sau khoảng một giờ.",
+      "evidence": [
+       "R1",
+       "R2"
+      ]
+     }
+    ],
+    "insights_method": "minh họa: đếm review theo từ khoá + số sao — không phải AI"
+   }
+  },
+  {
+   "parent_asin": "B0DEMOHP09",
+   "main_category": "All Electronics",
+   "title": "Basswood Pod Max (chưa duyệt — không được công bố)",
+   "store": "Basswood",
+   "average_rating": 3.9,
+   "rating_number": 120,
+   "price": 31.0,
+   "features": [],
+   "description": [],
+   "images": [],
+   "videos": [],
+   "categories": [
+    "Electronics",
+    "Headphones, Earbuds & Accessories",
+    "Headphones",
+    "Earbud Headphones"
+   ],
+   "details": {
+    "Brand": "Basswood",
+    "Model Name": "Pod Max",
+    "Ear Placement": "In Ear"
+   },
+   "bought_together": null,
+   "reviews": [],
+   "smartbuy": {
+    "category": "headphones",
+    "status": "PENDING",
+    "pending_reasons": [
+     "Chưa có thông số kết nối đã xác minh (data gate)",
+     "Chưa có review"
+    ],
+    "model": "Pod Max",
+    "shape": "in-ear",
+    "tone": "stone",
+    "attributes": {},
+    "reviews_total": 0,
+    "rating_hist": {},
+    "insights": [],
+    "insights_method": "minh họa: đếm review theo từ khoá + số sao — không phải AI"
+   }
+  },
+  {
+   "parent_asin": "B0DEMOMS01",
+   "main_category": "Computers",
+   "title": "Glidr Flow Wireless Mouse, Ergonomic Shape, 2.4GHz + Bluetooth, Silent Clicks, 4000 DPI",
+   "store": "Glidr",
+   "average_rating": 4.5,
+   "rating_number": 6210,
+   "price": 15.99,
+   "features": [
+    "2.4GHz USB receiver and Bluetooth",
+    "Adjustable 800/1600/2400/4000 DPI",
+    "Silent clicks",
+    "Ergonomic right-hand shape"
+   ],
+   "description": [],
+   "images": [],
+   "videos": [],
+   "categories": [
+    "Electronics",
+    "Computers & Accessories",
+    "Computer Accessories & Peripherals",
+    "Keyboards, Mice & Accessories",
+    "Mice"
+   ],
+   "details": {
+    "Brand": "Glidr",
+    "Model Name": "Flow",
+    "Connectivity Technology": "2.4 GHz, Bluetooth",
+    "Number of Buttons": "6",
+    "Item Weight": "98 Grams",
+    "Battery Life": "12 Months (1 AA battery)",
+    "Hand Orientation": "Right"
+   },
+   "bought_together": null,
+   "reviews": [
+    {
+     "rating": 5.0,
+     "title": "My wrist pain eased after a week…",
+     "text": "My wrist pain eased after a week of using this at work.",
+     "images": [],
+     "asin": "B0DEMOMS01",
+     "parent_asin": "B0DEMOMS01",
+     "timestamp": 1676431800000,
+     "helpful_vote": 25,
+     "verified_purchase": true
+    },
+    {
+     "rating": 5.0,
+     "title": "Fits my hand perfectly for 8-hour days",
+     "text": "Fits my hand perfectly for 8-hour days.",
+     "images": [],
+     "asin": "B0DEMOMS01",
+     "parent_asin": "B0DEMOMS01",
+     "timestamp": 1668483000000,
+     "helpful_vote": 9,
+     "verified_purchase": true
+    },
+    {
+     "rating": 5.0,
+     "title": "So quiet I can use it in…",
+     "text": "So quiet I can use it in the library.",
+     "images": [],
+     "asin": "B0DEMOMS01",
+     "parent_asin": "B0DEMOMS01",
+     "timestamp": 1681529400000,
+     "helpful_vote": 7,
+     "verified_purchase": true
+    },
+    {
+     "rating": 4.0,
+     "title": "Still on the first battery after 7…",
+     "text": "Still on the first battery after 7 months.",
+     "images": [],
+     "asin": "B0DEMOMS01",
+     "parent_asin": "B0DEMOMS01",
+     "timestamp": 1686799800000,
+     "helpful_vote": 3,
+     "verified_purchase": true
+    }
+   ],
+   "smartbuy": {
+    "category": "mouse",
+    "status": "APPROVED",
+    "pending_reasons": [],
+    "model": "Flow",
+    "shape": "ergonomic",
+    "tone": "stone",
+    "attributes": {
+     "connectivity": {
+      "value": "2.4 GHz + Bluetooth",
+      "status": "VERIFIED",
+      "source": "D:Connectivity Technology",
+      "tags": [
+       "bluetooth",
+       "wireless-2.4"
+      ]
+     },
+     "dpi": {
+      "value": "800–4000",
+      "status": "VERIFIED",
+      "source": "F2"
+     },
+     "buttons": {
+      "value": "6 nút",
+      "status": "VERIFIED",
+      "source": "D:Number of Buttons"
+     },
+     "weight": {
+      "value": "98 g",
+      "status": "VERIFIED",
+      "source": "D:Item Weight"
+     },
+     "battery": {
+      "value": "1 pin AA, đến 12 tháng",
+      "status": "VERIFIED",
+      "source": "D:Battery Life"
+     },
+     "shape": {
+      "value": "Công thái học, tay phải",
+      "status": "VERIFIED",
+      "source": "F4"
+     }
+    },
+    "reviews_total": 16,
+    "rating_hist": {
+     "5": 10,
+     "4": 4,
+     "3": 1,
+     "2": 0,
+     "1": 1
+    },
+    "insights": [
+     {
+      "aspect": "Cầm lâu",
+      "pos": 9,
+      "mixed": 2,
+      "neg": 1,
+      "summary": "Khen dáng ôm tay khi làm việc cả ngày; vài người đỡ mỏi cổ tay.",
+      "evidence": [
+       "R1",
+       "R2"
+      ]
+     },
+     {
+      "aspect": "Click êm",
+      "pos": 6,
+      "mixed": 0,
+      "neg": 1,
+      "summary": "Gần như không có tiếng, hợp văn phòng và thư viện.",
+      "evidence": [
+       "R3"
+      ]
+     },
+     {
+      "aspect": "Pin",
+      "pos": 5,
+      "mixed": 0,
+      "neg": 0,
+      "summary": "Nhiều tháng chưa phải thay pin.",
+      "evidence": [
+       "R4"
+      ]
+     }
+    ],
+    "insights_method": "minh họa: đếm review theo từ khoá + số sao — không phải AI"
+   }
+  },
+  {
+   "parent_asin": "B0DEMOMS02",
+   "main_category": "Computers",
+   "title": "Orbit Mini Bluetooth Travel Mouse, Compact Size, Rechargeable via USB-C",
+   "store": "Orbit",
+   "average_rating": 4.0,
+   "rating_number": 980,
+   "price": 11.49,
+   "features": [
+    "Bluetooth connection",
+    "Rechargeable via USB-C",
+    "1200 DPI",
+    "3 buttons",
+    "62 g compact body"
+   ],
+   "description": [],
+   "images": [],
+   "videos": [],
+   "categories": [
+    "Electronics",
+    "Computers & Accessories",
+    "Computer Accessories & Peripherals",
+    "Keyboards, Mice & Accessories",
+    "Mice"
+   ],
+   "details": {
+    "Brand": "Orbit",
+    "Model Name": "Mini",
+    "Connectivity Technology": "Bluetooth",
+    "Number of Buttons": "3",
+    "Item Weight": "62 Grams",
+    "Hand Orientation": "Ambidextrous"
+   },
+   "bought_together": null,
+   "reviews": [
+    {
+     "rating": 4.0,
+     "title": "Perfect for my laptop bag",
+     "text": "Perfect for my laptop bag.",
+     "images": [],
+     "asin": "B0DEMOMS02",
+     "parent_asin": "B0DEMOMS02",
+     "timestamp": 1673753400000,
+     "helpful_vote": 4,
+     "verified_purchase": true
+    },
+    {
+     "rating": 2.0,
+     "title": "Too small for my hand",
+     "text": "Too small for my hand, cramps after an hour.",
+     "images": [],
+     "asin": "B0DEMOMS02",
+     "parent_asin": "B0DEMOMS02",
+     "timestamp": 1678851000000,
+     "helpful_vote": 6,
+     "verified_purchase": true
+    }
+   ],
+   "smartbuy": {
+    "category": "mouse",
+    "status": "APPROVED",
+    "pending_reasons": [],
+    "model": "Mini",
+    "shape": "compact",
+    "tone": "lilac",
+    "attributes": {
+     "connectivity": {
+      "value": "Bluetooth",
+      "status": "VERIFIED",
+      "source": "D:Connectivity Technology",
+      "tags": [
+       "bluetooth"
+      ]
+     },
+     "dpi": {
+      "value": "1200",
+      "status": "VERIFIED",
+      "source": "F3"
+     },
+     "buttons": {
+      "value": "3 nút",
+      "status": "VERIFIED",
+      "source": "D:Number of Buttons"
+     },
+     "weight": {
+      "value": "62 g",
+      "status": "VERIFIED",
+      "source": "D:Item Weight"
+     },
+     "battery": {
+      "value": null,
+      "status": "UNKNOWN",
+      "note": "Chỉ ghi “sạc USB-C”, không nêu thời lượng."
+     },
+     "shape": {
+      "value": "Nhỏ gọn, đối xứng",
+      "status": "VERIFIED",
+      "source": "F5"
+     }
+    },
+    "reviews_total": 6,
+    "rating_hist": {
+     "5": 2,
+     "4": 2,
+     "3": 1,
+     "2": 1,
+     "1": 0
+    },
+    "insights": [
+     {
+      "aspect": "Cầm lâu",
+      "pos": 1,
+      "mixed": 2,
+      "neg": 2,
+      "summary": "Nhỏ, tiện mang theo; tay to cầm lâu dễ mỏi.",
+      "evidence": [
+       "R1",
+       "R2"
+      ]
+     }
+    ],
+    "insights_method": "minh họa: đếm review theo từ khoá + số sao — không phải AI"
+   }
+  },
+  {
+   "parent_asin": "B0DEMOMS03",
+   "main_category": "Computers",
+   "title": "Pointer Lab Precision G Wired Gaming Mouse, 16000 DPI Optical Sensor, 58g Lightweight, RGB",
+   "store": "Pointer Lab",
+   "average_rating": 4.6,
+   "rating_number": 4420,
+   "price": 24.99,
+   "features": [
+    "16000 DPI optical sensor",
+    "58 g ultralight shell",
+    "6 buttons",
+    "Paracord-style USB cable"
+   ],
+   "description": [],
+   "images": [],
+   "videos": [],
+   "categories": [
+    "Electronics",
+    "Computers & Accessories",
+    "Computer Accessories & Peripherals",
+    "Keyboards, Mice & Accessories",
+    "Mice"
+   ],
+   "details": {
+    "Brand": "Pointer Lab",
+    "Model Name": "Precision G",
+    "Connectivity Technology": "Wired USB",
+    "Number of Buttons": "6",
+    "Item Weight": "58 Grams",
+    "Batteries Required": "No",
+    "Hand Orientation": "Ambidextrous"
+   },
+   "bought_together": null,
+   "reviews": [
+    {
+     "rating": 5.0,
+     "title": "Tracking is flawless in shooters",
+     "text": "Tracking is flawless in shooters.",
+     "images": [],
+     "asin": "B0DEMOMS03",
+     "parent_asin": "B0DEMOMS03",
+     "timestamp": 1684121400000,
+     "helpful_vote": 14,
+     "verified_purchase": true
+    },
+    {
+     "rating": 3.0,
+     "title": "The cable still drags a bit on…",
+     "text": "The cable still drags a bit on my mousepad.",
+     "images": [],
+     "asin": "B0DEMOMS03",
+     "parent_asin": "B0DEMOMS03",
+     "timestamp": 1676431800000,
+     "helpful_vote": 3,
+     "verified_purchase": true
+    }
+   ],
+   "smartbuy": {
+    "category": "mouse",
+    "status": "APPROVED",
+    "pending_reasons": [],
+    "model": "Precision G",
+    "shape": "gaming",
+    "tone": "clay",
+    "attributes": {
+     "connectivity": {
+      "value": "Có dây USB",
+      "status": "VERIFIED",
+      "source": "D:Connectivity Technology",
+      "tags": [
+       "wired"
+      ]
+     },
+     "dpi": {
+      "value": "100–16000",
+      "status": "VERIFIED",
+      "source": "F1"
+     },
+     "buttons": {
+      "value": "6 nút",
+      "status": "VERIFIED",
+      "source": "D:Number of Buttons"
+     },
+     "weight": {
+      "value": "58 g",
+      "status": "VERIFIED",
+      "source": "D:Item Weight"
+     },
+     "battery": {
+      "value": "Không dùng pin",
+      "status": "VERIFIED",
+      "source": "D:Batteries Required"
+     },
+     "shape": {
+      "value": "Đối xứng",
+      "status": "VERIFIED",
+      "source": "D:Hand Orientation"
+     }
+    },
+    "reviews_total": 11,
+    "rating_hist": {
+     "5": 8,
+     "4": 2,
+     "3": 1,
+     "2": 0,
+     "1": 0
+    },
+    "insights": [
+     {
+      "aspect": "Chơi game",
+      "pos": 9,
+      "mixed": 1,
+      "neg": 0,
+      "summary": "Cảm biến chính xác, nhẹ tay khi chơi bắn súng.",
+      "evidence": [
+       "R1"
+      ]
+     },
+     {
+      "aspect": "Dây",
+      "pos": 2,
+      "mixed": 2,
+      "neg": 1,
+      "summary": "Dây mềm nhưng vẫn hơi vướng khi vẩy chuột nhanh.",
+      "evidence": [
+       "R2"
+      ]
+     }
+    ],
+    "insights_method": "minh họa: đếm review theo từ khoá + số sao — không phải AI"
+   }
+  },
+  {
+   "parent_asin": "B0DEMOMS04",
+   "main_category": "Computers",
+   "title": "Kestrel Silent M Wireless Mouse 2.4GHz, Quiet Click, Up to 18-Month Battery Life",
+   "store": "Kestrel",
+   "average_rating": 4.3,
+   "rating_number": 3105,
+   "price": 10.99,
+   "features": [
+    "2.4GHz wireless with USB nano receiver",
+    "Up to 18 months battery life (1 AA)",
+    "1000 DPI",
+    "75 g"
+   ],
+   "description": [],
+   "images": [],
+   "videos": [],
+   "categories": [
+    "Electronics",
+    "Computers & Accessories",
+    "Computer Accessories & Peripherals",
+    "Keyboards, Mice & Accessories",
+    "Mice"
+   ],
+   "details": {
+    "Brand": "Kestrel",
+    "Model Name": "Silent M",
+    "Connectivity Technology": "2.4 GHz (USB receiver)",
+    "Number of Buttons": "3",
+    "Item Weight": "75 Grams",
+    "Battery Life": "18 Months (1 AA battery)",
+    "Hand Orientation": "Ambidextrous"
+   },
+   "bought_together": null,
+   "reviews": [
+    {
+     "rating": 5.0,
+     "title": "Over a year and still on the…",
+     "text": "Over a year and still on the original battery.",
+     "images": [],
+     "asin": "B0DEMOMS04",
+     "parent_asin": "B0DEMOMS04",
+     "timestamp": 1673753400000,
+     "helpful_vote": 15,
+     "verified_purchase": true
+    },
+    {
+     "rating": 5.0,
+     "title": "Battery life is unreal",
+     "text": "Battery life is unreal.",
+     "images": [],
+     "asin": "B0DEMOMS04",
+     "parent_asin": "B0DEMOMS04",
+     "timestamp": 1665804600000,
+     "helpful_vote": 6,
+     "verified_purchase": true
+    },
+    {
+     "rating": 4.0,
+     "title": "Clicks are quiet",
+     "text": "Clicks are quiet, the scroll wheel is a little loose.",
+     "images": [],
+     "asin": "B0DEMOMS04",
+     "parent_asin": "B0DEMOMS04",
+     "timestamp": 1681529400000,
+     "helpful_vote": 2,
+     "verified_purchase": true
+    }
+   ],
+   "smartbuy": {
+    "category": "mouse",
+    "status": "APPROVED",
+    "pending_reasons": [],
+    "model": "Silent M",
+    "shape": "standard",
+    "tone": "sage",
+    "attributes": {
+     "connectivity": {
+      "value": "2.4 GHz (đầu thu USB)",
+      "status": "VERIFIED",
+      "source": "D:Connectivity Technology",
+      "tags": [
+       "wireless-2.4"
+      ]
+     },
+     "dpi": {
+      "value": "1000",
+      "status": "VERIFIED",
+      "source": "F3"
+     },
+     "buttons": {
+      "value": "3 nút",
+      "status": "VERIFIED",
+      "source": "D:Number of Buttons"
+     },
+     "weight": {
+      "value": "75 g",
+      "status": "VERIFIED",
+      "source": "D:Item Weight"
+     },
+     "battery": {
+      "value": "1 pin AA, đến 18 tháng",
+      "status": "VERIFIED",
+      "source": "D:Battery Life"
+     },
+     "shape": {
+      "value": "Đối xứng",
+      "status": "VERIFIED",
+      "source": "D:Hand Orientation"
+     }
+    },
+    "reviews_total": 10,
+    "rating_hist": {
+     "5": 6,
+     "4": 2,
+     "3": 1,
+     "2": 1,
+     "1": 0
+    },
+    "insights": [
+     {
+      "aspect": "Pin",
+      "pos": 6,
+      "mixed": 0,
+      "neg": 0,
+      "summary": "Nhiều người dùng hơn một năm chưa phải thay pin.",
+      "evidence": [
+       "R1",
+       "R2"
+      ]
+     },
+     {
+      "aspect": "Click êm",
+      "pos": 5,
+      "mixed": 1,
+      "neg": 0,
+      "summary": "Click nhỏ tiếng; con lăn hơi lỏng.",
+      "evidence": [
+       "R3"
+      ]
+     }
+    ],
+    "insights_method": "minh họa: đếm review theo từ khoá + số sao — không phải AI"
+   }
+  },
+  {
+   "parent_asin": "B0DEMOMS05",
+   "main_category": "Computers",
+   "title": "Glidr Vertical V Ergonomic Wireless Mouse, Rechargeable, 2.4GHz, 6 Buttons",
+   "store": "Glidr",
+   "average_rating": 4.3,
+   "rating_number": 2280,
+   "price": 21.99,
+   "features": [
+    "Vertical ergonomic design",
+    "Rechargeable, up to 70 days per charge",
+    "2.4GHz",
+    "800/1600/2400 DPI",
+    "110 g"
+   ],
+   "description": [],
+   "images": [],
+   "videos": [],
+   "categories": [
+    "Electronics",
+    "Computers & Accessories",
+    "Computer Accessories & Peripherals",
+    "Keyboards, Mice & Accessories",
+    "Mice"
+   ],
+   "details": {
+    "Brand": "Glidr",
+    "Model Name": "Vertical V",
+    "Connectivity Technology": "2.4 GHz",
+    "Number of Buttons": "6",
+    "Item Weight": "110 Grams",
+    "Hand Orientation": "Right"
+   },
+   "bought_together": null,
+   "reviews": [
+    {
+     "rating": 5.0,
+     "title": "Took a week to adjust",
+     "text": "Took a week to adjust, now my wrist feels much better.",
+     "images": [],
+     "asin": "B0DEMOMS05",
+     "parent_asin": "B0DEMOMS05",
+     "timestamp": 1678851000000,
+     "helpful_vote": 11,
+     "verified_purchase": true
+    },
+    {
+     "rating": 4.0,
+     "title": "Good for RSI",
+     "text": "Good for RSI.",
+     "images": [],
+     "asin": "B0DEMOMS05",
+     "parent_asin": "B0DEMOMS05",
+     "timestamp": 1671075000000,
+     "helpful_vote": 4,
+     "verified_purchase": true
+    },
+    {
+     "rating": 2.0,
+     "title": "A charge lasts about three weeks",
+     "text": "A charge lasts about three weeks, not 70 days.",
+     "images": [],
+     "asin": "B0DEMOMS05",
+     "parent_asin": "B0DEMOMS05",
+     "timestamp": 1686799800000,
+     "helpful_vote": 7,
+     "verified_purchase": true
+    }
+   ],
+   "smartbuy": {
+    "category": "mouse",
+    "status": "APPROVED",
+    "pending_reasons": [],
+    "model": "Vertical V",
+    "shape": "vertical",
+    "tone": "sand",
+    "attributes": {
+     "connectivity": {
+      "value": "2.4 GHz",
+      "status": "VERIFIED",
+      "source": "D:Connectivity Technology",
+      "tags": [
+       "wireless-2.4"
+      ]
+     },
+     "dpi": {
+      "value": "800–2400",
+      "status": "VERIFIED",
+      "source": "F4"
+     },
+     "buttons": {
+      "value": "6 nút",
+      "status": "VERIFIED",
+      "source": "D:Number of Buttons"
+     },
+     "weight": {
+      "value": "110 g",
+      "status": "VERIFIED",
+      "source": "D:Item Weight"
+     },
+     "battery": {
+      "value": null,
+      "status": "CONFLICT",
+      "values": [
+       {
+        "value": "Sạc, đến 70 ngày",
+        "source": "F2"
+       },
+       {
+        "value": "≈ 3 tuần",
+        "source": "R3"
+       }
+      ]
+     },
+     "shape": {
+      "value": "Chuột dọc, tay phải",
+      "status": "VERIFIED",
+      "source": "F1"
+     }
+    },
+    "reviews_total": 8,
+    "rating_hist": {
+     "5": 4,
+     "4": 2,
+     "3": 1,
+     "2": 1,
+     "1": 0
+    },
+    "insights": [
+     {
+      "aspect": "Mỏi cổ tay",
+      "pos": 5,
+      "mixed": 1,
+      "neg": 1,
+      "summary": "Nhiều người đỡ mỏi cổ tay sau 1–2 tuần làm quen.",
+      "evidence": [
+       "R1",
+       "R2"
+      ]
+     },
+     {
+      "aspect": "Pin",
+      "pos": 1,
+      "mixed": 1,
+      "neg": 2,
+      "summary": "Mâu thuẫn với thông số: vài người chỉ dùng được khoảng ba tuần mỗi lần sạc.",
+      "evidence": [
+       "R3"
+      ]
+     }
+    ],
+    "insights_method": "minh họa: đếm review theo từ khoá + số sao — không phải AI"
+   }
+  },
+  {
+   "parent_asin": "B0DEMOMS06",
+   "main_category": "Computers",
+   "title": "Orbit Pro Wireless Gaming Mouse, Tri-Mode Bluetooth / 2.4GHz / USB-C, 26000 DPI, 80H Battery",
+   "store": "Orbit",
+   "average_rating": 4.7,
+   "rating_number": 1890,
+   "price": 39.99,
+   "features": [
+    "Tri-mode connectivity",
+    "26000 DPI sensor",
+    "Up to 80 hours battery",
+    "7 buttons",
+    "63 g"
+   ],
+   "description": [],
+   "images": [],
+   "videos": [],
+   "categories": [
+    "Electronics",
+    "Computers & Accessories",
+    "Computer Accessories & Peripherals",
+    "Keyboards, Mice & Accessories",
+    "Mice"
+   ],
+   "details": {
+    "Brand": "Orbit",
+    "Model Name": "Pro Wireless",
+    "Connectivity Technology": "Bluetooth, 2.4 GHz, USB-C",
+    "Number of Buttons": "7",
+    "Item Weight": "63 Grams",
+    "Battery Life": "80 Hours (rechargeable)",
+    "Hand Orientation": "Ambidextrous"
+   },
+   "bought_together": null,
+   "reviews": [
+    {
+     "rating": 5.0,
+     "title": "No noticeable lag on 2",
+     "text": "No noticeable lag on 2.4GHz.",
+     "images": [],
+     "asin": "B0DEMOMS06",
+     "parent_asin": "B0DEMOMS06",
+     "timestamp": 1681529400000,
+     "helpful_vote": 10,
+     "verified_purchase": true
+    },
+    {
+     "rating": 4.0,
+     "title": "I charge it about once a week",
+     "text": "I charge it about once a week.",
+     "images": [],
+     "asin": "B0DEMOMS06",
+     "parent_asin": "B0DEMOMS06",
+     "timestamp": 1686799800000,
+     "helpful_vote": 3,
+     "verified_purchase": true
+    }
+   ],
+   "smartbuy": {
+    "category": "mouse",
+    "status": "APPROVED",
+    "pending_reasons": [],
+    "model": "Pro Wireless",
+    "shape": "gaming",
+    "tone": "stone",
+    "attributes": {
+     "connectivity": {
+      "value": "Bluetooth + 2.4 GHz + USB-C",
+      "status": "VERIFIED",
+      "source": "D:Connectivity Technology",
+      "tags": [
+       "bluetooth",
+       "wireless-2.4",
+       "wired"
+      ]
+     },
+     "dpi": {
+      "value": "100–26000",
+      "status": "VERIFIED",
+      "source": "F2"
+     },
+     "buttons": {
+      "value": "7 nút",
+      "status": "VERIFIED",
+      "source": "D:Number of Buttons"
+     },
+     "weight": {
+      "value": "63 g",
+      "status": "VERIFIED",
+      "source": "D:Item Weight"
+     },
+     "battery": {
+      "value": "Sạc, đến 80 giờ",
+      "status": "VERIFIED",
+      "source": "D:Battery Life"
+     },
+     "shape": {
+      "value": "Đối xứng",
+      "status": "VERIFIED",
+      "source": "D:Hand Orientation"
+     }
+    },
+    "reviews_total": 24,
+    "rating_hist": {
+     "5": 18,
+     "4": 4,
+     "3": 2,
+     "2": 0,
+     "1": 0
+    },
+    "insights": [
+     {
+      "aspect": "Chơi game",
+      "pos": 18,
+      "mixed": 2,
+      "neg": 0,
+      "summary": "Độ trễ thấp ở chế độ 2.4 GHz.",
+      "evidence": [
+       "R1"
+      ]
+     },
+     {
+      "aspect": "Pin",
+      "pos": 10,
+      "mixed": 2,
+      "neg": 1,
+      "summary": "Khoảng một tuần chơi mỗi lần sạc.",
+      "evidence": [
+       "R2"
+      ]
+     }
+    ],
+    "insights_method": "minh họa: đếm review theo từ khoá + số sao — không phải AI"
+   }
+  },
+  {
+   "parent_asin": "B0DEMOMS07",
+   "main_category": "Computers",
+   "title": "Pointer Lab Office Basic Wired USB Mouse, 1000 DPI, Plug and Play",
+   "store": "Pointer Lab",
+   "average_rating": 4.2,
+   "rating_number": 7450,
+   "price": 6.99,
+   "features": [
+    "Wired USB",
+    "1000 DPI",
+    "3 buttons",
+    "Plug and play"
+   ],
+   "description": [],
+   "images": [],
+   "videos": [],
+   "categories": [
+    "Electronics",
+    "Computers & Accessories",
+    "Computer Accessories & Peripherals",
+    "Keyboards, Mice & Accessories",
+    "Mice"
+   ],
+   "details": {
+    "Brand": "Pointer Lab",
+    "Model Name": "Office Basic",
+    "Connectivity Technology": "Wired USB",
+    "Number of Buttons": "3",
+    "Batteries Required": "No",
+    "Hand Orientation": "Ambidextrous"
+   },
+   "bought_together": null,
+   "reviews": [
+    {
+     "rating": 5.0,
+     "title": "Does the job for office work",
+     "text": "Does the job for office work.",
+     "images": [],
+     "asin": "B0DEMOMS07",
+     "parent_asin": "B0DEMOMS07",
+     "timestamp": 1676431800000,
+     "helpful_vote": 2,
+     "verified_purchase": true
+    },
+    {
+     "rating": 4.0,
+     "title": "Basic but reliable",
+     "text": "Basic but reliable.",
+     "images": [],
+     "asin": "B0DEMOMS07",
+     "parent_asin": "B0DEMOMS07",
+     "timestamp": 1663212600000,
+     "helpful_vote": 1,
+     "verified_purchase": true
+    },
+    {
+     "rating": 3.0,
+     "title": "Clicks are loud",
+     "text": "Clicks are loud.",
+     "images": [],
+     "asin": "B0DEMOMS07",
+     "parent_asin": "B0DEMOMS07",
+     "timestamp": 1684121400000,
+     "helpful_vote": 1,
+     "verified_purchase": false
+    },
+    {
+     "rating": 5.0,
+     "title": "Bought ten for our office",
+     "text": "Bought ten for our office, all fine.",
+     "images": [],
+     "asin": "B0DEMOMS07",
+     "parent_asin": "B0DEMOMS07",
+     "timestamp": 1673753400000,
+     "helpful_vote": 0,
+     "verified_purchase": true
+    }
+   ],
+   "smartbuy": {
+    "category": "mouse",
+    "status": "APPROVED",
+    "pending_reasons": [],
+    "model": "Office Basic",
+    "shape": "standard",
+    "tone": "mist",
+    "attributes": {
+     "connectivity": {
+      "value": "Có dây USB",
+      "status": "VERIFIED",
+      "source": "D:Connectivity Technology",
+      "tags": [
+       "wired"
+      ]
+     },
+     "dpi": {
+      "value": "1000",
+      "status": "VERIFIED",
+      "source": "F2"
+     },
+     "buttons": {
+      "value": "3 nút",
+      "status": "VERIFIED",
+      "source": "D:Number of Buttons"
+     },
+     "weight": {
+      "value": null,
+      "status": "UNKNOWN"
+     },
+     "battery": {
+      "value": "Không dùng pin",
+      "status": "VERIFIED",
+      "source": "D:Batteries Required"
+     },
+     "shape": {
+      "value": "Đối xứng",
+      "status": "VERIFIED",
+      "source": "D:Hand Orientation"
+     }
+    },
+    "reviews_total": 4,
+    "rating_hist": {
+     "5": 2,
+     "4": 1,
+     "3": 1,
+     "2": 0,
+     "1": 0
+    },
+    "insights": [],
+    "insights_method": "minh họa: đếm review theo từ khoá + số sao — không phải AI"
+   }
+  },
+  {
+   "parent_asin": "B0DEMOMS08",
+   "main_category": "Computers",
+   "title": "Kestrel Duo Multi-Device Wireless Mouse, Bluetooth + 2.4GHz, Switch Between 2 Computers",
+   "store": "Kestrel",
+   "average_rating": 4.4,
+   "rating_number": 1320,
+   "price": null,
+   "features": [
+    "Bluetooth and 2.4GHz",
+    "Easy-switch between 2 devices",
+    "1600 DPI",
+    "5 buttons",
+    "1 AA battery up to 12 months"
+   ],
+   "description": [],
+   "images": [],
+   "videos": [],
+   "categories": [
+    "Electronics",
+    "Computers & Accessories",
+    "Computer Accessories & Peripherals",
+    "Keyboards, Mice & Accessories",
+    "Mice"
+   ],
+   "details": {
+    "Brand": "Kestrel",
+    "Model Name": "Duo",
+    "Connectivity Technology": "Bluetooth, 2.4 GHz",
+    "Number of Buttons": "5",
+    "Item Weight": "85 Grams",
+    "Battery Life": "12 Months (1 AA battery)",
+    "Hand Orientation": "Ambidextrous"
+   },
+   "bought_together": null,
+   "reviews": [
+    {
+     "rating": 5.0,
+     "title": "Switching between my work laptop and home…",
+     "text": "Switching between my work laptop and home PC is instant.",
+     "images": [],
+     "asin": "B0DEMOMS08",
+     "parent_asin": "B0DEMOMS08",
+     "timestamp": 1678851000000,
+     "helpful_vote": 5,
+     "verified_purchase": true
+    }
+   ],
+   "smartbuy": {
+    "category": "mouse",
+    "status": "APPROVED",
+    "pending_reasons": [],
+    "model": "Duo",
+    "shape": "standard",
+    "tone": "clay",
+    "attributes": {
+     "connectivity": {
+      "value": "Bluetooth + 2.4 GHz",
+      "status": "VERIFIED",
+      "source": "D:Connectivity Technology",
+      "tags": [
+       "bluetooth",
+       "wireless-2.4"
+      ]
+     },
+     "dpi": {
+      "value": "1600",
+      "status": "VERIFIED",
+      "source": "F3"
+     },
+     "buttons": {
+      "value": "5 nút",
+      "status": "VERIFIED",
+      "source": "D:Number of Buttons"
+     },
+     "weight": {
+      "value": "85 g",
+      "status": "VERIFIED",
+      "source": "D:Item Weight"
+     },
+     "battery": {
+      "value": "1 pin AA, đến 12 tháng",
+      "status": "VERIFIED",
+      "source": "D:Battery Life"
+     },
+     "shape": {
+      "value": "Đối xứng",
+      "status": "VERIFIED",
+      "source": "D:Hand Orientation"
+     }
+    },
+    "reviews_total": 6,
+    "rating_hist": {
+     "5": 3,
+     "4": 2,
+     "3": 1,
+     "2": 0,
+     "1": 0
+    },
+    "insights": [
+     {
+      "aspect": "Đa thiết bị",
+      "pos": 4,
+      "mixed": 1,
+      "neg": 0,
+      "summary": "Chuyển giữa laptop và PC nhanh.",
+      "evidence": [
+       "R1"
+      ]
+     }
+    ],
+    "insights_method": "minh họa: đếm review theo từ khoá + số sao — không phải AI"
+   }
+  },
+  {
+   "parent_asin": "B0DEMOKB01",
+   "main_category": "Computers",
+   "title": "Clack 75 Wireless Mechanical Keyboard, 75% Layout, Hot-Swappable, Tri-Mode, Brown Switches, RGB",
+   "store": "Clack",
+   "average_rating": 4.5,
+   "rating_number": 2760,
+   "price": 45.99,
+   "features": [
+    "75% layout",
+    "Hot-swappable sockets",
+    "Tri-mode: Bluetooth 5.1, 2.4GHz, USB-C",
+    "Brown tactile switches",
+    "RGB",
+    "4000mAh battery"
+   ],
+   "description": [],
+   "images": [],
+   "videos": [],
+   "categories": [
+    "Electronics",
+    "Computers & Accessories",
+    "Computer Accessories & Peripherals",
+    "Keyboards, Mice & Accessories",
+    "Keyboards"
+   ],
+   "details": {
+    "Brand": "Clack",
+    "Model Name": "75 Wireless",
+    "Connectivity Technology": "Bluetooth, 2.4 GHz, USB-C",
+    "Special Feature": "RGB Backlit",
+    "Battery Life": "4000 mAh"
+   },
+   "bought_together": null,
+   "reviews": [
+    {
+     "rating": 5.0,
+     "title": "Typing reports all day is a joy",
+     "text": "Typing reports all day is a joy.",
+     "images": [],
+     "asin": "B0DEMOKB01",
+     "parent_asin": "B0DEMOKB01",
+     "timestamp": 1678851000000,
+     "helpful_vote": 12,
+     "verified_purchase": true
+    },
+    {
+     "rating": 3.0,
+     "title": "Bluetooth lags for a second after sleep",
+     "text": "Bluetooth lags for a second after sleep.",
+     "images": [],
+     "asin": "B0DEMOKB01",
+     "parent_asin": "B0DEMOKB01",
+     "timestamp": 1684121400000,
+     "helpful_vote": 5,
+     "verified_purchase": true
+    }
+   ],
+   "smartbuy": {
+    "category": "keyboard",
+    "status": "APPROVED",
+    "pending_reasons": [],
+    "model": "75 Wireless",
+    "shape": "75",
+    "tone": "sand",
+    "attributes": {
+     "connectivity": {
+      "value": "Bluetooth + 2.4 GHz + USB-C",
+      "status": "VERIFIED",
+      "source": "D:Connectivity Technology",
+      "tags": [
+       "bluetooth",
+       "wireless-2.4",
+       "wired"
+      ]
+     },
+     "layout": {
+      "value": "75%",
+      "status": "VERIFIED",
+      "source": "F1",
+      "tags": [
+       "75"
+      ]
+     },
+     "switch": {
+      "value": "Brown (tactile)",
+      "status": "VERIFIED",
+      "source": "F4"
+     },
+     "hot_swap": {
+      "value": "Có",
+      "status": "VERIFIED",
+      "source": "F2"
+     },
+     "backlight": {
+      "value": "RGB",
+      "status": "VERIFIED",
+      "source": "D:Special Feature"
+     },
+     "battery": {
+      "value": "4000 mAh",
+      "status": "VERIFIED",
+      "source": "D:Battery Life"
+     }
+    },
+    "reviews_total": 18,
+    "rating_hist": {
+     "5": 12,
+     "4": 4,
+     "3": 1,
+     "2": 1,
+     "1": 0
+    },
+    "insights": [
+     {
+      "aspect": "Cảm giác gõ",
+      "pos": 13,
+      "mixed": 2,
+      "neg": 1,
+      "summary": "Switch brown có khấc nhẹ, gõ văn bản dài dễ chịu.",
+      "evidence": [
+       "R1"
+      ]
+     },
+     {
+      "aspect": "Kết nối",
+      "pos": 6,
+      "mixed": 2,
+      "neg": 2,
+      "summary": "Bluetooth đôi khi trễ một nhịp khi máy vừa thức dậy.",
+      "evidence": [
+       "R2"
+      ]
+     }
+    ],
+    "insights_method": "minh họa: đếm review theo từ khoá + số sao — không phải AI"
+   }
+  },
+  {
+   "parent_asin": "B0DEMOKB02",
+   "main_category": "Computers",
+   "title": "Lattice TKL Office Wireless Keyboard, Tenkeyless, Quiet Membrane Keys, 2.4GHz",
+   "store": "Lattice",
+   "average_rating": 4.2,
+   "rating_number": 1450,
+   "price": 22.99,
+   "features": [
+    "Tenkeyless",
+    "Quiet membrane keys",
+    "2.4GHz wireless",
+    "24-month battery (2 AAA)",
+    "No backlight"
+   ],
+   "description": [],
+   "images": [],
+   "videos": [],
+   "categories": [
+    "Electronics",
+    "Computers & Accessories",
+    "Computer Accessories & Peripherals",
+    "Keyboards, Mice & Accessories",
+    "Keyboards"
+   ],
+   "details": {
+    "Brand": "Lattice",
+    "Model Name": "TKL Office",
+    "Connectivity Technology": "2.4 GHz",
+    "Battery Life": "24 Months (2 AAA batteries)"
+   },
+   "bought_together": null,
+   "reviews": [
+    {
+     "rating": 5.0,
+     "title": "Quiet enough for an open office",
+     "text": "Quiet enough for an open office.",
+     "images": [],
+     "asin": "B0DEMOKB02",
+     "parent_asin": "B0DEMOKB02",
+     "timestamp": 1676431800000,
+     "helpful_vote": 4,
+     "verified_purchase": true
+    }
+   ],
+   "smartbuy": {
+    "category": "keyboard",
+    "status": "APPROVED",
+    "pending_reasons": [],
+    "model": "TKL Office",
+    "shape": "tkl",
+    "tone": "mist",
+    "attributes": {
+     "connectivity": {
+      "value": "2.4 GHz",
+      "status": "VERIFIED",
+      "source": "D:Connectivity Technology",
+      "tags": [
+       "wireless-2.4"
+      ]
+     },
+     "layout": {
+      "value": "TKL (80%)",
+      "status": "VERIFIED",
+      "source": "F1",
+      "tags": [
+       "tkl"
+      ]
+     },
+     "switch": {
+      "value": "Membrane, gõ êm",
+      "status": "VERIFIED",
+      "source": "F2"
+     },
+     "hot_swap": {
+      "value": null,
+      "status": "UNKNOWN",
+      "note": "Không có nguồn trong metadata — chưa xác minh."
+     },
+     "backlight": {
+      "value": "Không",
+      "status": "VERIFIED",
+      "source": "F5"
+     },
+     "battery": {
+      "value": "2 pin AAA, đến 24 tháng",
+      "status": "VERIFIED",
+      "source": "D:Battery Life"
+     }
+    },
+    "reviews_total": 9,
+    "rating_hist": {
+     "5": 4,
+     "4": 3,
+     "3": 1,
+     "2": 1,
+     "1": 0
+    },
+    "insights": [
+     {
+      "aspect": "Độ ồn",
+      "pos": 6,
+      "mixed": 1,
+      "neg": 0,
+      "summary": "Gõ êm, hợp văn phòng mở.",
+      "evidence": [
+       "R1"
+      ]
+     }
+    ],
+    "insights_method": "minh họa: đếm review theo từ khoá + số sao — không phải AI"
+   }
+  },
+  {
+   "parent_asin": "B0DEMOKB03",
+   "main_category": "Computers",
+   "title": "Tactile & Co. Mono 60 Wired Mechanical Keyboard, 60% Compact, Red Linear Switches, Hot-Swap",
+   "store": "Tactile & Co.",
+   "average_rating": 4.4,
+   "rating_number": 990,
+   "price": 32.5,
+   "features": [
+    "60% compact layout",
+    "Linear red switches",
+    "Hot-swap",
+    "USB-C wired",
+    "White backlight"
+   ],
+   "description": [],
+   "images": [],
+   "videos": [],
+   "categories": [
+    "Electronics",
+    "Computers & Accessories",
+    "Computer Accessories & Peripherals",
+    "Keyboards, Mice & Accessories",
+    "Keyboards"
+   ],
+   "details": {
+    "Brand": "Tactile & Co.",
+    "Model Name": "Mono 60",
+    "Connectivity Technology": "Wired USB-C",
+    "Special Feature": "White Backlit",
+    "Batteries Required": "No"
+   },
+   "bought_together": null,
+   "reviews": [
+    {
+     "rating": 4.0,
+     "title": "Love the extra desk space",
+     "text": "Love the extra desk space.",
+     "images": [],
+     "asin": "B0DEMOKB03",
+     "parent_asin": "B0DEMOKB03",
+     "timestamp": 1673753400000,
+     "helpful_vote": 3,
+     "verified_purchase": true
+    },
+    {
+     "rating": 2.0,
+     "title": "No arrow keys",
+     "text": "No arrow keys, hard for spreadsheets.",
+     "images": [],
+     "asin": "B0DEMOKB03",
+     "parent_asin": "B0DEMOKB03",
+     "timestamp": 1681529400000,
+     "helpful_vote": 6,
+     "verified_purchase": true
+    }
+   ],
+   "smartbuy": {
+    "category": "keyboard",
+    "status": "APPROVED",
+    "pending_reasons": [],
+    "model": "Mono 60",
+    "shape": "60",
+    "tone": "stone",
+    "attributes": {
+     "connectivity": {
+      "value": "Có dây USB-C",
+      "status": "VERIFIED",
+      "source": "D:Connectivity Technology",
+      "tags": [
+       "wired"
+      ]
+     },
+     "layout": {
+      "value": "60%",
+      "status": "VERIFIED",
+      "source": "F1",
+      "tags": [
+       "60"
+      ]
+     },
+     "switch": {
+      "value": "Red (linear)",
+      "status": "VERIFIED",
+      "source": "F2"
+     },
+     "hot_swap": {
+      "value": "Có",
+      "status": "VERIFIED",
+      "source": "F3"
+     },
+     "backlight": {
+      "value": "Trắng",
+      "status": "VERIFIED",
+      "source": "D:Special Feature"
+     },
+     "battery": {
+      "value": "Không dùng pin",
+      "status": "VERIFIED",
+      "source": "D:Batteries Required"
+     }
+    },
+    "reviews_total": 7,
+    "rating_hist": {
+     "5": 4,
+     "4": 2,
+     "3": 0,
+     "2": 1,
+     "1": 0
+    },
+    "insights": [
+     {
+      "aspect": "Kích thước",
+      "pos": 3,
+      "mixed": 2,
+      "neg": 2,
+      "summary": "Gọn bàn; thiếu phím mũi tên làm vài người khó quen.",
+      "evidence": [
+       "R1",
+       "R2"
+      ]
+     }
+    ],
+    "insights_method": "minh họa: đếm review theo từ khoá + số sao — không phải AI"
+   }
+  },
+  {
+   "parent_asin": "B0DEMOKB04",
+   "main_category": "Computers",
+   "title": "Clack Full Silent Wired Keyboard, Full-Size with Numpad, Spill-Resistant",
+   "store": "Clack",
+   "average_rating": 4.3,
+   "rating_number": 5230,
+   "price": 12.99,
+   "features": [
+    "Full-size layout with numeric keypad",
+    "Spill-resistant design",
+    "Wired USB",
+    "Quiet membrane keys"
+   ],
+   "description": [],
+   "images": [],
+   "videos": [],
+   "categories": [
+    "Electronics",
+    "Computers & Accessories",
+    "Computer Accessories & Peripherals",
+    "Keyboards, Mice & Accessories",
+    "Keyboards"
+   ],
+   "details": {
+    "Brand": "Clack",
+    "Model Name": "Full Silent",
+    "Connectivity Technology": "Wired USB",
+    "Batteries Required": "No"
+   },
+   "bought_together": null,
+   "reviews": [
+    {
+     "rating": 5.0,
+     "title": "The numpad is a must for my…",
+     "text": "The numpad is a must for my accounting work.",
+     "images": [],
+     "asin": "B0DEMOKB04",
+     "parent_asin": "B0DEMOKB04",
+     "timestamp": 1678851000000,
+     "helpful_vote": 5,
+     "verified_purchase": true
+    }
+   ],
+   "smartbuy": {
+    "category": "keyboard",
+    "status": "APPROVED",
+    "pending_reasons": [],
+    "model": "Full Silent",
+    "shape": "full",
+    "tone": "sage",
+    "attributes": {
+     "connectivity": {
+      "value": "Có dây USB",
+      "status": "VERIFIED",
+      "source": "D:Connectivity Technology",
+      "tags": [
+       "wired"
+      ]
+     },
+     "layout": {
+      "value": "Full-size (100%)",
+      "status": "VERIFIED",
+      "source": "F1",
+      "tags": [
+       "full"
+      ]
+     },
+     "switch": {
+      "value": "Membrane",
+      "status": "VERIFIED",
+      "source": "F4"
+     },
+     "hot_swap": {
+      "value": null,
+      "status": "UNKNOWN",
+      "note": "Không có nguồn trong metadata — chưa xác minh."
+     },
+     "backlight": {
+      "value": null,
+      "status": "UNKNOWN",
+      "note": "Nguồn không nhắc tới đèn nền."
+     },
+     "battery": {
+      "value": "Không dùng pin",
+      "status": "VERIFIED",
+      "source": "D:Batteries Required"
+     }
+    },
+    "reviews_total": 10,
+    "rating_hist": {
+     "5": 5,
+     "4": 3,
+     "3": 2,
+     "2": 0,
+     "1": 0
+    },
+    "insights": [
+     {
+      "aspect": "Nhập số",
+      "pos": 6,
+      "mixed": 1,
+      "neg": 0,
+      "summary": "Có bàn phím số, hợp kế toán và nhập liệu.",
+      "evidence": [
+       "R1"
+      ]
+     }
+    ],
+    "insights_method": "minh họa: đếm review theo từ khoá + số sao — không phải AI"
+   }
+  },
+  {
+   "parent_asin": "B0DEMOKB05",
+   "main_category": "Computers",
+   "title": "Lattice Slim BT Low-Profile Bluetooth Keyboard, Multi-Device (3), Rechargeable, Backlit",
+   "store": "Lattice",
+   "average_rating": 4.4,
+   "rating_number": 2100,
+   "price": 27.99,
+   "features": [
+    "Bluetooth multi-device (up to 3)",
+    "Low-profile scissor keys",
+    "Rechargeable, up to 3 months with backlight off",
+    "Full-size layout with numeric keypad"
+   ],
+   "description": [],
+   "images": [],
+   "videos": [],
+   "categories": [
+    "Electronics",
+    "Computers & Accessories",
+    "Computer Accessories & Peripherals",
+    "Keyboards, Mice & Accessories",
+    "Keyboards"
+   ],
+   "details": {
+    "Brand": "Lattice",
+    "Model Name": "Slim BT",
+    "Connectivity Technology": "Bluetooth (3 devices)",
+    "Special Feature": "White Backlit",
+    "Battery Life": "3 Months (rechargeable, backlight off)"
+   },
+   "bought_together": null,
+   "reviews": [
+    {
+     "rating": 5.0,
+     "title": "Switching between iPad and laptop is seamless",
+     "text": "Switching between iPad and laptop is seamless.",
+     "images": [],
+     "asin": "B0DEMOKB05",
+     "parent_asin": "B0DEMOKB05",
+     "timestamp": 1676431800000,
+     "helpful_vote": 8,
+     "verified_purchase": true
+    },
+    {
+     "rating": 4.0,
+     "title": "Feels like a laptop keyboard",
+     "text": "Feels like a laptop keyboard, in a good way.",
+     "images": [],
+     "asin": "B0DEMOKB05",
+     "parent_asin": "B0DEMOKB05",
+     "timestamp": 1684121400000,
+     "helpful_vote": 2,
+     "verified_purchase": true
+    }
+   ],
+   "smartbuy": {
+    "category": "keyboard",
+    "status": "APPROVED",
+    "pending_reasons": [],
+    "model": "Slim BT",
+    "shape": "low",
+    "tone": "lilac",
+    "attributes": {
+     "connectivity": {
+      "value": "Bluetooth, 3 thiết bị",
+      "status": "VERIFIED",
+      "source": "D:Connectivity Technology",
+      "tags": [
+       "bluetooth"
+      ]
+     },
+     "layout": {
+      "value": "Full-size, phím mỏng",
+      "status": "VERIFIED",
+      "source": "F4",
+      "tags": [
+       "full"
+      ]
+     },
+     "switch": {
+      "value": "Scissor (phím mỏng)",
+      "status": "VERIFIED",
+      "source": "F2"
+     },
+     "hot_swap": {
+      "value": null,
+      "status": "UNKNOWN",
+      "note": "Không có nguồn trong metadata — chưa xác minh."
+     },
+     "backlight": {
+      "value": "Trắng",
+      "status": "VERIFIED",
+      "source": "D:Special Feature"
+     },
+     "battery": {
+      "value": "Sạc, đến 3 tháng (tắt đèn)",
+      "status": "VERIFIED",
+      "source": "D:Battery Life"
+     }
+    },
+    "reviews_total": 13,
+    "rating_hist": {
+     "5": 8,
+     "4": 3,
+     "3": 1,
+     "2": 0,
+     "1": 1
+    },
+    "insights": [
+     {
+      "aspect": "Đa thiết bị",
+      "pos": 7,
+      "mixed": 1,
+      "neg": 1,
+      "summary": "Chuyển giữa iPad, laptop, điện thoại nhanh.",
+      "evidence": [
+       "R1"
+      ]
+     },
+     {
+      "aspect": "Cảm giác gõ",
+      "pos": 5,
+      "mixed": 2,
+      "neg": 1,
+      "summary": "Hành trình phím nông, giống bàn phím laptop.",
+      "evidence": [
+       "R2"
+      ]
+     }
+    ],
+    "insights_method": "minh họa: đếm review theo từ khoá + số sao — không phải AI"
+   }
+  },
+  {
+   "parent_asin": "B0DEMOKB06",
+   "main_category": "Computers",
+   "title": "Tactile & Co. Ergo Split Wired Ergonomic Keyboard, Split Layout, Tenting Kit Included",
+   "store": "Tactile & Co.",
+   "average_rating": 4.3,
+   "rating_number": 520,
+   "price": 59.0,
+   "features": [
+    "Split ergonomic layout",
+    "Tenting kit included",
+    "Brown tactile hot-swap switches",
+    "USB-C wired"
+   ],
+   "description": [],
+   "images": [],
+   "videos": [],
+   "categories": [
+    "Electronics",
+    "Computers & Accessories",
+    "Computer Accessories & Peripherals",
+    "Keyboards, Mice & Accessories",
+    "Keyboards"
+   ],
+   "details": {
+    "Brand": "Tactile & Co.",
+    "Model Name": "Ergo Split",
+    "Connectivity Technology": "Wired USB-C",
+    "Batteries Required": "No"
+   },
+   "bought_together": null,
+   "reviews": [
+    {
+     "rating": 4.0,
+     "title": "My shoulders feel better after two weeks",
+     "text": "My shoulders feel better after two weeks.",
+     "images": [],
+     "asin": "B0DEMOKB06",
+     "parent_asin": "B0DEMOKB06",
+     "timestamp": 1681529400000,
+     "helpful_vote": 4,
+     "verified_purchase": true
+    },
+    {
+     "rating": 2.0,
+     "title": "Steep learning curve",
+     "text": "Steep learning curve.",
+     "images": [],
+     "asin": "B0DEMOKB06",
+     "parent_asin": "B0DEMOKB06",
+     "timestamp": 1676431800000,
+     "helpful_vote": 3,
+     "verified_purchase": true
+    }
+   ],
+   "smartbuy": {
+    "category": "keyboard",
+    "status": "APPROVED",
+    "pending_reasons": [],
+    "model": "Ergo Split",
+    "shape": "split",
+    "tone": "clay",
+    "attributes": {
+     "connectivity": {
+      "value": "Có dây USB-C",
+      "status": "VERIFIED",
+      "source": "D:Connectivity Technology",
+      "tags": [
+       "wired"
+      ]
+     },
+     "layout": {
+      "value": "Tách đôi (split)",
+      "status": "VERIFIED",
+      "source": "F1",
+      "tags": [
+       "split"
+      ]
+     },
+     "switch": {
+      "value": "Brown (tactile)",
+      "status": "VERIFIED",
+      "source": "F3"
+     },
+     "hot_swap": {
+      "value": "Có",
+      "status": "VERIFIED",
+      "source": "F3"
+     },
+     "backlight": {
+      "value": null,
+      "status": "UNKNOWN",
+      "note": "Nguồn không nhắc tới đèn nền."
+     },
+     "battery": {
+      "value": "Không dùng pin",
+      "status": "VERIFIED",
+      "source": "D:Batteries Required"
+     }
+    },
+    "reviews_total": 5,
+    "rating_hist": {
+     "5": 3,
+     "4": 1,
+     "3": 0,
+     "2": 1,
+     "1": 0
+    },
+    "insights": [
+     {
+      "aspect": "Làm quen",
+      "pos": 2,
+      "mixed": 2,
+      "neg": 1,
+      "summary": "Cần 1–2 tuần làm quen; đỡ mỏi vai khi gõ lâu.",
+      "evidence": [
+       "R1",
+       "R2"
+      ]
+     }
+    ],
+    "insights_method": "minh họa: đếm review theo từ khoá + số sao — không phải AI"
+   }
+  },
+  {
+   "parent_asin": "B0DEMOKB07",
+   "main_category": "Computers",
+   "title": "Clack 98 Pro Wireless Mechanical Keyboard, 96% Layout, Gasket Mount, Bluetooth / 2.4GHz",
+   "store": "Clack",
+   "average_rating": 4.6,
+   "rating_number": 1240,
+   "price": 54.99,
+   "features": [
+    "Pre-lubed yellow linear switches",
+    "96% layout",
+    "Gasket mount",
+    "Tri-mode",
+    "RGB",
+    "5000mAh",
+    "Hot-swappable sockets"
+   ],
+   "description": [],
+   "images": [],
+   "videos": [],
+   "categories": [
+    "Electronics",
+    "Computers & Accessories",
+    "Computer Accessories & Peripherals",
+    "Keyboards, Mice & Accessories",
+    "Keyboards"
+   ],
+   "details": {
+    "Brand": "Clack",
+    "Model Name": "98 Pro",
+    "Connectivity Technology": "Bluetooth, 2.4 GHz, USB-C",
+    "Special Feature": "RGB Backlit",
+    "Battery Life": "5000 mAh",
+    "Switch Type": "Brown"
+   },
+   "bought_together": null,
+   "reviews": [
+    {
+     "rating": 5.0,
+     "title": "Thocky and soft",
+     "text": "Thocky and soft, best keyboard I've owned.",
+     "images": [],
+     "asin": "B0DEMOKB07",
+     "parent_asin": "B0DEMOKB07",
+     "timestamp": 1684121400000,
+     "helpful_vote": 9,
+     "verified_purchase": true
+    },
+    {
+     "rating": 3.0,
+     "title": "The listing said yellow switches",
+     "text": "The listing said yellow switches, mine came with browns.",
+     "images": [],
+     "asin": "B0DEMOKB07",
+     "parent_asin": "B0DEMOKB07",
+     "timestamp": 1686799800000,
+     "helpful_vote": 6,
+     "verified_purchase": true
+    }
+   ],
+   "smartbuy": {
+    "category": "keyboard",
+    "status": "APPROVED",
+    "pending_reasons": [],
+    "model": "98 Pro",
+    "shape": "96",
+    "tone": "stone",
+    "attributes": {
+     "connectivity": {
+      "value": "Bluetooth + 2.4 GHz + USB-C",
+      "status": "VERIFIED",
+      "source": "D:Connectivity Technology",
+      "tags": [
+       "bluetooth",
+       "wireless-2.4",
+       "wired"
+      ]
+     },
+     "layout": {
+      "value": "96%",
+      "status": "VERIFIED",
+      "source": "F2",
+      "tags": [
+       "96"
+      ]
+     },
+     "switch": {
+      "value": null,
+      "status": "CONFLICT",
+      "values": [
+       {
+        "value": "Yellow (linear)",
+        "source": "F1"
+       },
+       {
+        "value": "Brown (tactile)",
+        "source": "D:Switch Type"
+       }
+      ]
+     },
+     "hot_swap": {
+      "value": "Có",
+      "status": "VERIFIED",
+      "source": "F7"
+     },
+     "backlight": {
+      "value": "RGB",
+      "status": "VERIFIED",
+      "source": "D:Special Feature"
+     },
+     "battery": {
+      "value": "5000 mAh",
+      "status": "VERIFIED",
+      "source": "D:Battery Life"
+     }
+    },
+    "reviews_total": 15,
+    "rating_hist": {
+     "5": 11,
+     "4": 3,
+     "3": 1,
+     "2": 0,
+     "1": 0
+    },
+    "insights": [
+     {
+      "aspect": "Cảm giác gõ",
+      "pos": 12,
+      "mixed": 1,
+      "neg": 0,
+      "summary": "Gasket êm, tiếng gõ trầm.",
+      "evidence": [
+       "R1"
+      ]
+     },
+     {
+      "aspect": "Switch",
+      "pos": 0,
+      "mixed": 3,
+      "neg": 1,
+      "summary": "Vài người nhận switch khác với mô tả.",
+      "evidence": [
+       "R2"
+      ]
+     }
+    ],
+    "insights_method": "minh họa: đếm review theo từ khoá + số sao — không phải AI"
+   }
+  },
+  {
+   "parent_asin": "B0DEMOKB08",
+   "main_category": "Computers",
+   "title": "Lattice Compact 68 Bluetooth Mechanical Keyboard, 65% Layout with Arrow Keys",
+   "store": "Lattice",
+   "average_rating": 4.1,
+   "rating_number": 760,
+   "price": 29.99,
+   "features": [
+    "65% layout with arrow keys",
+    "Bluetooth 5.0 and USB-C",
+    "Red linear switches",
+    "2000mAh"
+   ],
+   "description": [],
+   "images": [],
+   "videos": [],
+   "categories": [
+    "Electronics",
+    "Computers & Accessories",
+    "Computer Accessories & Peripherals",
+    "Keyboards, Mice & Accessories",
+    "Keyboards"
+   ],
+   "details": {
+    "Brand": "Lattice",
+    "Model Name": "Compact 68",
+    "Connectivity Technology": "Bluetooth, USB-C",
+    "Special Feature": "White Backlit",
+    "Battery Life": "2000 mAh"
+   },
+   "bought_together": null,
+   "reviews": [
+    {
+     "rating": 4.0,
+     "title": "Nice compact size and it still has…",
+     "text": "Nice compact size and it still has arrows.",
+     "images": [],
+     "asin": "B0DEMOKB08",
+     "parent_asin": "B0DEMOKB08",
+     "timestamp": 1676431800000,
+     "helpful_vote": 1,
+     "verified_purchase": true
+    },
+    {
+     "rating": 3.0,
+     "title": "Bluetooth pairing was finicky at first",
+     "text": "Bluetooth pairing was finicky at first.",
+     "images": [],
+     "asin": "B0DEMOKB08",
+     "parent_asin": "B0DEMOKB08",
+     "timestamp": 1681529400000,
+     "helpful_vote": 0,
+     "verified_purchase": false
+    }
+   ],
+   "smartbuy": {
+    "category": "keyboard",
+    "status": "APPROVED",
+    "pending_reasons": [],
+    "model": "Compact 68",
+    "shape": "65",
+    "tone": "sage",
+    "attributes": {
+     "connectivity": {
+      "value": "Bluetooth + USB-C",
+      "status": "VERIFIED",
+      "source": "D:Connectivity Technology",
+      "tags": [
+       "bluetooth",
+       "wired"
+      ]
+     },
+     "layout": {
+      "value": "65%",
+      "status": "VERIFIED",
+      "source": "F1",
+      "tags": [
+       "65"
+      ]
+     },
+     "switch": {
+      "value": "Red (linear)",
+      "status": "VERIFIED",
+      "source": "F3"
+     },
+     "hot_swap": {
+      "value": null,
+      "status": "UNKNOWN"
+     },
+     "backlight": {
+      "value": "Trắng",
+      "status": "VERIFIED",
+      "source": "D:Special Feature"
+     },
+     "battery": {
+      "value": "2000 mAh",
+      "status": "VERIFIED",
+      "source": "D:Battery Life"
+     }
+    },
+    "reviews_total": 2,
+    "rating_hist": {
+     "5": 0,
+     "4": 1,
+     "3": 1,
+     "2": 0,
+     "1": 0
+    },
+    "insights": [],
+    "insights_method": "minh họa: đếm review theo từ khoá + số sao — không phải AI"
+   }
+  },
+  {
+   "parent_asin": "B0DEMOKB09",
+   "main_category": "Computers",
+   "title": "Clack Mini 40 (chưa duyệt — không được công bố)",
+   "store": "Clack",
+   "average_rating": 3.8,
+   "rating_number": 64,
+   "price": 25.0,
+   "features": [],
+   "description": [],
+   "images": [],
+   "videos": [],
+   "categories": [
+    "Electronics",
+    "Computers & Accessories",
+    "Computer Accessories & Peripherals",
+    "Keyboards, Mice & Accessories",
+    "Keyboards"
+   ],
+   "details": {
+    "Brand": "Clack",
+    "Model Name": "Mini 40"
+   },
+   "bought_together": null,
+   "reviews": [],
+   "smartbuy": {
+    "category": "keyboard",
+    "status": "PENDING",
+    "pending_reasons": [
+     "Chưa có thông số kết nối đã xác minh (data gate)",
+     "Chưa có review"
+    ],
+    "model": "Mini 40",
+    "shape": "60",
+    "tone": "mist",
+    "attributes": {},
+    "reviews_total": 0,
+    "rating_hist": {},
+    "insights": [],
+    "insights_method": "minh họa: đếm review theo từ khoá + số sao — không phải AI"
+   }
+  }
+ ]
+}
