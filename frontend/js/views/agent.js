@@ -12,13 +12,14 @@ import { catalogParams } from "./catalog.js";
 import { toast, openPopover, closePopovers } from "../layers.js";
 
 const EXAMPLES = [
-  "Tai nghe Bluetooth dưới 1 triệu để học online, ưu tiên đeo thoải mái",
-  "Chuột không dây cho dân văn phòng, click êm, cầm lâu không mỏi",
-  "Bàn phím cơ nhỏ gọn có Bluetooth, dưới 1,2 triệu",
+  { icon: "headphones", text: "Tai nghe Bluetooth dưới 1 triệu để học online" },
+  { icon: "mouse", text: "Chuột không dây click êm cho dân văn phòng" },
+  { icon: "keyboard", text: "Bàn phím cơ Bluetooth nhỏ gọn, dưới 1,2 triệu" },
 ];
 
 const logOpen = new Map();
 let ledgerOpen = null;
+let howOpen = false;
 let lastLedgerVersion = -1;
 let tick = null;
 const seenMsgs = new Set();
@@ -33,11 +34,11 @@ export function mountAgent(el) {
     <form class="composer" data-submit="ask" autocomplete="off">
       <div class="composer__scope" data-scope></div>
       <div class="composer__box">
-        <label class="visually-hidden" for="ask-input">Mô tả nhu cầu cho agent</label>
-        <textarea id="ask-input" rows="1" maxlength="2000" placeholder="mô tả nhu cầu: loại, ngân sách, dùng vào việc gì…"></textarea>
-        <button class="send" type="submit" aria-label="Gửi cho agent" disabled>${icon("arrow-up")}</button>
+        <label class="visually-hidden" for="ask-input">Mô tả nhu cầu cho trợ lý</label>
+        <textarea id="ask-input" rows="1" maxlength="2000" placeholder="Mô tả nhu cầu của bạn…" aria-describedby="ask-hint"></textarea>
+        <button class="send" type="submit" aria-label="Gửi cho trợ lý" disabled>${icon("arrow-up")}</button>
       </div>
-      <div class="composer__foot"><span><kbd>↵</kbd> gửi · <kbd>⇧</kbd><kbd>↵</kbd> xuống dòng · <kbd>/</kbd> lọc · <kbd>?</kbd> phím tắt</span><span>no checkout</span></div>
+      <p class="visually-hidden" id="ask-hint">Enter để gửi, Shift + Enter để xuống dòng.</p>
     </form>`);
   const ta = $("#ask-input", el);
   ta.addEventListener("input", () => { autosize(ta); syncSend(); });
@@ -48,6 +49,7 @@ export function mountAgent(el) {
     const d = e.target;
     if (d.matches && d.matches("details.log")) logOpen.set(d.dataset.msg, d.open);
     if (d.matches && d.matches("details.ledger")) ledgerOpen = d.open;
+    if (d.matches && d.matches("details.how")) howOpen = d.open;
   }, true);
   updateAgent();
 }
@@ -103,34 +105,34 @@ export function updateAgent() {
   syncSend();
 }
 
-function currentState() {
-  if (state.busy) return "ST-03";
-  const m = lastAgentMessage();
-  if (!m) return null;
-  if (m.error) return "ST-08";
-  return (m.payload && m.payload.state) || null;
-}
-
 export function updateHead() {
   const el = $("[data-agent-head]");
   if (!el) return;
-  const h = state.health;
-  const m = h && h.model;
   render(el, html`
-    <div>
-      <h2 class="agent__title">${icon("sparkles", { size: 20 })}Agent <em>// research</em></h2>
-      <p class="agent__sub">
-        ${statePill(currentState())}
-        ${m ? (m.fake
-          ? html`<span class="warn" title="MODEL_PROVIDER chưa đặt trong .env — codebase/ai.py chạy chế độ giả">${icon("alert")}model: fake</span>`
-          : html`<span>model: ${m.name || m.provider}</span>`)
-          : state.healthError ? html`<span class="warn">${icon("alert")}offline</span>` : html`<span>model: …</span>`}
-      </p>
+    <div class="agent__id">
+      <span class="agent__mark" aria-hidden="true">${icon("sparkles", { size: 18 })}</span>
+      <div>
+        <h2 class="agent__title">Trợ lý nghiên cứu</h2>
+        <p class="agent__status">${headStatus()}</p>
+      </div>
     </div>
     <div class="agent__head-tools">
-      <button class="icon-btn icon-btn--sm" data-action="agent-menu" aria-label="Tuỳ chọn agent" aria-haspopup="dialog">${icon("more")}</button>
-      <button class="icon-btn icon-btn--sm agent__close" data-action="close-agent" aria-label="Đóng agent">${icon("x")}</button>
+      <button class="icon-btn icon-btn--sm" id="agent-menu-btn" data-action="agent-menu" aria-label="Tuỳ chọn trợ lý" aria-haspopup="dialog">${icon("more")}</button>
+      <button class="icon-btn icon-btn--sm agent__close" data-action="close-agent" aria-label="Đóng trợ lý">${icon("x")}</button>
     </div>`);
+}
+
+/** Một dòng dưới tên trợ lý: đang chạy › model giả (bấm để mở kịch bản minh họa) › mất kết nối › tên model. */
+function headStatus() {
+  if (state.busy) return html`<span class="status-dot status-dot--busy"></span>Đang nghiên cứu…`;
+  const m = state.health && state.health.model;
+  if (m && m.fake) {
+    return html`<button class="model-badge" id="agent-model-btn" data-action="agent-menu" aria-haspopup="dialog"
+      title="MODEL_PROVIDER chưa đặt trong .env, codebase/ai.py đang trả output giả. Bấm để xem kịch bản minh họa.">${icon("alert", { size: 13 })}Chưa nối model${icon("chevron-down", { size: 13 })}</button>`;
+  }
+  if (state.healthError) return html`<span class="status-dot status-dot--err"></span>Mất kết nối máy chủ`;
+  if (m) return html`<span class="status-dot status-dot--ok"></span><span class="agent__model" title="Model đang dùng">${m.name || m.provider}</span>`;
+  return html`<span class="status-dot"></span>Đang kết nối…`;
 }
 
 function hasContext(c) {
@@ -142,28 +144,28 @@ export function updateLedger() {
   if (!el) return;
   const c = state.agent.context;
   const has = hasContext(c);
-  const open = ledgerOpen == null ? has && window.innerHeight >= 1000 : ledgerOpen;
   const bumped = has && c.version > lastLedgerVersion && lastLedgerVersion >= 0;
   lastLedgerVersion = c.version || 0;
+  // Chưa có nhu cầu thì không chiếm chỗ — sổ nhu cầu chỉ hiện khi trợ lý đã ghi được gì đó.
+  if (!has) { render(el, ""); return; }
+  const open = ledgerOpen == null ? window.innerHeight >= 1000 : ledgerOpen;
   const none = (t = "—") => html`<span class="none">${t}</span>`;
-  const summary = has
-    ? `${c.category_label || "cat?"} · ${(c.hard || []).length} hard · ${(c.soft || []).length} soft`
-    : "trống";
+  const hard = (c.hard || []).length;
+  const soft = (c.soft || []).length;
   render(el, html`<details class="ledger ${bumped ? "is-bumped" : ""}" ${open ? "open" : ""}>
-    <summary><span class="kicker kicker--ink">context</span>${has ? html`<span class="ledger__ver" title="context_version">v${c.version}</span>` : ""}<span class="muted">${summary}</span>${icon("chevron-down", { size: 15 })}</summary>
+    <summary><span class="ledger__label">Nhu cầu</span><span class="ledger__ver" title="Phiên bản nhu cầu (context_version)">v${c.version}</span><span class="ledger__sum">${c.category_label || "chưa rõ loại"} · ${hard} bắt buộc · ${soft} ưu tiên</span>${icon("chevron-down", { size: 15 })}</summary>
     <div class="ledger__body">
-      ${has ? html`<dl>
-          <dt>category</dt><dd>${c.category_label ? html`<span class="chip chip--purpose">${c.category_label}</span>` : none("chưa rõ")}</dd>
-          <dt>hard</dt><dd>${(c.hard || []).length ? c.hard.map((x, i) => ctxChip("hard", x, i, { removable: true })) : none()}</dd>
-          <dt>soft</dt><dd>${(c.soft || []).length ? c.soft.map((x, i) => ctxChip("soft", x, i, { removable: true })) : none()}</dd>
-          <dt>purpose</dt><dd>${c.purpose ? html`<span class="chip chip--purpose">${c.purpose}</span>` : none("chưa nêu")}</dd>
-          ${(c.exclude || []).length ? html`<dt>exclude</dt><dd>${c.exclude.map((x, i) => ctxChip("exclude", x, i, { removable: true }))}</dd>` : ""}
-        </dl>
-        <div class="ledger__foot">
-          <span>${state.agent.dirty ? "Bạn đã sửa context — kết quả cũ không còn áp dụng." : "hard: agent không tự nới · soft: chỉ để xếp hạng"}</span>
-          ${state.agent.dirty ? html`<button class="btn btn--accent btn--sm" data-action="rerun" ${state.busy ? "disabled" : ""}>${icon("refresh", { size: 14 })} chạy lại</button>` : ""}
-        </div>`
-        : html`<p class="none" style="padding-bottom:4px">Agent ghi ngành hàng, điều kiện bắt buộc (hard), tiêu chí ưu tiên (soft), mục đích vào đây. Bạn bỏ được bất kỳ mục nào.</p>`}
+      <dl>
+        <dt>Loại</dt><dd>${c.category_label ? html`<span class="chip chip--purpose">${c.category_label}</span>` : none("chưa rõ")}</dd>
+        <dt>Bắt buộc</dt><dd>${hard ? c.hard.map((x, i) => ctxChip("hard", x, i, { removable: true })) : none()}</dd>
+        <dt>Ưu tiên</dt><dd>${soft ? c.soft.map((x, i) => ctxChip("soft", x, i, { removable: true })) : none()}</dd>
+        <dt>Mục đích</dt><dd>${c.purpose ? html`<span class="chip chip--purpose">${c.purpose}</span>` : none("chưa nêu")}</dd>
+        ${(c.exclude || []).length ? html`<dt>Loại trừ</dt><dd>${c.exclude.map((x, i) => ctxChip("exclude", x, i, { removable: true }))}</dd>` : ""}
+      </dl>
+      <div class="ledger__foot">
+        <span>${state.agent.dirty ? "Bạn đã sửa nhu cầu — kết quả cũ không còn áp dụng." : "Bắt buộc: không tự nới · Ưu tiên: chỉ để xếp hạng"}</span>
+        ${state.agent.dirty ? html`<button class="btn btn--accent btn--sm" data-action="rerun" ${state.busy ? "disabled" : ""}>${icon("refresh", { size: 14 })} Chạy lại</button>` : ""}
+      </div>
     </div>
   </details>`);
 }
@@ -175,14 +177,14 @@ export function updateScope() {
   let chip;
   if (s.type === "product" && s.id) {
     const p = api.cached(s.id);
-    chip = html`<span class="scope-chip">${icon("search", { size: 12 })}<span>${s.id}${p ? ` · ${p.brand} ${p.model}` : ""}</span><button data-action="scope-reset" aria-label="Bỏ phạm vi sản phẩm, quay lại danh mục đang lọc">${icon("x", { size: 11 })}</button></span>`;
+    chip = html`<span class="scope-chip" title="Đang hỏi về sản phẩm ${s.id}">${icon("search", { size: 13 })}<span>${p ? `${p.brand} ${p.model}` : s.id}</span><button data-action="scope-reset" aria-label="Bỏ phạm vi sản phẩm, quay lại danh mục đang lọc">${icon("x", { size: 12 })}</button></span>`;
   } else if (s.type === "compare") {
-    chip = html`<span class="scope-chip">${icon("columns", { size: 12 })}<span>diff · ${state.compare.length} sản phẩm</span><button data-action="scope-reset" aria-label="Bỏ phạm vi so sánh">${icon("x", { size: 11 })}</button></span>`;
+    chip = html`<span class="scope-chip">${icon("columns", { size: 13 })}<span>So sánh ${state.compare.length} sản phẩm</span><button data-action="scope-reset" aria-label="Bỏ phạm vi so sánh">${icon("x", { size: 12 })}</button></span>`;
   } else {
     const d = state.catalog.data;
-    chip = html`<span class="scope-chip scope-chip--plain">${icon("filter", { size: 12 })}<span>${catLabel(state.category)}${d ? ` · ${d.total} đang lọc` : ""}</span></span>`;
+    chip = html`<span class="scope-chip scope-chip--plain" title="Trợ lý trả lời trong phạm vi danh mục đang lọc">${icon("filter", { size: 13 })}<span>${catLabel(state.category)}${d ? ` · ${d.total} sản phẩm` : ""}</span></span>`;
   }
-  render(el, html`<span>scope</span>${chip}`);
+  render(el, html`<span class="visually-hidden">Phạm vi câu hỏi:</span>${chip}`);
 }
 
 /* ───── Hội thoại ───── */
@@ -195,6 +197,8 @@ export function updateThread({ scroll = "auto" } = {}) {
   const latestAgentId = (lastAgentMessage() || {}).id;
   render(el, html`${t.length ? t.map((m) => message(m, latestAgentId)) : intro()}${state.busy ? working() : ""}`);
   el.dataset.count = String(t.length);
+  const ta = $("#ask-input");
+  if (ta) ta.placeholder = t.length ? "Hỏi thêm hoặc chỉnh nhu cầu…" : "Mô tả nhu cầu của bạn…";
   // Hiệu ứng xuất hiện chỉ cho tin nhắn mới — tin cũ đứng yên khi vẽ lại.
   el.querySelectorAll(".msg[data-id]").forEach((n) => {
     if (!seenMsgs.has(n.dataset.id)) { if (!firstThreadRender) n.classList.add("msg--new"); seenMsgs.add(n.dataset.id); }
@@ -207,28 +211,31 @@ export function updateThread({ scroll = "auto" } = {}) {
   }
 }
 
+/* Màn trống: một câu hỏi, ba câu mẫu, ba cam kết. Chi tiết cách làm việc gập lại; kịch bản minh họa nằm trong menu
+   (mở từ nhãn "Chưa nối model" hoặc nút ⋯), không chen vào đây. */
 function intro() {
-  const fake = state.health && state.health.model && state.health.model.fake;
   return html`<div class="intro">
-    <p class="kicker"><span class="slash">//</span> start</p>
-    <h3 class="intro__title">Giao nhu cầu, <em>nhận ≤ 3 lựa chọn có nguồn.</em></h3>
-    <p class="intro__lede">Agent lập kế hoạch → gọi <span class="mono">search_catalog</span> → loại sản phẩm vi phạm điều kiện → đọc details, features, review → chấm F, tính S → tự kiểm tra trước khi trả lời.</p>
-    <div class="intro__examples">${EXAMPLES.map((e) => html`<button class="chip chip--example" data-action="reply" data-text="${e}"><span>${e}</span>${icon("arrow-up-right", { size: 15 })}</button>`)}</div>
-    <ul class="rules">
-      <li>${icon("check")}<span>Không tự đổi điều kiện bắt buộc — muốn nới phải hỏi trước.</span></li>
-      <li>${icon("check")}<span>Không bịa thông số: không có nguồn thì ghi <span class="mono">UNKNOWN</span>.</span></li>
-      <li>${icon("check")}<span>Chỉ tư vấn: không đặt hàng, không thanh toán.</span></li>
-    </ul>
-    ${fake ? previewBox() : ""}
-  </div>`;
-}
-
-function previewBox() {
-  return html`<div class="notice notice--preview">${icon("info")}
-      <div class="notice__title">model: fake — agent chưa nối model</div>
-      <div class="notice__body">Câu hỏi thật vẫn chạy qua <span class="mono">codebase/agent.py</span> nhưng chỉ nhận output giả. Xem đủ các trạng thái giao diện bằng kịch bản minh họa (payload dựng sẵn, không phải AI):</div>
+    <div>
+      <h3 class="intro__title">Bạn đang cần mua gì?</h3>
+      <p class="intro__lede">Mô tả nhu cầu, trợ lý chọn tối đa 3 sản phẩm kèm lý do và nguồn.</p>
     </div>
-    ${scenarioButtons()}`;
+    <div class="intro__examples" role="group" aria-label="Câu hỏi mẫu">${EXAMPLES.map((e) => html`<button class="example" data-action="reply" data-text="${e.text}">
+        <span class="example__icon" aria-hidden="true">${icon(e.icon, { size: 17 })}</span><span class="example__text">${e.text}</span>${icon("arrow-up", { size: 15, cls: "example__go" })}</button>`)}</div>
+    <ul class="promises" aria-label="Cam kết của trợ lý">
+      <li>${icon("shield", { size: 15 })}Có nguồn</li>
+      <li>${icon("lock", { size: 15 })}Không tự nới điều kiện</li>
+      <li>${icon("ban", { size: 15 })}Không đặt hàng</li>
+    </ul>
+    <details class="how" ${howOpen ? "open" : ""}>
+      <summary>Trợ lý làm việc thế nào?${icon("chevron-down", { size: 14, cls: "chev" })}</summary>
+      <ol>
+        <li><span>Tách điều kiện bắt buộc và tiêu chí ưu tiên từ câu của bạn.</span></li>
+        <li><span>Lọc danh mục, loại sản phẩm không đạt điều kiện bắt buộc.</span></li>
+        <li><span>Đọc thông số và review làm bằng chứng. Thiếu nguồn thì ghi <span class="mono">UNKNOWN</span>, không đoán.</span></li>
+        <li><span>Chấm độ phù hợp và tự kiểm tra rồi mới trả lời. Muốn nới điều kiện thì hỏi bạn trước.</span></li>
+      </ol>
+    </details>
+  </div>`;
 }
 
 export function scenarioButtons() {
@@ -237,11 +244,10 @@ export function scenarioButtons() {
 
 function working() {
   return html`<div class="msg msg--agent msg--new" aria-hidden="true">
-    <div class="msg__meta"><span class="msg__who">smartbuy</span>${statePill("ST-03")}</div>
     <div class="working">
-      <div class="working__row"><span>running research loop…</span><span data-elapsed>${fmt.elapsed(Date.now() - state.busySince)}</span></div>
+      <div class="working__row"><span>Đang nghiên cứu…</span><span data-elapsed>${fmt.elapsed(Date.now() - state.busySince)}</span></div>
       <div class="working__bar">${Array.from({ length: 24 }, (_, k) => html`<i style="--k:${k}"></i>`)}</div>
-      <p class="working__note">plan → search_catalog → validate_constraints → get_evidence → score → reflect. Các bước thật hiện khi agent trả kết quả (không giả tiến độ).</p>
+      <p class="working__note">Các bước thật sẽ hiện khi có kết quả, không giả tiến độ.</p>
     </div>
   </div>`;
 }
@@ -249,8 +255,9 @@ function working() {
 function message(m, latestAgentId) {
   if (m.role === "user") {
     return html`<div class="msg msg--user" data-id="${m.id}">
-      <div class="msg__meta"><span>you · ${fmt.clock(m.at)}</span>${m.preview ? html`<span class="msg__tag">demo</span>` : ""}</div>
-      <p class="msg__body">${m.text}</p></div>`;
+      <p class="msg__body" title="${fmt.clock(m.at)}">${m.text}</p>
+      ${m.preview ? html`<span class="msg__tag" title="Câu hỏi dựng sẵn của kịch bản minh họa">Minh họa</span>` : ""}
+    </div>`;
   }
   if (m.role === "system") {
     return html`<div class="msg msg--system" data-id="${m.id}">${icon(m.icon || "edit")}<p class="line">${m.text}</p></div>`;
@@ -267,20 +274,20 @@ function agentMessage(m, isLatest) {
   const prose = (p && p.message) || m.output || "";
   return html`<article class="msg msg--agent ${stale ? "msg--stale" : ""}" data-id="${m.id}">
     <div class="msg__meta">
-      <span class="msg__who">smartbuy</span><span>${fmt.clock(m.at)}</span>${code ? statePill(code) : ""}
-      ${m.preview ? html`<span class="msg__tag">demo</span>` : ""}
-      ${stale ? html`<span class="stale-tag">ctx v${m.contextVersion} · stale</span>` : ""}
+      ${code ? statePill(code, { withCode: false }) : ""}<span>${fmt.clock(m.at)}</span>
+      ${m.preview ? html`<span class="msg__tag" title="Payload dựng sẵn, không phải AI, không có trace">Minh họa</span>` : ""}
+      ${stale ? html`<span class="stale-tag" title="Kết quả theo nhu cầu v${m.contextVersion}, nhu cầu hiện là v${state.agent.context.version}">Nhu cầu đã đổi</span>` : ""}
     </div>
     ${m.error ? errorBlock(m.error) : ""}
     ${p && p.error ? errorBlock(p.error, true) : ""}
     ${prose ? html`<div class="msg__prose"><p>${prose}</p></div>` : ""}
-    ${fakeText ? html`<div class="notice notice--preview">${icon("info")}<div class="notice__title">output giả của codebase/agent.py</div><div class="notice__body">Nối model theo docs/connect-model.md. Muốn giao diện vẽ Top 3, trạng thái, bằng chứng… agent trả thêm khoá <span class="mono">smartbuy</span> (frontend/README.md).</div></div>` : ""}
+    ${fakeText ? html`<div class="notice notice--preview">${icon("info")}<div class="notice__title">Output giả, chưa nối model</div><div class="notice__body">Nối model theo <span class="mono">docs/connect-model.md</span>. Để vẽ Top 3, agent trả thêm khoá <span class="mono">smartbuy</span> (xem <span class="mono">frontend/README.md</span>).</div></div>` : ""}
     ${p && p.plan && p.plan.length ? planLog(p.plan, m, isLatest && !recs.length) : (m.events && m.events.length ? traceLog(m) : "")}
     ${p && p.clarify ? clarify(p.clarify, m, isLatest) : ""}
     ${p && p.no_match ? noMatch(p.no_match) : ""}
     ${p && p.pending_change ? slip(p.pending_change, m, isLatest) : ""}
     ${recs.length ? recList(recs) : ""}
-    ${p && p.limits && p.limits.length && !recs.length ? html`<ul class="rules" style="border:0;padding:0">${p.limits.map((l) => html`<li>${icon("alert")}<span>${l}</span></li>`)}</ul>` : ""}
+    ${p && p.limits && p.limits.length && !recs.length ? html`<ul class="rules">${p.limits.map((l) => html`<li>${icon("alert")}<span>${l}</span></li>`)}</ul>` : ""}
     ${p && p.next_actions && p.next_actions.length && isLatest ? nextActions(p.next_actions, m) : ""}
     ${foot(m)}
   </article>`;
@@ -297,7 +304,7 @@ function errorBlock(err, fromPayload = false) {
     TOOL_ERROR: "Lỗi công cụ" + (err.tool ? ` ${err.tool}` : ""),
   }[err.type] || "Không thể xử lý";
   return html`<div class="notice notice--err" role="alert">${icon("alert")}
-    <div class="notice__title">${title} <span class="mono muted" style="font-size:11px;font-weight:500">[${err.type || "ERROR"}]</span></div>
+    <div class="notice__title">${title} <span class="notice__code">${err.type || "ERROR"}</span></div>
     <div class="notice__body">${err.message || ""}${err.retry_count ? ` (retry ${err.retry_count})` : ""}.${fromPayload ? "" : html` <b>Lỗi hệ thống — không có nghĩa là không có sản phẩm phù hợp.</b>`} Danh mục và bộ lọc vẫn dùng được.</div>
     ${fromPayload ? "" : html`<div class="notice__actions"><button class="btn btn--sm btn--accent" data-action="retry-last">${icon("refresh", { size: 14 })} Thử lại</button><button class="btn btn--sm btn--ghost" data-action="browse-catalog">Tự duyệt danh mục</button></div>`}
   </div>`;
@@ -324,10 +331,10 @@ const sec2 = (ms) => (ms / 1000).toFixed(2);
 function planLog(plan, m, defaultOpen) {
   const total = plan.reduce((a, s) => a + (s.ms || 0), 0);
   const open = logOpen.has(m.id) ? logOpen.get(m.id) : defaultOpen;
-  const flag = plan.some((s) => s.status === "error") ? " · error" : plan.some((s) => s.status === "warn") ? " · warn" : "";
+  const flag = plan.some((s) => s.status === "error") ? "error" : plan.some((s) => s.status === "warn") ? "warn" : "";
   let t = 0;
   return html`<details class="log" data-msg="${m.id}" ${open ? "open" : ""}>
-    <summary>${icon("terminal")}<span>trace · ${plan.length} steps · ${fmt.seconds(total)}${flag}</span>${icon("chevron-down", { cls: "chev" })}</summary>
+    <summary>${icon("activity")}<span>Quá trình · ${plan.length} bước · ${fmt.seconds(total)}</span>${flag ? html`<span class="log__flag log__flag--${flag}">${flag === "error" ? "có lỗi" : "có cảnh báo"}</span>` : ""}${icon("chevron-down", { cls: "chev" })}</summary>
     <ol>${plan.map((s, i) => {
       t += s.ms || 0;
       const st = s.status || "done";
@@ -344,7 +351,7 @@ function traceLog(m) {
   const ev = m.events || [];
   const open = logOpen.has(m.id) ? logOpen.get(m.id) : false;
   return html`<details class="log" data-msg="${m.id}" ${open ? "open" : ""}>
-    <summary>${icon("terminal")}<span>trace thật · ${ev.length} events · ${fmt.seconds(m.trace && m.trace.latency_ms)}</span>${icon("chevron-down", { cls: "chev" })}</summary>
+    <summary>${icon("activity")}<span>Trace · ${ev.length} sự kiện · ${fmt.seconds(m.trace && m.trace.latency_ms)}</span>${icon("chevron-down", { cls: "chev" })}</summary>
     <ol>${ev.map((e, i) => {
       const st = e.error ? "error" : "done";
       const fn = e.kind === "model" ? (e.name || "call_model") : e.kind === "tool" ? e.name : "note";
@@ -372,15 +379,16 @@ function clarify(c, m, isLatest) {
 
 function noMatch(nm) {
   return html`<div class="notice">${icon("search")}
-    <div class="notice__title">NO_MATCH · vì sao</div>
+    <div class="notice__title">Vì sao chưa có lựa chọn phù hợp</div>
     <div class="notice__body"><ul style="margin:4px 0 0 16px;display:grid;gap:4px">${(nm.findings || []).map((f) => html`<li>${f}</li>`)}</ul></div>
   </div>`;
 }
 
+/** Phiếu đề xuất điều chỉnh (pending_change). BR-ST-05: không áp dụng gì cho tới khi người dùng chọn. */
 function slip(pc, m, isLatest) {
   const r = m.resolved;
   return html`<div class="slip ${r ? "is-resolved" : ""}" aria-label="${pc.title || "Đề xuất điều chỉnh"}">
-    <div class="slip__head"><span class="kicker">${icon("edit", { size: 12 })} pending_change · cần bạn duyệt</span><span class="mono muted" style="font-size:11px">${pc.id || ""}</span></div>
+    <div class="slip__head" title="${pc.id || ""}"><span class="slip__label">${icon("edit", { size: 13 })} Cần bạn duyệt</span></div>
     ${r ? html`<p class="slip__resolved">${icon("check", { size: 14 })} đã chọn: ${r.label}</p>`
       : html`<div class="slip__opts">${(pc.options || []).map((o) => html`<button class="opt ${o.kind === "keep" ? "opt--keep" : ""}" data-action="choose-change" data-msg="${m.id}" data-key="${o.key}" ${isLatest && !state.busy ? "" : "disabled"}>
             <span class="opt__title">${o.title}</span>
@@ -388,7 +396,7 @@ function slip(pc, m, isLatest) {
             ${o.note ? html`<span class="opt__note">${o.note}</span>` : ""}
             ${icon("chevron-right")}
           </button>`)}</div>
-        <p class="ask__hint">Không thay đổi nào được áp dụng cho tới khi bạn chọn (BR-ST-05).</p>`}
+        <p class="ask__hint">Chưa có gì thay đổi cho tới khi bạn chọn.</p>`}
   </div>`;
 }
 
@@ -406,7 +414,7 @@ function recList(recs) {
     })}</div>
     <div class="msg__actions">
       <button class="btn btn--accent btn--sm" data-action="open-report">${icon("report", { size: 14 })} Mở báo cáo</button>
-      <button class="btn btn--sm" data-action="compare-recs" data-ids="${recs.map((r) => r.id).join(",")}">${icon("columns", { size: 14 })} diff</button>
+      <button class="btn btn--sm" data-action="compare-recs" data-ids="${recs.map((r) => r.id).join(",")}">${icon("columns", { size: 14 })} So sánh</button>
     </div>`;
 }
 
@@ -419,14 +427,14 @@ function nextActions(list, m) {
   })}</div>`;
 }
 
+/** Chân tin nhắn thật: thời gian + token, chi tiết lượt gọi nằm trong tooltip và trang trace.
+ *  Tin minh họa không có chân — nhãn "Minh họa" ở dòng meta đã nói rõ là không có trace. */
 function foot(m) {
   const t = m.trace;
-  if (m.preview) return html`<div class="msg__foot"><span>demo payload · không có trace thật</span></div>`;
-  if (!m.runId) return "";
+  if (m.preview || !m.runId) return "";
   return html`<div class="msg__foot">
-    <span>${m.runId}</span>
-    ${t ? html`<span>${t.model_calls} call · ${t.tool_calls} tool · ${t.tokens_in}→${t.tokens_out} tok · ${fmt.seconds(t.latency_ms)}</span>` : ""}
-    <button data-action="open-trace" data-msg="${m.id}">open trace</button>
+    ${t ? html`<span title="${m.runId} · ${t.model_calls} lượt gọi model · ${t.tool_calls} lượt gọi công cụ">${fmt.seconds(t.latency_ms)} · ${t.tokens_in}→${t.tokens_out} token</span>` : html`<span>${m.runId}</span>`}
+    <button data-action="open-trace" data-msg="${m.id}">Xem trace</button>
   </div>`;
 }
 
@@ -480,7 +488,7 @@ async function afterAgentMessage(msg) {
   if (recs.length) {
     try { await api.products(recs.map((r) => r.id)); } catch (e) { /* báo cáo sẽ tự báo lỗi */ }
     updateThread();
-    toast(`Report sẵn sàng · ${recs.length} pick.`, { actionLabel: "mở", onAction: () => { location.hash = "#/bao-cao"; }, kind: "ok" });
+    toast(`Báo cáo đã sẵn sàng · ${recs.length} lựa chọn.`, { actionLabel: "Mở", onAction: () => { location.hash = "#/bao-cao"; }, kind: "ok" });
   }
   const st = msg.error ? "ST-08" : msg.payload && msg.payload.state;
   announce(st === "ST-08" ? "Agent gặp lỗi, không có nghĩa là không có sản phẩm" : recs.length ? `Agent đề xuất ${recs.length} lựa chọn` : "Agent đã trả lời");
@@ -565,8 +573,8 @@ export function removeCriterion(kind, idx) {
   state.agent.context = { ...c, [kind]: list.filter((_, i) => i !== idx), version: (c.version || 0) + 1 };
   if (kind === "hard" && item.key === "price") state.agent.context.budget = null;
   state.agent.dirty = true;
-  const what = { hard: "hard", soft: "soft", exclude: "exclude" }[kind];
-  push({ role: "system", icon: "edit", text: `context v${state.agent.context.version}: bỏ ${what} “${label}” — kết quả trước đó không còn áp dụng.` });
+  const what = { hard: "điều kiện bắt buộc", soft: "tiêu chí ưu tiên", exclude: "điều kiện loại trừ" }[kind];
+  push({ role: "system", icon: "edit", text: `Nhu cầu v${state.agent.context.version}: đã bỏ ${what} “${label}”. Kết quả trước không còn áp dụng.` });
   save();
   emit("agent", "report-data");
   updateThread({ scroll: "bottom" });
@@ -609,12 +617,12 @@ export function clearThread() {
 export function agentMenu(anchor) {
   const last = [...state.agent.thread].reverse().find((m) => m.role === "agent" && m.runId);
   openPopover(anchor, html`<div class="menu" role="menu">
-      <p class="kicker" style="padding:6px 10px 2px">demo scenarios</p>
-      <p class="muted">Payload dựng sẵn để xem đủ trạng thái giao diện — không phải AI.</p>
+      <p class="kicker" style="padding:6px 10px 2px">Kịch bản minh họa</p>
+      <p class="muted">Dữ liệu dựng sẵn để xem đủ trạng thái giao diện, không phải AI.</p>
       ${scenarioButtons()}
       <hr>
       ${last ? html`<button role="menuitem" data-action="open-trace" data-msg="${last.id}">${icon("activity", { size: 15 })} Trace lượt gần nhất</button>` : ""}
-      <button role="menuitem" data-action="clear-thread">${icon("trash", { size: 15 })} Xoá hội thoại, giữ context</button>
+      <button role="menuitem" data-action="clear-thread">${icon("trash", { size: 15 })} Xoá hội thoại, giữ nhu cầu</button>
       <button role="menuitem" data-action="new-session">${icon("rotate", { size: 15 })} Bắt đầu phiên mới</button>
     </div>`, { cls: "menu-pop", label: "Tuỳ chọn agent" });
 }
