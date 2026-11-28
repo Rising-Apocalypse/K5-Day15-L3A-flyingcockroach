@@ -306,19 +306,19 @@ body {
 .gate--off .st { color: var(--text-3); }
 
 .stage { width: min(100%, 1580px); margin: 0 auto; padding: 0 clamp(24px, 5.1vw, 96px) 110px; outline: none; }
-.cat-head { padding-top: clamp(24px, 2.8vw, 48px); }
-.catalog-intro { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-bottom: clamp(20px, 2vw, 32px); }
+.cat-head { padding-top: clamp(16px, 2vw, 28px); }
+.catalog-intro { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 10px; }
 .catalog-intro h1 { font-size: clamp(27px, 2.5vw, 42px); line-height: 1.2; letter-spacing: -.055em; }
 .catalog-intro p { margin-top: 6px; color: var(--text-2); font-size: clamp(14px, 1.05vw, 17px); }
 .advisor-cta, .advisor-cta:hover { background: var(--brand-gradient); color: white; border-color: transparent; min-height: 41px; border-radius: 10px; }
 .advisor-cta:hover { box-shadow: 0 4px 20px var(--accent-soft); }
-.catalog-controls, .kpi, .grid .card { background: var(--glass); border: 1px solid var(--glass-edge); box-shadow: var(--glass-shadow); border-radius: 22px; }
-.catalog-controls { padding: clamp(18px, 2vw, 30px); }
+.catalog-controls, .kpi, .grid .card { background: var(--glass); border: 0; border-radius: var(--r-1); }
+.catalog-controls { padding: clamp(8px, 1vw, 12px); }
 .catalog-search { display: flex; gap: 12px; align-items: center; height: 46px; padding: 0 15px; border: 1px solid var(--field); border-radius: 9px; color: var(--text-2); background: var(--glass-field); }
 .catalog-search input { flex: 1; min-width: 0; width: 100%; height: 100%; background: transparent; border: 0; font-size: 14px; outline: none; }
 .catalog-search input::placeholder { color: var(--text-3); }
 .catalog-search:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
-.keycaps { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 16px; }
+.keycaps { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
 .keycap { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 38px; padding: 0 13px; border: 1px solid var(--accent-line); border-radius: 9px; background: var(--surface); color: var(--text); font-weight: 500; font-size: 14px; transition: background var(--dur-2), transform var(--dur-2); }
 .keycap__icon .icon { width: 17px; height: 17px; }
 .keycap__count { font-variant-numeric: tabular-nums; font-size: 11px; opacity: .8; }
@@ -327,15 +327,15 @@ body {
 .data-flag { display: inline-flex; align-items: center; gap: 5px; background: none; border: 0; padding: 4px 0; color: var(--text-3); font: 400 12px var(--font-sans); }
 .data-flag:hover { color: var(--accent); }
 .data-flag .icon { width: 14px; height: 14px; }
-.kpis { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: clamp(12px,1.6vw,24px); margin-top: clamp(18px,1.8vw,28px); }
-.kpi { --tone: var(--accent); display: flex; align-items: center; gap: clamp(10px,1vw,16px); padding: clamp(14px,1.6vw,24px); min-width: 0; min-height: 104px; }
+.kpis { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: var(--card-gap); margin-top: var(--card-gap); }
+.kpi { --tone: var(--accent); display: flex; align-items: center; gap: 8px; padding: clamp(8px, 1vw, 12px); min-width: 0; min-height: 68px; }
 .kpi--message { --tone: var(--cyan); }
 .kpi--shield { --tone: var(--ok); }
 .kpi--wallet { --tone: var(--warn); }
 .metric-icon { flex: none; display: grid; place-items: center; width: 46px; height: 46px; border: 1px solid color-mix(in srgb, var(--tone) 30%, transparent); border-radius: 12px; color: var(--tone); background: color-mix(in srgb, var(--tone) 11%, transparent); }
 .kpi__v { display: block; font-size: clamp(23px,1.8vw,31px); }
 .kpi__label { display: block; margin-top: 3px; font-size: 13px; color: var(--text-2); line-height: 1.4; }
-.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 22px 0 15px; }
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: var(--card-gap) 0; }
 .toolbar__count { display: flex; align-items: center; gap: 9px; font-size: 19px; letter-spacing: -.04em; }
 .toolbar__count span { padding: 2px 8px; background: var(--accent-soft); color: var(--accent); border-radius: 8px; font-size: 12px; }
 .toolbar__chips { display: flex; flex-wrap: wrap; gap: 6px; flex: 1 1 auto; min-width: 0; }
@@ -343,7 +343,7 @@ body {
 .toolbar__right .select { width: auto; height: 32px; }
 .filters-open { display: inline-flex; }
 
-.grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: clamp(12px,1.6vw,24px); }
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: var(--card-gap); }
 @media (max-width: 1080px) { .grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 @media (max-width: 620px) { .grid { grid-template-columns: minmax(0,1fr); } }
 .grid--enter .card { animation: rise 380ms var(--ease-out) backwards; animation-delay: calc(var(--i, 0) * 30ms); }
@@ -361,7 +361,7 @@ body {
 .card__title a { text-decoration: none; }
 .card__title a::after { content: ""; position: absolute; inset: 0; z-index: 1; }
 .card__title a:focus-visible { outline: none; }
-.card__title a:focus-visible::after { outline: 2px solid var(--focus); outline-offset: -2px; border-radius: var(--r-3); }
+.card__title a:focus-visible::after { outline: 2px solid var(--focus); outline-offset: -2px; border-radius: var(--r-1); }
 .card__listing { font-size: 12px; line-height: 1.4; color: var(--text-3); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .specs { display: grid; gap: 4px; margin-top: 4px; }
 .spec { display: grid; grid-template-columns: 8px 62px minmax(0, 1fr); gap: 8px; align-items: center; font-size: 12.5px; }
@@ -442,7 +442,7 @@ body {
 .tray--full .tray__name { display: none; }
 
 /* Thẻ danh mục: ảnh thu nhỏ, thông số và hành động. */
-.grid .card { --product-tone: var(--cyan); padding: clamp(16px,1.6vw,26px); }
+.grid .card { --product-tone: var(--cyan); padding: clamp(10px, 1vw, 14px); }
 .grid .card:nth-child(3n + 2) { --product-tone: var(--accent); }
 .grid .card:nth-child(3n) { --product-tone: var(--ok); }
 .product-heading { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 13px; }
@@ -452,14 +452,13 @@ body {
 .product-heading .plate svg { stroke-width: 5; }
 .product-heading .plate .pf { fill: transparent; }
 .card__title { font: 600 19px/1.35 var(--font-sans); letter-spacing: -.035em; }
-.card__body { padding: 0; margin-top: 15px; }
-.card .specs { gap: 7px; }
-.card .spec { padding: 7px 10px; min-height: 51px; grid-template-columns: 7px minmax(0,1fr); column-gap: 8px; row-gap: 0; border: 1px solid var(--line); border-radius: 9px; background: var(--glass-field); }
-.card .spec .led { grid-row: span 2; }
+.card__body { padding: 0; margin-top: 8px; }
+.card .specs { gap: 2px; margin-top: 0; }
+.card .spec { padding: 3px 8px; min-height: 27px; background: var(--glass-field); }
 .card .spec .k { text-transform: none; font-size: 11px; letter-spacing: .02em; }
-.card .spec .v { font-size: 13px; }
-.card__foot { margin: 16px 0 0; padding: 0; border: 0; }
-.product-actions { z-index: 2; position: relative; display: flex; align-items: center; justify-content: space-between; gap: 8px; border-top: 1px solid var(--line); margin-top: 14px; padding-top: 12px; }
+.card .spec .v { font-size: 13px; white-space: normal; overflow-wrap: anywhere; }
+.card__foot { margin: 8px 0 0; padding: 0; border: 0; }
+.product-actions { z-index: 2; position: relative; display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; }
 .product-actions .card__ask { margin: 0; align-self: center; }
 .product-actions .toggle-compare { font-size: 12px; text-transform: none; letter-spacing: 0; }
 /* ───────────── 5. Lớp phủ ───────────── */
@@ -941,7 +940,6 @@ body.has-tray .toasts { bottom: calc(86px + var(--tabbar-h)); }
 .agent__close { display: inline-grid; }
 .agent-scrim { position: fixed; inset: 0; z-index: 49; background: var(--scrim); }
 @media (max-width: 1100px) {
-  .kpi { gap: 10px; padding: 14px; }
   .metric-icon { width: 36px; height: 36px; }
 }
 @media (max-width: 860px) {
@@ -965,15 +963,13 @@ body.has-tray .toasts { bottom: calc(86px + var(--tabbar-h)); }
   .catalog-intro { align-items: flex-start; gap: 10px; }
   .catalog-intro h1 { font-size: 25px; }
   .advisor-cta { padding: 0 9px; font-size: 12px; min-height: 36px; }
-  .catalog-controls { padding: 14px; }
   .catalog-search { gap: 7px; padding: 0 9px; }
   .catalog-search input { font-size: 16px; }
   .catalog-search kbd, .keycap__count { display: none; }
-  .keycaps { gap: 5px; margin-top: 12px; }
+  .keycaps { gap: 5px; margin-top: 8px; }
   .keycap { flex: 1; gap: 5px; padding: 0 6px; font-size: 12px; white-space: nowrap; }
   .keycap__icon { display: none; } /* 4 tab (có "Tất cả") không đủ chỗ cho icon trên màn hẹp */
-  .kpis { gap: 8px; }
-  .kpi { min-height: 78px; border-radius: 15px; }
+  .kpi { min-height: 56px; }
   .kpi__label { font-size: 12px; }
   .toolbar__right { flex-wrap: wrap; }
   .tabbar { position: fixed; z-index: 40; left: 0; right: 0; bottom: 0; height: var(--tabbar-h); display: grid; grid-template-columns: repeat(4, 1fr); padding-bottom: env(safe-area-inset-bottom); background: var(--surface); border-top: 1px solid var(--line); }
@@ -998,7 +994,7 @@ body.has-tray .toasts { bottom: calc(86px + var(--tabbar-h)); }
 
 /* ───────────── 12. Trợ năng ───────────── */
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .card:hover { transform: translateY(-4px); border-color: var(--accent-line); box-shadow: 0 12px 28px -14px var(--accent-line); }
+  .card:hover { transform: translateY(-1px); box-shadow: var(--glass-shadow); }
   .keycap:hover { transform: translateY(-2px); }
   .keycap:active { transform: translateY(0); }
 }
@@ -1009,6 +1005,7 @@ body.has-tray .toasts { bottom: calc(86px + var(--tabbar-h)); }
   .card:hover .plate svg, .card:hover .plate img { transform: none; }
 }
 @media (forced-colors: active) {
+  .catalog-controls, .kpi, .grid .card { border: 1px solid CanvasText; }
   .btn--primary, .btn--accent, .send, .badge, .chip--hard { border: 1px solid CanvasText; }
   .segm i.on, .hist__bar, .sentiment > i, .led { background: CanvasText; forced-color-adjust: none; }
   .keycap[aria-pressed="true"] { outline: 2px solid CanvasText; }
