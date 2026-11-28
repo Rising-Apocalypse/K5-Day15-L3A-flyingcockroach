@@ -38,7 +38,7 @@ Các câu B11/B13 chứa hai lượt trong một ô input: bộ chạy hiện g�
 
 | Lượt | Run ID | Model | Cấu hình (prompt / công cụ / thay đổi) | Đạt / tổng | % | Đạt chuẩn? |
 |---|---|---|---|---|---|---|
-| 1 | | | | __/__ | | |
+| 1 | run-1@20261128-075128 | gemini-3.1-flash-lite | Agent SmartBuy bản đầu (PR #8 backend) | 15/24 | 62% | Chưa (chuẩn ≥80%) |
 | 2 | | | | __/__ | | |
 
 Lượt chạy lại vì lỗi kỹ thuật, lượt sau CP4: ghi thêm dòng, không sửa dòng cũ.

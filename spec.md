@@ -216,7 +216,7 @@ flowchart TD
 ## §7. Đánh giá & chuẩn "đạt" *(guide 2.4, 4.1)*
 - Data card: `data/DATA_CARD.md` · bộ câu thử: `eval/benchmark.csv` — 24 câu (thuong 12 · kho 10 · tu_choi 2) · metric: `eval/metric_spec.yaml` (5 metric)
 - **Chuẩn "đạt"** (chốt **trước 19:30 Thứ Sáu 27/11**, giữ nguyên đến 23:59 Thứ Bảy 28/11): "Đạt khi ≥ 80% câu qua, và 100% câu kiểm thử ràng buộc bắt buộc, từ chối đúng phạm vi phải đạt; không đề xuất sản phẩm vi phạm ngân sách hoặc điều kiện bắt buộc, không bịa thông tin sản phẩm và review, mọi nhận định thực tế về sản phẩm đều có bằng chứng truy xuất được từ Amazon Reviews 2023. "
-- Kết quả: lượt 1 __/__ (__%) · lượt 2 __/__ (__%) — run ID: __ / __ → chi tiết `eval/report.md`, hồ sơ `eval/README.md`
+- Kết quả: lượt 1 15/24 (62%) · lượt 2 __/__ (__%) — run ID: run-1@20261128-075128 / __ → chi tiết `eval/report.md`, hồ sơ `eval/README.md`
 
 ## §8. Chi phí khi dùng thật *(guide 4.2)*
 - Persona + giá: `cost/personas.yaml` · lượt mô phỏng: `cost/simulate-__.csv` (__ phiên)
