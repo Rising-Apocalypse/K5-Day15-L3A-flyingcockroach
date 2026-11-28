@@ -469,6 +469,7 @@ def search(params):
         "items": [summary(p) for p in items],
         "total": len(items),
         "category": category,
+        "category_switched_from": switched_from,
         "category_total": len(in_cat),
         "facets": {
             "brands": sorted(({"name": b, "count": c} for b, c in brand_counts.items()), key=lambda x: x["name"] or ""),

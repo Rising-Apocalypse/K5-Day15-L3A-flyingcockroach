@@ -9,12 +9,16 @@ Dataset nào, xử lý gì: tóm 2–3 dòng từ `data/DATA_CARD.md`.
 
 ## 2. Bộ câu thử dựng ra sao
 
-- `eval/benchmark.csv`: __ câu (thuong __ · kho __ · tu_choi __, trong đó __ câu tấn công)
-- Nguồn (`python run.py check` in sẵn): nguoi_dung __ · data_that __ · tu_viet __ · sinh_seed __ → từ người dùng / data thật __/__ (cần ≥1/3)
-- Độ phủ — lưới input 3–5 chiều (guide 2.4 bước 5): __
+- `eval/benchmark.csv`: 24 câu (thuong 12 · kho 10 · tu_choi 2). Hai câu từ chối là B14 (giao dịch ngoài phạm vi) và B15 (tấn công yêu cầu bỏ quy tắc, tạo sản phẩm/review giả).
+- Nguồn (`python run.py check`): nguoi_dung 6 · data_that 3 · tu_viet 15 · sinh_seed 0 → từ người dùng / data thật 9/24 (37,5%, đạt ≥1/3).
+- Độ phủ: ngành hàng (tai nghe/chuột/bàn phím); thông tin đầu vào (đủ/thiếu/mâu thuẫn); bằng chứng (có/thiếu/trái chiều); nhu cầu (ngân sách/tính năng/ưu tiên); tương tác (một lượt/nhiều lượt/từ chối).
 - Câu `kho` trỏ về 4 lớp chỗ khó (`spec.md` §5): lớp 1: __ · lớp 2: __ · lớp 3: __ · lớp 4: __
 
 ## 3. Metric và cách chấm
+
+B01–B15 được giữ nguyên khi mở rộng. B16–B24 là câu chuyển thể từ trải nghiệm thật, không phải yêu cầu nguyên văn của người tham gia; `source` ghi rõ vị trí nguồn. B16–B18 dựa trên P1–P3; B19–B21 dựa trên câu trả lời mở khảo sát (tab `680797427`, hàng 7/10/20, cột K); B22–B24 dựa trên ba review có ID trong `evidence/data-mining.md`. Link khảo sát nằm trong `evidence/summary.md`. Không thay expected theo output của agent.
+
+Các câu B11/B13 chứa hai lượt trong một ô input: bộ chạy hiện gửi nguyên ô vào `answer(text)`. Chúng kiểm xử lý nội dung ngữ cảnh được cung cấp, chưa chứng minh bộ nhớ phiên qua hai lần gọi API độc lập.
 
 | Metric (`eval/metric_spec.yaml`) | Cách chấm | Ngưỡng |
 |---|---|---|
@@ -34,7 +38,7 @@ Dataset nào, xử lý gì: tóm 2–3 dòng từ `data/DATA_CARD.md`.
 
 | Lượt | Run ID | Model | Cấu hình (prompt / công cụ / thay đổi) | Đạt / tổng | % | Đạt chuẩn? |
 |---|---|---|---|---|---|---|
-| 1 | | | | __/__ | | |
+| 1 | run-1@20261128-075128 | gemini-3.1-flash-lite | Agent SmartBuy bản đầu (PR #8 backend) | 15/24 | 62% | Chưa (chuẩn ≥80%) |
 | 2 | | | | __/__ | | |
 
 Lượt chạy lại vì lỗi kỹ thuật, lượt sau CP4: ghi thêm dòng, không sửa dòng cũ.
