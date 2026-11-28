@@ -6,7 +6,7 @@ README của nhóm có mục "Dùng AI vào việc gì" (2–3 dòng, bắt bu�
 
 | Việc | Công cụ AI | AI làm gì | Người kiểm/sửa gì | Ai phụ trách |
 |---|---|---|---|---|
-| Code bản chạy thử | | | | |
+| Code bản chạy thử | Claude Code (Claude Opus 5.5) | Viết backend 27/11: `ai.py` (gọi model), `tools.py`, `agent.py`, chế độ `--from-export` của `build_catalog.py` — chi tiết `docs/backend-log.md` | Chạy 15 câu thử chế độ giả + `eval --try` 3 câu; người còn phải đọc lại code và chấm lượt 1: __ | Lý Thành Lập |
 | Prompt / thiết kế lời gọi mô hình | | | | |
 | Đào data (viết script đếm, gợi ý nhãn) | | | Kiểm tay __ dòng, khớp __ | |
 | Rà câu hỏi phỏng vấn / khảo sát | | Chỉ rà câu dẫn dắt | | |
