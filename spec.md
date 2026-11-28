@@ -279,7 +279,8 @@ flowchart TD
 | 28/11 10:07–11:43 | Tìm kiếm hiểu tiếng Việt (PR #11); agent hỏi lại khi thiếu ngân sách / tên mẫu / nhu cầu, bắt thêm điều kiện bắt buộc, sửa prompt (PR #12, #13 vào `develop`) | Lần cải tiến trước lượt 2, nhắm nhóm lỗi "không hỏi lại khi thiếu thông tin" (B16–B21, B24 ở lượt 1) |
 | 28/11 14:04 | Merge `develop` vào `main` (PR #14) | Đưa cải tiến lên `main` trước khi chạy lượt 2 |
 | 28/11 14:03–14:10 | Chạy lượt 2: 24/24 (100%), run `run-2@20261128-140317`; Claude Code đề xuất cột `pass`, Nguyễn Trung Anh duyệt | Đo sau cải tiến, cùng bộ câu và cách chấm |
-| 28/11 14:10 | `cost/personas.yaml`: thay dòng "(ví dụ)" bằng nguồn giá và số người dùng ghi "(tự ước tính)"; chạy `simulate --rate-from eval/run-2.csv` | Mô phỏng chi phí cho CP4 |
+| 28/11 14:08–14:20 | `cost/personas.yaml`: thay dòng "(ví dụ)" bằng số theo §2 (100 người cơ sở; 1/2/4 phiên), ghi "(tự ước tính)"; chạy `simulate --rate-from eval/run-2.csv` (50 phiên) → $0.0013 / task thành công; điền `cost/cost-estimate.md`, §8 | Mô phỏng chi phí cho CP4 |
+| 28/11 14:12–14:21 | Thêm `demo-slides.pdf`; cập nhật trang 4–7 theo lượt 2, chi phí và link video | Slide nhóm làm trước khi có lượt 2 và mô phỏng |
 
 **Sau CP4 (đến 23:59 Thứ Bảy 28/11)** (sửa theo góp ý — không sửa chuẩn "đạt", câu thử, số bằng chứng, kết quả các lượt đã chạy)
 
