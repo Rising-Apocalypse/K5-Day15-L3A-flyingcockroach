@@ -39,10 +39,10 @@ Các câu B11/B13 chứa hai lượt trong một ô input: bộ chạy hiện g�
 | Lượt | Run ID | Model | Cấu hình (prompt / công cụ / thay đổi) | Đạt / tổng | % | Đạt chuẩn? |
 |---|---|---|---|---|---|---|
 | 1 | run-1@20261128-075128 | gemini-3.1-flash-lite | Agent SmartBuy bản đầu (PR #8 backend) | 15/24 | 62% | Chưa (chuẩn ≥80%) |
-| 2 | | | | __/__ | | |
+| 2 | run-2@20261128-140317 | gemini-3.1-flash-lite | Hỏi lại khi thiếu ngân sách / tên mẫu / nhu cầu, bắt thêm điều kiện bắt buộc, sửa prompt (PR #12, #13, #14) | 24/24 | 100% | Đạt |
 
 Lượt chạy lại vì lỗi kỹ thuật, lượt sau CP4: ghi thêm dòng, không sửa dòng cũ.
 
 ## 6. Lỗi chính
 
-Tóm 2–3 dòng từ `eval/report.md`: nhóm lỗi lớn nhất · đã sửa gì · còn lại gì.
+Nhóm lỗi lớn nhất lượt 1 là **không hỏi lại khi thiếu thông tin** (7/9 câu trượt: B16–B21, B24). Đã sửa agent để hỏi ngân sách / tên mẫu / nhu cầu thay vì tự đề xuất → lượt 2 đạt 24/24, không câu nào tệ đi. Còn lại: chưa có bộ nhớ phiên thật (B11, B13 gộp hai lượt một ô), phần "Vì sao" của model chưa có kiểm tự động trích dẫn, lượt 2 mới một người chấm. Chi tiết: `eval/report.md`.

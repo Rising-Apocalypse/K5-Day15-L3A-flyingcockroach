@@ -245,7 +245,7 @@ flowchart TD
 ## §7. Đánh giá & chuẩn "đạt" *(guide 2.4, 4.1)*
 - Data card: `data/DATA_CARD.md` · bộ câu thử: `eval/benchmark.csv` — 24 câu (thuong 12 · kho 10 · tu_choi 2) · metric: `eval/metric_spec.yaml` (5 metric)
 - **Chuẩn "đạt"** (chốt **trước 19:30 Thứ Sáu 27/11**, giữ nguyên đến 23:59 Thứ Bảy 28/11): "Đạt khi ≥ 80% câu qua, và 100% câu kiểm thử ràng buộc bắt buộc, từ chối đúng phạm vi phải đạt; không đề xuất sản phẩm vi phạm ngân sách hoặc điều kiện bắt buộc, không bịa thông tin sản phẩm và review, mọi nhận định thực tế về sản phẩm đều có bằng chứng truy xuất được từ Amazon Reviews 2023. "
-- Kết quả: lượt 1 15/24 (62%) · lượt 2 __/__ (__%) — run ID: run-1@20261128-075128 / __ → chi tiết `eval/report.md`, hồ sơ `eval/README.md`
+- Kết quả: lượt 1 15/24 (62%) · lượt 2 24/24 (100%) — run ID: run-1@20261128-075128 / run-2@20261128-140317 → chi tiết `eval/report.md`, hồ sơ `eval/README.md`
 
 ## §8. Chi phí khi dùng thật *(guide 4.2)*
 - Persona + giá: `cost/personas.yaml` · lượt mô phỏng: `cost/simulate-__.csv` (__ phiên)
@@ -276,6 +276,10 @@ flowchart TD
 | 28/11 07:41 | Merge `develop` vào `main` (PR #9) | `main` trước đó vẫn là agent ví dụ của khung |
 | 28/11 07:51 | Chạy lượt 1: 15/24 (62%), run `run-1@20261128-075128` | Đo trước khi cải tiến |
 | 28/11 sau CP3 | Bổ sung `spec.md` đầu file, nửa sau §4, §5, §6, §9 (form CP3 đã khai §5–§6 chưa xong) | Hoàn thiện spec cho CP4; nội dung lấy từ code và bộ câu thử, không đổi chuẩn "đạt" |
+| 28/11 10:07–11:43 | Tìm kiếm hiểu tiếng Việt (PR #11); agent hỏi lại khi thiếu ngân sách / tên mẫu / nhu cầu, bắt thêm điều kiện bắt buộc, sửa prompt (PR #12, #13 vào `develop`) | Lần cải tiến trước lượt 2, nhắm nhóm lỗi "không hỏi lại khi thiếu thông tin" (B16–B21, B24 ở lượt 1) |
+| 28/11 14:04 | Merge `develop` vào `main` (PR #14) | Đưa cải tiến lên `main` trước khi chạy lượt 2 |
+| 28/11 14:03–14:10 | Chạy lượt 2: 24/24 (100%), run `run-2@20261128-140317`; Claude Code đề xuất cột `pass`, Nguyễn Trung Anh duyệt | Đo sau cải tiến, cùng bộ câu và cách chấm |
+| 28/11 14:10 | `cost/personas.yaml`: thay dòng "(ví dụ)" bằng nguồn giá và số người dùng ghi "(tự ước tính)"; chạy `simulate --rate-from eval/run-2.csv` | Mô phỏng chi phí cho CP4 |
 
 **Sau CP4 (đến 23:59 Thứ Bảy 28/11)** (sửa theo góp ý — không sửa chuẩn "đạt", câu thử, số bằng chứng, kết quả các lượt đã chạy)
 
