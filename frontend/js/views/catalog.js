@@ -28,7 +28,7 @@ const pct = (x) => (x == null || !isFinite(x) ? "—" : Math.round(x * 100) + "%
 
 export function catalogParams() {
   const f = state.filters;
-  const p = { category: state.category, q: f.q, sort: f.sort };
+  const p = { category: state.category === "all" ? "" : state.category, q: f.q, sort: f.sort };
   if (f.minVnd != null) p.min_vnd = f.minVnd;
   if (f.maxVnd != null) p.max_vnd = f.maxVnd;
   if (f.brands.length) p.brand = f.brands;
@@ -46,7 +46,7 @@ export async function loadCatalog() {
     if (my !== seq) return;
     api.remember(data.items);
     state.catalog = { status: "ready", data, error: null };
-    announce(`${data.total} sản phẩm ${catLabel(state.category).toLowerCase()} khớp bộ lọc`);
+    announce(`${data.total} sản phẩm${state.category === "all" ? "" : " " + catLabel(state.category).toLowerCase()} khớp bộ lọc`);
   } catch (e) {
     if (my !== seq) return;
     state.catalog = { status: "error", data: state.catalog.data, error: e };
@@ -95,7 +95,10 @@ function masthead() {
         <input id="q" type="search" aria-label="Lọc danh mục theo tên, thương hiệu, ASIN" placeholder="Tìm tên sản phẩm, thương hiệu hoặc ASIN…" value="${state.filters.q}" autocomplete="off" enterkeyhint="search">
         <kbd aria-hidden="true">/</kbd>
       </form>
-    <div class="keycaps" role="group" aria-label="Ngành hàng — phím tắt 1, 2, 3">
+    <div class="keycaps" role="group" aria-label="Ngành hàng — phím tắt 0, 1, 2, 3">
+      <button class="keycap" aria-pressed="${state.category === "all" ? "true" : "false"}" data-action="set-category" data-cat="all" aria-keyshortcuts="0">
+        <span class="keycap__icon">${icon("grid", { size: 22 })}</span>
+        <span class="keycap__name">Tất cả</span><span class="keycap__count" data-count="all">${meta && meta.published != null ? pad2(meta.published) : ""}</span></button>
       ${Object.entries(cats).map(([k, c], i) => html`<button class="keycap" aria-pressed="${k === state.category ? "true" : "false"}" data-action="set-category" data-cat="${k}" aria-keyshortcuts="${i + 1}">
         <span class="keycap__icon">${icon(categoryIcon(k), { size: 22 })}</span>
         <span class="keycap__name">${c.label}</span><span class="keycap__count" data-count="${k}">${c.count != null ? pad2(c.count) : ""}</span></button>`)}
@@ -113,6 +116,8 @@ function updateHead(head) {
       if (el) el.textContent = pad2(c.count);
     }
   }
+  const all = head.querySelector('[data-count="all"]');
+  if (all && meta && meta.published != null) all.textContent = pad2(meta.published);
   const k = head.querySelector("[data-kpis]");
   if (k) render(k, kpis());
 }
@@ -132,7 +137,7 @@ function kpis() {
     <div><strong class="kpi__v led-num">${value}</strong><span class="kpi__label">${label}</span><span class="visually-hidden">${sub}</span></div>
   </div>`;
   return [
-    tile("grid", "Sản phẩm", pad2(n), `/ ${d.category_total} trong ngành`),
+    tile("grid", "Sản phẩm", pad2(n), `/ ${d.category_total} ${state.category === "all" ? "trong danh mục" : "trong ngành"}`),
     tile("message", "Có đánh giá", pad2(withRev), n ? `${pct(withRev / n)} số item` : "—"),
     tile("shield", "Thông số xác minh", tot ? pct(ver / tot) : "—", `${ver}/${tot} trường`, "Tỉ lệ thông số có trạng thái VERIFIED (có nguồn)"),
     tile("wallet", "Giá trung vị", mid != null ? fmt.vndShort(mid).replace(" ", "") : "—", prices.length < n ? `${n - prices.length} price: null` : "≈ từ USD"),
@@ -144,7 +149,7 @@ function activeChips() {
   const chips = [];
   const chip = (k, v, action, data = "") =>
     html`<span class="chip chip--filter"><span class="k">${k}</span><span>${v}</span><button class="chip__x" data-action="${action}" ${data ? html`${data}` : ""} aria-label="Bỏ lọc ${k} ${v}">${icon("x")}</button></span>`;
-  if (f.q) chips.push(chip("q", `“${f.q}”`, "clear-q"));
+  if (f.q) chips.push(html`<span class="chip chip--filter"><span class="k">tìm</span><span>“${f.q}”</span><button class="chip__x" data-action="clear-q" aria-label="Xoá từ khoá ${f.q}">${icon("x")}</button></span>`);
   if (f.minVnd != null || f.maxVnd != null) chips.push(chip("giá", priceLabel(f.minVnd, f.maxVnd), "clear-price"));
   f.brands.forEach((b) => chips.push(html`<span class="chip chip--filter"><span class="k">hãng</span><span>${b}</span><button class="chip__x" data-action="toggle-brand" data-brand="${b}" aria-label="Bỏ lọc thương hiệu ${b}">${icon("x")}</button></span>`));
   if (f.minRating) chips.push(chip("sao", `≥ ${fmt.rating(f.minRating)}`, "clear-rating"));
@@ -172,7 +177,7 @@ function toolbar() {
   const mode = state.catalogView === "table" ? "table" : "grid";
   const meta = catMeta();
   const count = d
-    ? html`<h2 class="toolbar__count">${catLabel(state.category)} <span>${d.total}</span></h2>`
+    ? html`<h2 class="toolbar__count">${state.category === "all" ? "Tất cả sản phẩm" : catLabel(state.category)} <span>${d.total}</span></h2>`
     : html`<p class="toolbar__count"><span class="skel" style="display:inline-block;width:90px;height:16px"></span></p>`;
   return html`<div class="toolbar">
     ${count}
@@ -219,13 +224,40 @@ function skeletonGrid() {
 }
 
 function emptyResults(data) {
+  const f = state.filters;
   const n = activeFilterCount();
-  const hiddenNoPrice = (state.filters.minVnd != null || state.filters.maxVnd != null) && data.facets && data.facets.no_price;
+  const ask = html`<button class="btn btn--pen" data-action="ask-filtered">${icon("sparkles", { size: 15 })} Hỏi trợ lý</button>`;
+  if (!n) {
+    return emptyState({ glyph: "grid", center: true, title: "Ngành này chưa có sản phẩm được công bố", body: "Danh mục chỉ hiện sản phẩm đã được duyệt.", actions: ask });
+  }
+  // Từ khoá là tên ngành khác (đang ở Tai nghe mà gõ "chuột"): mời chuyển ngành, giữ nguyên từ khoá.
+  const other = data.q_category && data.q_category.count ? data.q_category : null;
+  if (other) {
+    return emptyState({
+      glyph: categoryIcon(other.category), center: true,
+      title: `“${f.q}” thuộc ngành ${other.label}`,
+      body: `Bạn đang xem ${catLabel(state.category)}. Ngành ${other.label} có ${other.count} sản phẩm khớp.`,
+      actions: html`<button class="btn btn--accent" data-action="search-in-category" data-cat="${other.category}">Xem trong ${other.label}</button>${ask}`,
+    });
+  }
+  // Đang ở một ngành, từ khoá không khớp ở đây nhưng khớp ở ngành khác ("razer" khi đang ở Tai nghe) → mời tìm trong Tất cả.
+  const elsewhere = f.q && state.category !== "all" && data.q_all_count ? data.q_all_count : 0;
+  if (elsewhere) {
+    return emptyState({
+      glyph: "search", center: true,
+      title: `Không có ${catLabel(state.category).toLowerCase()} nào khớp “${f.q}”`,
+      body: `Có ${elsewhere} sản phẩm khớp ở ngành khác.`,
+      actions: html`<button class="btn btn--accent" data-action="search-in-category" data-cat="all">${icon("grid", { size: 15 })} Tìm trong tất cả</button>${ask}`,
+    });
+  }
+  const hiddenNoPrice = (f.minVnd != null || f.maxVnd != null) && data.facets && data.facets.no_price;
   return emptyState({
-    title: n ? `0 kết quả cho ${n} điều kiện đang lọc` : "Ngành này chưa có sản phẩm được công bố",
-    body: html`${n ? "Bỏ bớt một điều kiện, hoặc để agent tìm phương án gần nhất — nó sẽ nói rõ điều gì phải nới và chờ bạn duyệt." : "Catalog chỉ hiện sản phẩm APPROVED."}${hiddenNoPrice ? html` <span class="muted">${data.facets.no_price} sản phẩm có price: null đang bị ẩn vì bạn lọc theo ngân sách.</span>` : ""}`,
-    actions: html`${n ? html`<button class="btn btn--primary" data-action="clear-filters">Bỏ tất cả bộ lọc</button>` : ""}
-      <button class="btn btn--pen" data-action="ask-filtered">${icon("terminal", { size: 15 })} Giao cho agent</button>`,
+    glyph: "search", center: true,
+    title: f.q ? `Không có sản phẩm khớp “${f.q}”${n > 1 ? ` và ${n - 1} bộ lọc khác` : ""}` : `Không có sản phẩm khớp ${n} bộ lọc`,
+    body: html`${f.q ? "Ô tìm kiếm khớp tên, hãng hoặc ASIN. Muốn mô tả nhu cầu thì hỏi trợ lý." : "Bỏ bớt một bộ lọc, hoặc nhờ trợ lý tìm phương án gần nhất."}${hiddenNoPrice ? html` <span class="muted">${data.facets.no_price} sản phẩm chưa có giá đang bị ẩn vì bạn lọc theo giá.</span>` : ""}`,
+    actions: html`${f.q && n === 1
+      ? html`<button class="btn btn--primary" data-action="clear-q">Xoá từ khoá</button>`
+      : html`<button class="btn btn--primary" data-action="clear-filters">Bỏ tất cả bộ lọc</button>`}${ask}`,
   });
 }
 
@@ -265,7 +297,9 @@ function sortHead(label, kind, cls = "") {
 }
 
 function tableView(items) {
-  const keys = (CARD_KEYS[state.category] || []).slice(0, 2);
+  // "Tất cả": các ngành có thông số khác nhau, nên thay 2 cột thông số bằng cột ngành.
+  const all = state.category === "all";
+  const keys = all ? [] : (CARD_KEYS[state.category] || []).slice(0, 2);
   const cell = (p, k) => {
     const a = (p.attributes || {})[k] || { status: "UNKNOWN" };
     const st = a.status || "UNKNOWN";
@@ -273,9 +307,10 @@ function tableView(items) {
     return html`<td><span class="sp sp--${st.toLowerCase()}"><span class="led led--${ledFor(st)}" aria-hidden="true"></span>${v}</span></td>`;
   };
   return html`<table class="ptable">
-    <caption class="visually-hidden">${catLabel(state.category)} — ${items.length} sản phẩm</caption>
+    <caption class="visually-hidden">${all ? "Tất cả sản phẩm" : catLabel(state.category)} — ${items.length} sản phẩm</caption>
     <thead><tr>
       <th scope="col">asin</th><th scope="col">sản phẩm</th>
+      ${all ? html`<th scope="col">ngành</th>` : ""}
       ${keys.map((k) => html`<th scope="col">${SHORT[k] || k}</th>`)}
       ${sortHead("giá", "price", "r")}${sortHead("sao", "rating", "r")}${sortHead("lượt", "reviews", "r")}${sortHead("Q", "relevance", "r")}
       <th scope="col"><span class="visually-hidden">So sánh</span></th>
@@ -285,6 +320,7 @@ function tableView(items) {
       return html`<tr data-action="open-product" data-id="${p.id}">
         <td class="asin">${p.id}</td>
         <td><div class="prod">${plate(p, { variant: "thumb" })}<div><a href="#/sp/${p.id}">${p.brand} ${p.model}</a><small>${p.title}</small></div></div></td>
+        ${all ? html`<td><span class="sp">${icon(categoryIcon(p.category), { size: 15 })}${catLabel(p.category)}</span></td>` : ""}
         ${keys.map((k) => cell(p, k))}
         <td class="r">${p.price_vnd != null ? fmt.vnd(p.price_vnd) : html`<span class="muted">null</span>`}</td>
         <td class="r">${fmt.rating(p.rating)}</td>
@@ -366,7 +402,7 @@ export function filtersHtml(prefix = "f") {
         })}
       </section>`)}
 
-    <section class="fgroup" aria-labelledby="${prefix}-gate">
+    ${state.category === "all" ? html`<p class="fgroup__hint">Chọn một ngành (Tai nghe, Chuột, Bàn phím) để lọc thêm theo thông số kỹ thuật.</p>` : html`<section class="fgroup" aria-labelledby="${prefix}-gate">
       <div class="fgroup__title"><h3 class="kicker kicker--ink" id="${prefix}-gate">data gate</h3><span class="kicker">≥ ${Math.round(gate * 100)}%</span></div>
       <div class="gatebox">
         ${cands.map((k) => {
@@ -377,18 +413,19 @@ export function filtersHtml(prefix = "f") {
         })}
       </div>
       <p class="fgroup__hint">Bộ lọc chỉ bật khi đủ sản phẩm có thông số <b>đã xác minh</b> (AC-CAT-02). Item chưa xác minh không bao giờ khớp bộ lọc. DPI, switch, pin… hỏi agent để xem từng mẫu.</p>
-    </section>`;
+    </section>`}`;
 }
 
 /* ───── Hành động ───── */
-export function setCategory(cat) {
+/** keepQuery: giữ từ khoá khi chuyển ngành (vd đang ở Tai nghe gõ "chuột logitech" rồi bấm "Xem trong Chuột"). */
+export function setCategory(cat, { keepQuery = false } = {}) {
   if (cat === state.category) return;
   state.category = cat;
   // BR-CTX-11: đổi ngành hàng thì không mang thuộc tính riêng của ngành cũ sang.
-  state.filters = { ...DEFAULT_FILTERS(), q: "", sort: state.filters.sort };
+  state.filters = { ...DEFAULT_FILTERS(), q: keepQuery ? state.filters.q : "", sort: state.filters.sort };
   state.priceError = null;
   const q = document.getElementById("q");
-  if (q) q.value = "";
+  if (q) q.value = state.filters.q;
   save();
   emit("filters");
   loadCatalog();
