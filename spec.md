@@ -248,10 +248,10 @@ flowchart TD
 - Kết quả: lượt 1 15/24 (62%) · lượt 2 24/24 (100%) — run ID: run-1@20261128-075128 / run-2@20261128-140317 → chi tiết `eval/report.md`, hồ sơ `eval/README.md`
 
 ## §8. Chi phí khi dùng thật *(guide 4.2)*
-- Persona + giá: `cost/personas.yaml` · lượt mô phỏng: `cost/simulate-__.csv` (__ phiên)
-- Chi phí / task thành công: __ (model __) · __ (model __)
-- Chi phí / tháng ở quy mô thật: thấp __ · cơ sở __ · cao __ → chi tiết `cost/cost-estimate.md`
-- So với impact / người / tháng (§2): đáng làm không, vì sao:
+- Persona + giá: `cost/personas.yaml` · lượt mô phỏng: `cost/simulate-1.csv` (50 phiên, 0 lỗi, tỉ lệ đạt từ `run-2`)
+- Chi phí / task thành công: $0.0013 ≈ 34 ₫ (model gemini-3.1-flash-lite) · $0.0075 ≈ 195 ₫ (model gemini-4-hydrogen)
+- Chi phí / tháng ở quy mô thật: thấp $0.16 · cơ sở $0.33 · cao $0.99 (flash-lite; 50 / 100 / 300 người, *tự ước tính*) → chi tiết `cost/cost-estimate.md`
+- So với impact / người / tháng (§2): đáng làm không, vì sao: chi phí model ≈ 85 ₫ / người / tháng (flash-lite) so với impact giả định 15 phút / người / tháng — chi phí không phải rào cản; rủi ro nằm ở impact chưa đo, nên bước tiếp là thử với người mua thật.
 
 ## §9. Rủi ro & an toàn
 - Dữ liệu: người được phỏng vấn ghi P1–P3, không ghi tên hay liên hệ; review Amazon chỉ giữ mã review đã băm, không có tên hay mã người viết; SmartBuy không thu tài khoản, lịch sử mua hay thông tin cá nhân của người dùng. Gửi lên model chỉ có tin nhắn người dùng và dữ liệu catalog công khai.
