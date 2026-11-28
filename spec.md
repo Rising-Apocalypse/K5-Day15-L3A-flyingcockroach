@@ -263,8 +263,8 @@ flowchart TD
   - **Nguyễn Trung Anh** (đội trưởng): tạo repo, điền `TEAMS.md` và canvas; merge `develop` vào `main` (PR #9); chạy lượt 1, commit kết quả và bản chấm; bổ sung `spec.md` đầu file, nửa sau §4, §5, §6, §9 và changelog §10; merge `develop` vào `main` lần 2 (PR #14), chạy và duyệt chấm lượt 2, viết `eval/report.md`, chạy `simulate` và điền §8 / `cost/cost-estimate.md`, đưa `demo-slides.pdf` lên và cập nhật trang 4–7.
   - Nguyễn Tiến Cường: __
   - Lý Thành Lập: __
-  - Nguyễn Thị Thùy Dung: __
-- Dùng AI vào việc gì (2–3 dòng; chi tiết `docs/ai-usage.md`): Nguyễn Trung Anh dùng Claude Code (Claude Opus 5.5) để setup repo, kiểm rồi merge `develop` vào `main`, chạy `eval`, và soạn nháp spec §4 nửa sau, §5, §6, §9 từ code và bộ câu thử; cột `pass` lượt 1 do người chấm, không dùng AI chấm. Backend dùng Claude Code (Lý Thành Lập). Các thành viên khác: __
+  - **Nguyễn Thị Thùy Dung (BA):** cập nhật canvas nghiên cứu sản phẩm; tổng hợp và tài liệu hóa 3 phỏng vấn P1–P3 cùng kết quả khảo sát trong `evidence/summary.md`; hoàn thiện spec §0–§3, lát cắt và thiết kế ở §4, chuẩn nghiệm thu ở §7; xây dựng bộ câu thử và metric, mở rộng `eval/benchmark.csv` lên 24 câu, cập nhật hồ sơ `eval/README.md`; bổ sung notebook, bảng nhãn và script `evidence/count_pain.py` để tái lập số đếm pain, ghi rõ nguồn bằng chứng, giới hạn dữ liệu và các giả định impact (commit `89bba09`, `b99b1d3`, `8cf9e17`, `d421ff9`, `fe3ebf9`, `fe371af`, `8c1b235`).
+- Dùng AI vào việc gì (2–3 dòng; chi tiết `docs/ai-usage.md`): Nguyễn Trung Anh dùng Claude Code (Claude Opus 5.5) để setup repo, kiểm rồi merge `develop` vào `main`, chạy `eval`, và soạn nháp spec §4 nửa sau, §5, §6, §9 từ code và bộ câu thử; cột `pass` lượt 1 do người chấm, không dùng AI chấm. Backend dùng Claude Code (Lý Thành Lập). Nguyễn Thị Thùy Dung dùng Codex để rà soát mức độ hoàn thiện của repo, đối chiếu code và tài liệu với kết quả kiểm tra, tổng hợp phần việc BA từ lịch sử commit và soạn nháp phần phân công, khai báo dùng AI ở §10; nội dung về đóng góp cá nhân cần Dung đọc lại trước khi commit. Các lượt hỗ trợ này không tạo dữ liệu phỏng vấn/khảo sát hoặc sửa kết quả eval đã chạy.
 - Nhật ký thay đổi — **mọi thay đổi sau CP2 19:30 Thứ Sáu 27/11 phải có dòng ở đây**:
 
 **CP2 → CP4** (vd thu hẹp lát cắt, hỏi thêm người dùng, lần cải tiến trước lượt 2)
@@ -288,3 +288,6 @@ flowchart TD
 | Thời điểm | Đổi gì | Vì sao |
 |---|---|---|
 | 28/11 15:06 | Sửa `codebase/catalog.py`: bỏ biến `switched_from` còn sót sau khi gộp nhánh (trang danh mục báo `NameError`) | Lỗi giao diện phát hiện khi chạy web trước demo; không đổi agent, câu thử hay kết quả lượt đã chạy |
+| 28/11 16:02 | Bổ sung phần việc của Nguyễn Thị Thùy Dung (BA) ở §10 | Đối chiếu lịch sử commit và các tài liệu trong repo để hoàn thiện phân công cá nhân |
+| 28/11 16:03 | Bổ sung khai báo dùng Codex của Nguyễn Thị Thùy Dung ở §10 và `docs/ai-usage.md` | Ghi nhận các việc AI hỗ trợ đã xác minh trong phiên rà soát repo và hoàn thiện phân công |
+| 28/11 16:05 | Bổ sung `evidence/hypothesis.md` và cập nhật trạng thái tài liệu trong `evidence/summary.md` | Hoàn thiện giả thuyết từ nguồn hiện có, ghi rõ bổ sung sau thu thập dữ liệu; tiêu chí mới chỉ là đề xuất cho vòng kiểm chứng tiếp theo, không đổi số liệu hay chuẩn đạt §7 |
