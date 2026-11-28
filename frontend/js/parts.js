@@ -26,6 +26,7 @@ export function attrLabel(key) {
 }
 
 export function catLabel(key) {
+  if (key === "all") return "Tất cả";
   const c = (catMeta().categories || {})[key];
   return (c && c.label) || ({ headphones: "Tai nghe", mouse: "Chuột", keyboard: "Bàn phím" }[key] || key);
 }
@@ -128,8 +129,11 @@ export function contextChips(ctx, { removable = false } = {}) {
   ];
 }
 
-export function emptyState({ title, body, actions = "" }) {
-  return html`<div class="empty"><p class="empty__title">${title}</p><p class="empty__body">${body}</p><div class="empty__actions">${actions}</div></div>`;
+/** Trạng thái trống. glyph: tên icon đặt trong ô phía trên tiêu đề; center: canh giữa (vùng kết quả rộng). */
+export function emptyState({ title, body, actions = "", glyph = "", center = false }) {
+  return html`<div class="empty ${center ? "empty--center" : ""}">
+    ${glyph ? html`<span class="empty__icon" aria-hidden="true">${icon(glyph, { size: 22 })}</span>` : ""}
+    <p class="empty__title">${title}</p><p class="empty__body">${body}</p><div class="empty__actions">${actions}</div></div>`;
 }
 
 export function errorNotice(err, { retry = "", extra = "" } = {}) {

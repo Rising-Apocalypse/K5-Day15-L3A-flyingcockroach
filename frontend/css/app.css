@@ -413,10 +413,13 @@ body {
 .ptable .sp--conflict { color: var(--warn); }
 
 .empty { padding: 44px 0 34px; max-width: 580px; }
-.empty__title { font: 700 21px/1.25 var(--font-display); margin-bottom: 8px; }
-.empty__title::before { content: "∅ "; color: var(--accent); }
-.empty__body { color: var(--text-2); margin-bottom: 16px; }
+.empty--center { margin: 0 auto; padding: 56px 16px 48px; max-width: 580px; text-align: center; }
+.empty--center .empty__body { text-wrap: balance; }
+.empty__icon { display: inline-grid; place-items: center; width: 52px; height: 52px; margin-bottom: 16px; border-radius: 15px; color: var(--accent); background: var(--accent-soft); border: 1px solid var(--accent-line); }
+.empty__title { font: 700 21px/1.25 var(--font-display); margin-bottom: 8px; text-wrap: balance; }
+.empty__body { color: var(--text-2); margin-bottom: 18px; text-wrap: pretty; }
 .empty__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.empty--center .empty__actions { justify-content: center; }
 .catalog-foot { margin-top: 24px; padding-top: 12px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 6px 18px; }
 
 /* Khay so sánh */
@@ -967,7 +970,8 @@ body.has-tray .toasts { bottom: calc(86px + var(--tabbar-h)); }
   .catalog-search input { font-size: 16px; }
   .catalog-search kbd, .keycap__count { display: none; }
   .keycaps { gap: 5px; margin-top: 12px; }
-  .keycap { flex: 1; gap: 5px; padding: 0 6px; font-size: 12px; }
+  .keycap { flex: 1; gap: 5px; padding: 0 6px; font-size: 12px; white-space: nowrap; }
+  .keycap__icon { display: none; } /* 4 tab (có "Tất cả") không đủ chỗ cho icon trên màn hẹp */
   .kpis { gap: 8px; }
   .kpi { min-height: 78px; border-radius: 15px; }
   .kpi__label { font-size: 12px; }

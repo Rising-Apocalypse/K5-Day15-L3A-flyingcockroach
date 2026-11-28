@@ -10,7 +10,7 @@ import { SCENARIOS } from "./scenarios.js";
 let allProducts = null;
 let layer = null;
 
-const norm = (s) => String(s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d");
+export const norm = (s) => String(s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d");
 
 /** Điểm khớp đơn giản: chuỗi con liền (cao) > khớp đầu từ > khớp rải rác (subsequence). */
 function score(hay, q) {
@@ -68,6 +68,7 @@ function buildItems(q, ctx) {
     { icon: "grid", label: "Đi tới: Danh mục", hint: "g d", run: () => ctx.go("#/") },
     { icon: "report", label: "Đi tới: Báo cáo", hint: "g r", run: () => ctx.go("#/bao-cao") },
     { icon: "columns", label: "Đi tới: So sánh (diff)", hint: "g s", run: () => ctx.go("#/so-sanh") },
+    { icon: "grid", label: "Ngành: Tất cả", hint: "0", run: () => ctx.category("all") },
     { icon: "headphones", label: "Ngành: Tai nghe", hint: "1", run: () => ctx.category("headphones") },
     { icon: "mouse", label: "Ngành: Chuột", hint: "2", run: () => ctx.category("mouse") },
     { icon: "keyboard", label: "Ngành: Bàn phím", hint: "3", run: () => ctx.category("keyboard") },
