@@ -64,10 +64,29 @@ HARD_WORDS = {
     "microphone": ["có mic", "kèm mic", "có micro", "kèm micro", "phải có mic"],
     "numpad": ["bàn phím số", "phím số", "numpad"],
     "mechanical": ["bàn phím cơ", "phím cơ", "mechanical"],
+    "volume": ["nút âm lượng", "núm âm lượng", "phím âm lượng", "chỉnh âm lượng", "điều khiển âm lượng", "tăng giảm âm lượng",
+               "volume control", "volume knob", "volume key", "volume button"],
 }
 HARD_LABEL = {"bluetooth": "Bluetooth", "wireless": "Không dây", "wired": "Có dây", "anc": "Chống ồn chủ động (ANC)",
               "microphone": "Có micro", "numpad": "Có bàn phím số (full-size)",
-              "mechanical": "Bàn phím cơ"}
+              "mechanical": "Bàn phím cơ", "volume": "Có nút / phím chỉnh âm lượng"}
+# nút / phím chỉnh âm lượng: catalog không có thuộc tính riêng → chỉ MATCH khi tiêu đề / dòng mô tả / thông số của người bán
+# ghi rõ (vd "volume up/down", "volume control", "mute, play, volume"); không ghi → UNKNOWN (không coi là có, cũng không
+# coi là không). "volume limiting" (giới hạn âm lượng, tai nghe trẻ em) không phải nút chỉnh.
+VOLUME_RX = re.compile(r"volume\s*(\+|-|/|up|down|control|knob|roller|wheel|dial|button|key|rocker|adjust|slider|switch)"
+                       r"|(control|adjust|change|turn)\w*\s+(the\s+)?(audio\s+)?volume"
+                       r"|(mute|play|pause)[^.]{0,30}volume|volume[^.]{0,20}(mute|play|pause)", re.I)
+# câu hỏi về CÁCH agent xử lý khi thông tin sản phẩm thiếu / khi mô tả người bán và review nói ngược nhau
+MISSING_INFO_RX = (r"(nếu|khi|trường hợp|lỡ)[^.?!]{0,60}(không ghi|chưa ghi|không có thông tin|không nêu|không đề cập|"
+                   r"thiếu thông tin|không rõ|chưa rõ)[^.?!]{0,60}(xử lý|làm (sao|gì|thế nào)|thế nào|ra sao|\bsao\b)")
+SELLER_WORDS = r"(mô tả|quảng cáo|nhà bán|người bán|shop|thông số|trang sản phẩm|nhà sản xuất|hãng ghi|hãng nói)"
+BUYER_WORDS = r"(review|đánh giá|nhận xét|người mua|người dùng)"
+CONFLICT_RX = (SELLER_WORDS + r"[^?!]{0,80}" + BUYER_WORDS + r"[^?!]{0,60}(không|ngược|trái|khác|chê)"
+               r"|" + BUYER_WORDS + r"[^?!]{0,60}(ngược|trái|khác|chê)[^?!]{0,60}" + SELLER_WORDS)
+# "thu hẹp / chọn / so sánh … theo A, B, C" — danh sách sau "theo" là TIÊU CHÍ để cân nhắc, không phải điều kiện bắt buộc
+CRITERIA_LIST_RX = (r"(?<![a-zà-ỹ])(thu hẹp|lọc|chọn|xếp hạng|xếp|so sánh|đánh giá|cân nhắc|tư vấn|gợi ý)(?![a-zà-ỹ])"
+                    r"[^.?!|]{0,25}?(?<![a-zà-ỹ])(theo|dựa trên|dựa vào)\s+(các\s+)?(tiêu chí\s+)?([^.?!|]+)")
+MUST_RX = r"bắt buộc|phải có|cần có|nhất định|không thể thiếu"
 # kiểu đeo tai nghe (tag khớp thuộc tính wear_type của catalog)
 WEAR_WORDS = {"over-ear": ["trùm tai", "chụp tai", "over-ear", "over ear"], "on-ear": ["áp tai", "on-ear", "on ear"],
               "in-ear": ["nhét tai", "in-ear", "in ear"]}
@@ -89,9 +108,11 @@ SOFT = {
             "kw": ["mic", "microphone", "call", "calls", "zoom", "meeting"], "attr": "microphone"},
     "thoai_mai": {"label": "Thoải mái khi dùng lâu", "vi": ["thoải mái", "cầm", "đeo lâu", "mỏi tay", "êm tai", "công thái học"],
                   "kw": ["comfort", "comfortable", "ergonomic", "fit", "grip", "wrist", "hand", "fits"]},
+    # không dùng "click" trơn: review chuột nào cũng nhắc "click" (nút trái phải, double click) mà không nói gì về độ êm
     "click_em": {"label": "Tiếng click / gõ êm", "vi": ["click êm", "bấm êm", "gõ êm", "êm", "yên tĩnh", "im lặng", "ít ồn",
                                                         "tiếng click", "tiếng gõ", "độ ồn"],
-                 "kw": ["quiet", "silent", "noise", "noisy", "loud", "click", "clicky"]},
+                 "kw": ["quiet", "silent", "silence", "noise", "noisy", "loud", "clicky", "click sound", "clicking sound",
+                        "sound of the click", "clacky", "hush"]},
     "ben": {"label": "Độ bền", "vi": ["bền", "dùng được lâu", "độ bền"],  # không dùng "dùng lâu": trùng nhãn "Thoải mái khi dùng lâu"
             "kw": ["durable", "broke", "broken", "stopped working", "sturdy", "lasted", "died", "quit working", "years"]},
     "go_phim": {"label": "Cảm giác gõ", "vi": ["gõ văn bản", "cảm giác gõ", "đánh máy", "gõ phím", "gõ"],
@@ -114,6 +135,9 @@ NEGATION = r"(tuyệt đối không|không được|không hỗ trợ|không có
 COUNT_WORDS = {"một": 1, "1": 1, "hai": 2, "2": 2, "ba": 3, "3": 3}
 
 
+MONEY_100K = ("lít", "lit", "lốp", "lop", "xị", "xi", "trăm", "tram")
+
+
 def _amount(num, unit):
     v = float(num.replace(",", "."))
     unit = (unit or "").lower()
@@ -121,6 +145,8 @@ def _amount(num, unit):
         return int(v * 1_000_000)
     if unit in ("k", "nghìn", "ngàn"):
         return int(v * 1_000)
+    if unit in MONEY_100K:  # cách nói lóng: 1 lít = 1 lốp = 1 xị = 100.000đ; "5 trăm" (nói tắt) = 500.000đ
+        return int(v * 100_000)
     return int(v)
 
 
@@ -136,6 +162,7 @@ UNACCENTED = [
     ("choi game", "chơi game"), ("go van ban", "gõ văn bản"), ("am thanh", "âm thanh"), ("so sanh", "so sánh"),
     ("dat hang", "đặt hàng"), ("thanh toan", "thanh toán"), ("la gi", "là gì"), ("nho gon", "nhỏ gọn"),
     ("trum tai", "trùm tai"), ("chup tai", "chụp tai"), ("nhet tai", "nhét tai"), ("ap tai", "áp tai"),
+    ("nut am luong", "nút âm lượng"), ("chinh am luong", "chỉnh âm lượng"),
 ]
 
 
@@ -171,8 +198,14 @@ def _brand_is(p, value):
 
 
 def _split_soft(t):
-    """Tách câu thành phần CỨNG và phần MỀM theo dấu hiệu "ưu tiên…", "…thì tốt", "nếu được…"."""
+    """Tách câu thành phần CỨNG và phần MỀM theo dấu hiệu "ưu tiên…", "…thì tốt", "nếu được…", và danh sách tiêu chí
+    sau "thu hẹp / chọn / so sánh … theo" (trừ khi người dùng ghi rõ "bắt buộc / phải có" trong danh sách đó)."""
     hard, soft = [], []
+    for m in list(re.finditer(CRITERIA_LIST_RX, t)):
+        lst = m.group(5)
+        if not re.search(MUST_RX, lst):
+            soft.append(lst)
+            t = t.replace(lst, " ", 1)
     for clause in re.split(r"[,.;!?\n]|\bnhưng\b|\btuy nhiên\b", t):
         clause = clause.strip()
         if not clause:
@@ -214,11 +247,16 @@ def parse_constraints(text: str) -> dict:
     t = t.replace("cơ bản", "cơbản")  # "bàn phím cơ bản" ≠ bàn phím cơ (dính liền để ranh giới từ không khớp)
     # "1tr5", "1 triệu 2" → 1,5 / 1,2 triệu (chữ số lẻ ngay sau đơn vị)
     t = re.sub(r"(\d+)\s*(tr|triệu|củ)\s*(\d)(?![\d.,])", lambda m: " %s.%s triệu " % (m.group(1), m.group(3)), t)
+    t = re.sub(r"(\d+)\s*(tr|triệu|củ)\s*rưỡi", lambda m: " %s.5 triệu " % m.group(1), t)  # "1 triệu rưỡi" = 1,5 triệu
+    t = re.sub(r"(\d+)\s*trăm\s*(k|nghìn|ngàn)(?![a-zà-ỹ])", lambda m: " %s00 nghìn " % m.group(1), t)  # "5 trăm nghìn"
+    # "từ 3 đến 5 triệu", "3-5 lốp": đơn vị chỉ ghi ở số sau → áp cho cả số trước
+    t = re.sub(r"(?<![\d.,])(\d+(?:[.,]\d+)?)\s*(đến|tới|-|–|~)\s*(\d+(?:[.,]\d+)?)\s*(triệu|tr|củ|k|nghìn|ngàn|%s)(?![a-zà-ỹ])"
+               % "|".join(MONEY_100K), lambda m: " %s %s %s %s %s " % (m.group(1), m.group(4), m.group(2), m.group(3), m.group(4)), t)
     cats = [c for c, words in CATEGORY_WORDS.items() if _has(t, words)]
     oos = [w for w in OUT_OF_SCOPE_WORDS if _has(t, [w]) and not (w in ("ipad", "laptop", "điện thoại") and cats)]
 
     amounts = []
-    for m in re.finditer(r"(\d+(?:[.,]\d+)?)\s*(triệu|tr|củ|k|nghìn|ngàn)(?![a-zà-ỹ])", t):
+    for m in re.finditer(r"(\d+(?:[.,]\d+)?)\s*(triệu|tr|củ|k|nghìn|ngàn|%s)(?![a-zà-ỹ])" % "|".join(MONEY_100K), t):
         amounts.append(_amount(m.group(1), m.group(2)))
     for m in re.finditer(r"(\d{1,3}(?:[.,]\d{3})+|\d{5,})\s*(đ|vnd|vnđ|đồng)?", t):
         amounts.append(int(re.sub(r"[.,]", "", m.group(1))))
@@ -310,6 +348,8 @@ def parse_constraints(text: str) -> dict:
         "question": "?" in text or bool(re.search(r"\bcó\b.{0,40}\b(không|chưa)\s*$|\bbao nhiêu\b|\bthế nào\b|\bra sao\b", t.strip())),
         "find": find,
         "assume_unknown": bool(re.search(r"(không ghi|không rõ|chưa rõ|không nêu).{0,40}(mặc định|coi như|cứ cho là|giả sử)", t)),
+        "missing_info_q": bool(re.search(MISSING_INFO_RX, t)),
+        "conflict_q": bool(re.search(CONFLICT_RX, t)),
         "price_concern": price_concern,
         "budget_open": budget_open,
     }
@@ -362,6 +402,17 @@ def check_hard(p, req):
             ev = "T"
         same = _brand_is(p, req["value"])
         out.update(result="MATCH" if same == (key == "brand") else "MISMATCH", value=b, evidence=[ev] if ev else [])
+        return out
+    if key == "volume":  # chỉ đọc thông tin người bán (tiêu đề / mô tả / thông số), không đọc review
+        for e in p.get("evidence") or []:
+            if e.get("kind") == "review":
+                continue
+            txt = e.get("text") or ""
+            m = VOLUME_RX.search(txt)
+            if m and not re.search(r"limit", txt[max(0, m.start() - 30):m.end() + 30], re.I):
+                out.update(result="MATCH", value="người bán ghi \"%s\"" % m.group(0).strip(), evidence=[e["id"]])
+                return out
+        out["value"] = "người bán chưa nhắc tới"
         return out
     if key == "mechanical":  # switch đã xác minh là switch cơ, hoặc tiêu đề ghi "mechanical" (nguồn T)
         a = _attr(p, "switch")
@@ -463,6 +514,21 @@ def _review_hits(p, kws):
     return hits
 
 
+# Từ khoá mang nghĩa xấu sẵn ("loud", "broke", "lag") — "no lag", "not loud" là khen nên KHÔNG xét phủ định cho các từ này
+NEG_POLARITY_KW = {"noise", "noisy", "loud", "clicky", "clacky", "broke", "broken", "stopped working", "died",
+                   "quit working", "lag", "latency"}
+NEGATOR_RX = (r"\b(not|no|never|isn't|wasn't|aren't|don't|doesn't|didn't|wouldn't|won't|can't|cannot|nor)\b"
+              r"(?!\s+only)[^.!?;]{0,20}?\b")
+
+
+def _says_not(e, kws):
+    """Review nhắc tới tiêu chí nhưng PHỦ ĐỊNH nó ("not for gaming", "isn't quiet") → không phải lời khen, dù 5★."""
+    t = ("%s %s" % (e.get("title") or "", e.get("text") or "")).lower().replace("’", "'")
+    pos_kws = [k for k in kws if k not in NEG_POLARITY_KW]
+    has_pos = [k for k in pos_kws if re.search(r"\b%s" % re.escape(k), t)]
+    return bool(has_pos) and all(re.search(NEGATOR_RX + re.escape(k), t) for k in has_pos)
+
+
 @tool
 def get_evidence(product_id: str, soft: list = None, max_reviews: int = 4) -> dict:
     """get_evidence — bằng chứng của MỘT sản phẩm: thuộc tính đã xác minh, insight review, review theo tiêu chí mềm.
@@ -483,11 +549,15 @@ def get_evidence(product_id: str, soft: list = None, max_reviews: int = 4) -> di
         if not s or not s["kw"]:
             continue
         hits = _review_hits(p, s["kw"])
-        pos = [e for e in hits if (e.get("rating") or 0) >= 4]
+        said_not = {e["id"] for e in hits if _says_not(e, s["kw"])}
+        pos = [e for e in hits if (e.get("rating") or 0) >= 4 and e["id"] not in said_not]
         neg = [e for e in hits if (e.get("rating") or 0) <= 2]
-        pick = (pos[:2] + neg[:2])[:max_reviews] or hits[:max_reviews]
-        aspects[key] = {"label": s["label"], "n": len(hits), "pos": len(pos), "neg": len(neg),
-                        "evidence": [{"id": e["id"], "rating": e.get("rating"), "text": short(e.get("text"))} for e in pick]}
+        # review "nói không" (vd "I do not do gaming", "not for gaming") không phải lời khen, cũng chưa chắc là chê → đếm riêng
+        said = [e for e in hits if e["id"] in said_not and (e.get("rating") or 0) > 2]
+        pick = (pos[:2] + neg[:2] + said[:1])[:max_reviews] or hits[:max_reviews]
+        aspects[key] = {"label": s["label"], "n": len(hits), "pos": len(pos), "neg": len(neg), "said_not": len(said_not),
+                        "evidence": [dict({"id": e["id"], "rating": e.get("rating"), "text": short(e.get("text"))},
+                                          **({"says_not": True} if e["id"] in said_not else {})) for e in pick]}
     reviews = [e for e in p.get("evidence") or [] if e.get("kind") == "review"]
     top = sorted(reviews, key=lambda e: -(e.get("helpful") or 0))[:max_reviews]
     return {"id": p["id"], "name": display_name(p),
@@ -515,6 +585,42 @@ def find_product_by_name(text: str) -> dict:
         if len(model) > best_len:
             best, best_len = p, len(model)
     return {"id": best["id"], "name": display_name(best), "category": best["category"]} if best else {}
+
+
+@tool
+def find_products_by_name(text: str) -> list:
+    """find_products_by_name — mọi sản phẩm được nhắc tên trong câu (vd "so sánh JBL TUNE 500BT với Sony WH-CH510").
+    Input: tin nhắn người dùng. Output: [{"id", "name", "category"}] theo thứ tự xuất hiện, tối đa 3; cùng luật khớp chắc
+    như find_product_by_name (model có chữ số và ≥ 4 ký tự, hoặc cả hãng lẫn model có trong câu); tên dài khớp trước,
+    một đoạn chữ chỉ khớp một sản phẩm. Không tác động ra ngoài."""
+    t = " " + re.sub(r"\s+", " ", (text or "").lower()) + " "
+    found = []
+    for p in catalog.published():
+        model = (p.get("model") or "").lower().strip()
+        brand = (p.get("brand") or "").lower().strip()
+        if len(model) < 4:
+            continue
+        has_brand = bool(brand) and bool(re.search(r"(?<![a-z0-9])%s(?![a-z0-9])" % re.escape(brand), t))
+        m = re.search(r"(?<![a-z0-9])%s(?![a-z0-9])" % re.escape(model), t)
+        if m and (re.search(r"\d", model) or has_brand):
+            found.append((m.start(), m.end(), p))
+            continue
+        # tên model dài kèm chữ thừa ("Anker Space Q45"): có tên hãng trong câu + một mã có chữ số của model (≥ 3 ký tự)
+        if has_brand:
+            for tok in re.findall(r"[a-z0-9][a-z0-9\-]*", model):
+                if len(tok) >= 3 and re.search(r"\d", tok) and re.search(r"[a-z]", tok):
+                    mt = re.search(r"(?<![a-z0-9])%s(?![a-z0-9])" % re.escape(tok), t)
+                    if mt:
+                        found.append((mt.start(), mt.end(), p))
+                        break
+    found.sort(key=lambda x: (-(x[1] - x[0]), x[0]))
+    taken, out = [], []
+    for a, b, p in found:
+        if any(a < y and x < b for x, y in taken):
+            continue
+        taken.append((a, b))
+        out.append((a, {"id": p["id"], "name": display_name(p), "category": p["category"]}))
+    return [x for _, x in sorted(out, key=lambda x: x[0])][:3]
 
 
 # ───────── kiểm nhận định ↔ bằng chứng (check_shortlist dùng) ─────────
