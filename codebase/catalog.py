@@ -271,40 +271,48 @@ def _norm(text):
     return "".join(ch for ch in text if unicodedata.category(ch) != "Mn")
 
 
-# Ô tìm của web: tiêu đề Amazon là tiếng Anh, nên người dùng gõ tiếng Việt ("tai nghe", "không dây") sẽ không khớp chữ nào.
-# Cụm tên NGÀNH → chọn ngành (bỏ khỏi chuỗi tìm); cụm mô tả → khớp nếu tiêu đề có MỘT trong các từ tiếng Anh tương ứng.
-# Viết ở dạng đã _norm (không dấu). Cụm dài xét trước ("ban phim co" trước "ban phim").
-QUERY_CATEGORY = [
-    ("ban phim co day", "keyboard", ["wired"]),   # "có dây" mất dấu thành "co day" — phải xét trước "ban phim co"
+# Cụm tiếng Việt hay gõ vào ô tìm kiếm mà tiêu đề Amazon (tiếng Anh) không có: (cụm đã bỏ dấu, ngành, từ tiếng Anh).
+# Ngành ≠ None: cụm là tên ngành — đã khớp nhờ bộ lọc ngành. Danh sách từ: tiêu đề chứa một trong các từ là khớp.
+# Thứ tự có nghĩa: bỏ dấu thì "có" và "cơ" cùng là "co", nên "co day" (có dây) phải tách trước "ban phim co" (bàn phím cơ).
+# Tên ngành (Tai nghe, Chuột, Bàn phím) lấy từ nhãn trong catalog, xử lý sau cùng.
+VI_TERMS = [
+    ("khong day", None, ["wireless", "bluetooth"]),
+    ("co day", None, ["wired"]),
+    ("chong on", None, ["noise cancel", "noise-cancel"]),
+    ("choi game", None, ["gaming"]),
+    ("nhet tai", None, ["earbud", "in-ear", "in ear"]),
+    ("chup tai", None, ["over-ear", "over ear", "on-ear", "on ear"]),
+    ("trum tai", None, ["over-ear", "over ear"]),
+    ("cong thai hoc", None, ["ergonomic"]),
     ("ban phim co", "keyboard", ["mechanical"]),
-    ("tai nghe", "headphones", None), ("headphones", "headphones", None), ("headphone", "headphones", None),
-    ("ban phim", "keyboard", None), ("keyboards", "keyboard", None), ("keyboard", "keyboard", None),
-    ("chuot", "mouse", None), ("mouse", "mouse", None), ("mice", "mouse", None),
 ]
-QUERY_SYNONYMS = [
-    ("khong day", ["wireless", "bluetooth"]), ("co day", ["wired"]), ("chong on", ["noise cancel", "anc"]),
-    ("cong thai hoc", ["ergonomic"]), ("choi game", ["gaming", "gamer"]), ("nhet tai", ["in-ear", "in ear", "earbud"]),
-    ("trum tai", ["over-ear", "over ear"]), ("chong nuoc", ["waterproof", "water resistant", "ipx"]),
-]
+# Từ đệm tiếng Việt đứng riêng ("tai nghe CÓ mic", "chuột CHO dân văn phòng") — không bắt tiêu đề phải chứa.
+VI_STOP = {"co", "cho", "de", "va", "voi", "loai", "mua", "can", "minh", "toi", "cai", "chiec", "mot"}
 
 
-def parse_query(q):
-    """Chuỗi tìm đã _norm → (ngành nhắc tới [list], nhóm từ cần khớp [list các list: khớp nếu có 1 từ trong nhóm])."""
-    q = " %s " % re.sub(r"\s+", " ", q)
-    cats, groups = [], []
-    for phrase, cat, extra in QUERY_CATEGORY:
-        if " %s " % phrase in q:
-            q = q.replace(" %s " % phrase, " ")
-            if cat not in cats:
-                cats.append(cat)
-            if extra:
-                groups.append(extra)
-    for phrase, words in QUERY_SYNONYMS:
-        if " %s " % phrase in q:
-            q = q.replace(" %s " % phrase, " ")
+def parse_query(q, cats):
+    """Từ khoá đã chuẩn hoá → (ngành được gọi tên, nhóm từ đồng nghĩa, từ còn lại phải có trong tên/hãng/ASIN).
+
+    'tai nghe khong day sony' → (['headphones'], [['wireless', 'bluetooth']], ['sony'])
+    """
+    labels = sorted(((_norm(c.get("label")), k, None) for k, c in cats.items() if c.get("label")),
+                    key=lambda t: -len(t[0]))
+    named, groups = [], []
+    for phrase, cat, words in VI_TERMS + labels:
+        pat = r"(?<!\S)" + re.escape(phrase) + r"(?!\S)"
+        if not re.search(pat, q):
+            continue
+        if cat and cat not in named:
+            named.append(cat)
+        if words:
             groups.append(words)
-    groups += [[t] for t in q.split()]
-    return cats, groups
+        q = re.sub(pat, " ", q)
+    return named, groups, [t for t in q.split() if t not in VI_STOP]
+
+
+def _text_match(p, groups, tokens):
+    hay = _norm(" ".join(str(p.get(k) or "") for k in ("title", "brand", "store", "model", "id")))
+    return all(t in hay for t in tokens) and all(any(w in hay for w in g) for g in groups)
 
 
 def published(data=None):
@@ -381,6 +389,8 @@ def search(params):
     data = load()
     cats = data.get("categories") or {}
     category = (params.get("category") or "").strip()
+    if category == "all":  # tab "Tất cả" của giao diện = không lọc ngành
+        category = ""
     if category and category not in cats:
         raise CatalogError("Danh mục không có trong catalog: %s" % category)
     min_vnd = _int(params.get("min_vnd"), "Giá từ")
@@ -395,21 +405,28 @@ def search(params):
     if sort not in SORTS:
         sort = "relevance"
 
-    q = _norm(params.get("q") or "").strip()
-    q_cats, groups = parse_query(q)
-    switched_from = None
-    if len(q_cats) == 1 and q_cats[0] in cats and q_cats[0] != category:
-        # ô tìm gọi tên đúng một ngành khác ngành đang chọn ("tai nghe" khi đang ở Chuột) → tìm trong ngành đó.
-        # Hãng và thuộc tính kỹ thuật là của ngành cũ → bỏ (BR-CTX-11); giá, số sao, sắp xếp giữ nguyên.
-        switched_from, category = category or None, q_cats[0]
-        params = {k: v for k, v in params.items() if k in ("q", "min_vnd", "max_vnd", "min_rating", "sort")}
+    # Từ khoá: tên ngành tiếng Việt ("tai nghe") đã khớp nhờ bộ lọc ngành; vài cụm tiếng Việt ("không dây") khớp từ
+    # tiếng Anh tương ứng; từ còn lại phải có trong tên / hãng / ASIN. Gõ tên ngành khác ("chuột" khi đang ở Tai nghe)
+    # thì không có kết quả ở đây, kèm gợi ý q_category để giao diện mời chuyển ngành.
+    named, groups, tokens = parse_query(_norm(params.get("q") or "").strip(), cats)
+    other = next((k for k in named if k != category), None) if category and category not in named else None
 
-    in_cat = [p for p in published(data) if not category or p.get("category") == category]
+    in_cat = [p for p in published(data) if (p.get("category") == category if category else
+                                             not named or p.get("category") in named)]
     gates = (cats.get(category) or {}).get("filters") or {}
 
     def text_ok(p):
-        hay = _norm(" ".join(str(p.get(k) or "") for k in ("title", "brand", "store", "model", "id")))
-        return all(any(w in hay for w in g) for g in groups)
+        return not other and _text_match(p, groups, tokens)
+
+    q_category = None
+    if other:
+        n = sum(1 for p in published(data) if p.get("category") == other and _text_match(p, groups, tokens))
+        q_category = {"category": other, "label": (cats.get(other) or {}).get("label", other), "count": n}
+    # Đang ở một ngành và có từ khoá: đếm sản phẩm khớp từ khoá ở mọi ngành, để giao diện mời "Tìm trong tất cả".
+    q_all_count = None
+    if category and (named or groups or tokens):
+        q_all_count = sum(1 for p in published(data)
+                          if (not named or p.get("category") in named) and _text_match(p, groups, tokens))
 
     def price_ok(p):
         if min_vnd is None and max_vnd is None:
@@ -464,6 +481,8 @@ def search(params):
         "filter_candidates": (cats.get(category) or {}).get("filter_candidates") or list(gates),
         "gate": (cats.get(category) or {}).get("gate"),
         "sort": sort,
+        "q_category": q_category,
+        "q_all_count": q_all_count,
         "catalog": meta(data),
     }
 
