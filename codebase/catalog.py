@@ -469,7 +469,7 @@ def search(params):
         "items": [summary(p) for p in items],
         "total": len(items),
         "category": category,
-        "category_switched_from": None,  # Giữ tương thích API; giao diện chỉ gợi ý đổi ngành qua q_category.
+        "category_switched_from": None,  # không tự đổi ngành nữa; gợi ý chuyển ngành qua q_category
         "category_total": len(in_cat),
         "facets": {
             "brands": sorted(({"name": b, "count": c} for b, c in brand_counts.items()), key=lambda x: x["name"] or ""),

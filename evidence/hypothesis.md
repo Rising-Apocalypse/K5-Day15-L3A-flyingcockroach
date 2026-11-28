@@ -1,11 +1,17 @@
-# Giả thuyết — viết TRƯỚC khi tìm bằng chứng (5 phút, commit ngay)
+# Giả thuyết — khó thu hẹp và so sánh sản phẩm trước khi mua
 
-> Điền ở guide bước 1.1. Ôn lại: ngày 2 · lab ngày 2.
-> Viết **trước** khi đọc dòng data đầu tiên hay hỏi người đầu tiên, để không sửa cho khớp kết quả. Kết quả ngược giả thuyết vẫn đủ điểm nếu số là thật.
+> Bản bổ sung sau thu thập dữ liệu, dựa trên `canvas.md`, `spec.md` §0–§3 và `evidence/summary.md`. Trước lần bổ sung này, file vẫn là mẫu trống; không có ngưỡng kiểm chứng đặt trước được ghi nhận tại đây. Không dùng bản này để tuyên bố nhóm đã đăng ký giả thuyết trước nghiên cứu hoặc chấm lại bằng chứng cũ.
 
-- Ngày giờ viết: __
-- Người dùng chính (một vai cụ thể): __
-- **Mình nghĩ:** [ai] gặp khó khi [việc] vì [lý do], hậu quả là [mất gì].
-- **Có thể còn cách giải thích khác:** __
-- **Mình đúng nếu thấy:** [một con số nhóm tự chọn] — vd "≥2/3 người kể được một lần như thế trong 1 tháng qua" hoặc "≥x/N học viên bỏ ở bước này" *(ví dụ)*
-- **Nguồn sẽ dùng** (≥1 nguồn đạt ngưỡng, guide 1.2): [ ] đào data · [ ] phỏng vấn ≥3 · [ ] khảo sát ≥20 — nguồn chính: __ · nguồn để kiểm lại: __
+- Ngày giờ bổ sung: **28/11/2026 16:05 (giờ Việt Nam)**. Nội dung do Codex hỗ trợ soạn theo yêu cầu của Nguyễn Thị Thùy Dung (BA), cần đọc lại trước khi commit.
+- Người dùng chính (một vai cụ thể): người mua tự nghiên cứu tai nghe, chuột hoặc bàn phím cho nhu cầu cá nhân, có giới hạn ngân sách; nhóm tiếp cận ban đầu là sinh viên tìm mua tai nghe.
+- **Mình nghĩ:** người mua gặp khó khi thu hẹp và so sánh các sản phẩm phù hợp nhu cầu, ngân sách vì thông tin nằm ở nhiều nguồn, thông số khó đối chiếu và review có ý kiến trái chiều. Họ phải tìm thêm thông tin, mất thời gian cân nhắc và vẫn có thể chưa tự tin vào lựa chọn. Nguy cơ mua không phù hợp là giả thuyết về hệ quả, chưa được đo trực tiếp trong nghiên cứu hiện có.
+- **Có thể còn cách giải thích khác:** thời gian lựa chọn dài có thể do ngân sách hạn chế, chờ ưu đãi, sở thích nghiên cứu kỹ hoặc chưa rõ nhu cầu, thay vì do quá tải thông tin. Review trái chiều có thể phản ánh khác biệt nhu cầu và trải nghiệm sử dụng. Người mua cũng có thể giải quyết tốt bằng video, shop tin cậy hoặc AI hiện có; pain tồn tại không tự chứng minh cần SmartBuy.
+- **Mình đúng nếu thấy — tiêu chí đề xuất cho vòng kiểm chứng tiếp theo:** phỏng vấn **5 người mới, ngoài nhóm**, đã tự tìm mua một trong ba ngành hàng trong **30 ngày gần nhất**; ít nhất **3/5** kể được một tình huống cụ thể mà việc tổng hợp thông tin hoặc đối chiếu review khiến họ phải tìm thêm nguồn, khó thu hẹp lựa chọn hoặc trì hoãn quyết định. Mỗi trường hợp cần ghi nhiệm vụ, chỗ vướng, cách xử lý và hệ quả bằng lời kể; không chỉ tính câu trả lời đồng ý với mô tả pain. Đây là **ngưỡng đề xuất**, chưa được nhóm chốt trước vòng mới và không áp dụng hồi tố cho P1–P3 hay khảo sát hiện có. Nếu dưới 3/5, chưa đủ hỗ trợ giả thuyết theo tiêu chí này; nếu nguyên nhân khác chiếm ưu thế, cần điều chỉnh giả thuyết.
+- **Nguồn đã dùng:** [x] đào data · [x] phỏng vấn 3 người ngoài nhóm · [x] khảo sát 21 phản hồi, 20 đúng trải nghiệm mục tiêu. Nguồn chính để hiểu tình huống là [P1](interviews/P1.md), [P2](interviews/P2.md), [P3](interviews/P3.md); đối chiếu bằng khảo sát trong [summary.md](summary.md) và [data-mining.md](data-mining.md). Khảo sát chưa xác minh toàn bộ người trả lời ngoài nhóm hoặc không trùng nhau; review là đơn vị dữ liệu, không phải số người được khảo sát.
+- **Nguồn sẽ dùng cho vòng tiếp theo:** 5 cuộc phỏng vấn mới theo tiêu chí trên, hỏi trải nghiệm cụ thể trước khi giới thiệu SmartBuy. Ghi cả trường hợp không gặp pain và cách giải hiện tại có hiệu quả; không thay thế hoặc sửa số liệu đã thu thập.
+
+## Bằng chứng hiện có và giới hạn kết luận
+
+Theo [bản tổng hợp bằng chứng](summary.md), 3/3 người phỏng vấn kể khó khăn khi tìm tai nghe; trong 20 phản hồi khảo sát đúng trải nghiệm mục tiêu, 16 người chọn khó khăn về review, 14 người khó thu hẹp và 12 người khó so sánh. Đây là câu nhiều lựa chọn, không cộng các nhóm thành tổng số người. Phép đếm nhãn review ghi nhận 13/181 review có pain (7,18%), tái lập bằng `python evidence/count_pain.py`; không diễn giải tỷ lệ review này thành tỷ lệ người mua.
+
+Các nguồn hỗ trợ hướng nghiên cứu về khó thu hẹp và so sánh, nhưng chưa đủ để kết luận quan hệ nhân quả, mức phổ biến trong thị trường hoặc số phút SmartBuy tiết kiệm. Ba phỏng vấn mới bao phủ tai nghe; chưa đo tần suất pain, chưa có ngưỡng đặt trước cho dữ liệu cũ. Hiệu quả giải pháp cần kiểm riêng bằng tác vụ người dùng và thời gian thực hiện, không suy ra từ việc xác nhận pain.
