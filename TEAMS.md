@@ -12,7 +12,7 @@
 | STT | Họ và tên | Mã học viên | Vai trò | Phần việc chính |
 |---|---|---|---|---|
 | 1 | Nguyễn Trung Anh | 2A202603413 | Đội trưởng | Repo và tích hợp main, chạy và chấm eval lượt 1–2, report, mô phỏng chi phí, spec §4–§6, §8–§10 |
-| 2 | Nguyễn Tiến Cường | 2A202603425 | Thành viên | DevOp |
+| 2 | Nguyễn Tiến Cường | 2A202603425 | Thành viên | FE/DevOps: giao diện web và server web.py, panel trợ lý, tìm kiếm tiếng Việt và tab Tất cả, merge PR #2, #3, #6, #8 |
 | 3 | Lý Thành Lập | 2A202603414 | Thành viên | BE/FE |
 | 4 | Nguyễn Thị Thùy Dung | 2A202603552 | Thành viên | BA: canvas, tổng hợp bằng chứng phỏng vấn/khảo sát và phân tích pain, spec §0–§3 và thiết kế §4, benchmark 24 câu và metric §7, tài liệu giả thuyết nghiên cứu |
 
