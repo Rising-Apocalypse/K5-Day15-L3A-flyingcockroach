@@ -14,7 +14,7 @@
 | 1 | Nguyễn Trung Anh | 2A202603413 | Đội trưởng | Repo và tích hợp main, chạy và chấm eval lượt 1–2, report, mô phỏng chi phí, spec §4–§6, §8–§10 |
 | 2 | Nguyễn Tiến Cường | 2A202603425 | Thành viên | DevOp |
 | 3 | Lý Thành Lập | 2A202603414 | Thành viên | BE/FE |
-| 4 | Nguyễn Thị Thùy Dung | 2A202603552 | Thành viên | BA |
+| 4 | Nguyễn Thị Thùy Dung | 2A202603552 | Thành viên | BA: canvas, tổng hợp bằng chứng phỏng vấn/khảo sát và phân tích pain, spec §0–§3 và thiết kế §4, benchmark 24 câu và metric §7, tài liệu giả thuyết nghiên cứu |
 
 **Quy tắc điền**
 - **Lớp:** `L3A` hoặc `L3B`. **Track:** một chữ `A` (EdTech), `B` (Y tế), `C` (Du lịch), `D` (Thương mại điện tử), `E` (Tài chính) hoặc `F` (Làn khác). **Link repo:** link GitHub công khai của nhóm.

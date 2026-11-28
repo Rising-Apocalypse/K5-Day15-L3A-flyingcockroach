@@ -291,3 +291,5 @@ flowchart TD
 | 28/11 16:02 | Bổ sung phần việc của Nguyễn Thị Thùy Dung (BA) ở §10 | Đối chiếu lịch sử commit và các tài liệu trong repo để hoàn thiện phân công cá nhân |
 | 28/11 16:03 | Bổ sung khai báo dùng Codex của Nguyễn Thị Thùy Dung ở §10 và `docs/ai-usage.md` | Ghi nhận các việc AI hỗ trợ đã xác minh trong phiên rà soát repo và hoàn thiện phân công |
 | 28/11 16:05 | Bổ sung `evidence/hypothesis.md` và cập nhật trạng thái tài liệu trong `evidence/summary.md` | Hoàn thiện giả thuyết từ nguồn hiện có, ghi rõ bổ sung sau thu thập dữ liệu; tiêu chí mới chỉ là đề xuất cho vòng kiểm chứng tiếp theo, không đổi số liệu hay chuẩn đạt §7 |
+| 28/11 17:52 | Điền cụ thể phần việc BA của Nguyễn Thị Thùy Dung trong `TEAMS.md` | Đồng bộ bảng thành viên với phần phân công §10 và các tài liệu đã đóng góp |
+| 28/11 17:53 | Thêm bản nháp `reflection/nguyen-thi-thuy-dung.md` theo mẫu và cập nhật khai báo dùng AI | Tổng hợp đóng góp BA, hỗ trợ của Codex và bài học từ B22; ghi rõ phần trải nghiệm cá nhân cần đọc lại trước khi nộp |
