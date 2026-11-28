@@ -287,4 +287,4 @@ flowchart TD
 
 | Thời điểm | Đổi gì | Vì sao |
 |---|---|---|
-|  |  |  |
+| 28/11 15:06 | Sửa `codebase/catalog.py`: bỏ biến `switched_from` còn sót sau khi gộp nhánh (trang danh mục báo `NameError`) | Lỗi giao diện phát hiện khi chạy web trước demo; không đổi agent, câu thử hay kết quả lượt đã chạy |
