@@ -15,7 +15,7 @@ export const emptyContext = () => ({
 function freshSession() {
   return {
     session: { id: uid("S-"), startedAt: Date.now() },
-    category: "headphones",
+    category: "all", // "all" = tab "Tất cả" (không lọc ngành); còn lại là khoá ngành: headphones / mouse / keyboard
     filters: DEFAULT_FILTERS(),
     compare: [],
     agent: { context: emptyContext(), thread: [], scope: { type: "filtered" } },

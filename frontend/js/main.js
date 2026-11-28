@@ -16,7 +16,7 @@ import {
   chooseChange, retryLast, removeCriterion, rerun, askAboutProduct, askCompare, resetScope, clearThread, agentMenu, send,
 } from "./views/agent.js";
 import { openTrace } from "./views/trace.js";
-import { openPalette } from "./palette.js";
+import { openPalette, norm as fold } from "./palette.js";
 
 const stage = () => document.getElementById("main");
 const mqMobile = matchMedia("(max-width: 767px)");
@@ -208,7 +208,7 @@ function openShortcuts() {
     <div class="shortcuts">
       ${row("Bảng lệnh: tìm sản phẩm, lệnh, hỏi agent", [mod, "K"])}
       ${row("Lọc danh mục", ["/"])}
-      ${row("Đổi ngành: tai nghe · chuột · bàn phím", ["1", "2", "3"])}
+      ${row("Đổi ngành: tất cả · tai nghe · chuột · bàn phím", ["0", "1", "2", "3"])}
       ${row("Đi tới Danh mục / Báo cáo / So sánh", ["g", "d·r·s"])}
       ${row("Gửi cho agent · xuống dòng", ["↵", "⇧↵"])}
       ${row("Đóng lớp phủ", ["esc"])}
@@ -274,8 +274,16 @@ const actions = {
   "ask-filtered": () => {
     resetScope();
     const d = state.catalog.data;
-    focusComposer(`Mình cần ${state.category === "mouse" ? "chuột" : state.category === "keyboard" ? "bàn phím" : "tai nghe"}${state.filters.maxVnd ? " dưới " + fmt.vndShort(state.filters.maxVnd) : ""} — hiện ${d ? d.total : 0} mẫu khớp bộ lọc, gợi ý phương án gần nhất giúp mình.`);
+    const other = d && d.q_category && d.q_category.count ? d.q_category : null;
+    const cat = other ? other.label.toLowerCase() : { headphones: "tai nghe", mouse: "chuột", keyboard: "bàn phím" }[state.category] || "";
+    // Câu soạn sẵn dùng luôn từ khoá đã gõ, không lặp tên ngành nếu từ khoá đã có ("tai nghe sony" → "Mình cần tai nghe sony").
+    const q = (state.filters.q || "").trim();
+    const need = !q ? cat || "một sản phẩm phù hợp" : !cat || fold(q).includes(fold(cat)) ? q : `${cat} ${q}`;
+    const price = state.filters.maxVnd ? " dưới " + fmt.vndShort(state.filters.maxVnd) : "";
+    const none = d && d.total === 0 && !other;
+    focusComposer(`Mình cần ${need}${price}${none ? " — chưa thấy mẫu nào khớp bộ lọc, gợi ý phương án gần nhất giúp mình." : "."}`);
   },
+  "search-in-category": (el) => setCategory(el.dataset.cat, { keepQuery: true }),
   "clear-q": () => { state.filters.q = ""; const q = $("#q"); if (q) q.value = ""; applyFilters(); },
   "clear-price": () => { state.filters.minVnd = null; state.filters.maxVnd = null; state.priceError = null; applyFilters(); },
   "toggle-brand": (el) => { const b = el.dataset.brand; state.filters.brands = state.filters.brands.filter((x) => x !== b); applyFilters(); },
@@ -422,9 +430,9 @@ document.addEventListener("keydown", (e) => {
     return;
   }
   if (e.key === "?") { e.preventDefault(); openShortcuts(); return; }
-  if (["1", "2", "3"].includes(e.key)) {
+  if (["0", "1", "2", "3"].includes(e.key)) {
     if (state.view !== "catalog") location.hash = "#/";
-    setCategory(CATS[Number(e.key) - 1]);
+    setCategory(e.key === "0" ? "all" : CATS[Number(e.key) - 1]);
     return;
   }
   if (e.key === "g") { gPending = Date.now(); return; }
