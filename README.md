@@ -1,7 +1,7 @@
 > Đây là khung repo nộp bài. Điền mọi chỗ `____`, giữ nguyên tên các mục.
 > Giờ, mốc, luật, rubric: xem `README.md`, `02-guide.md`, `03-rubric.md` trong repo đề (bộ đề BTC phát).
 
-# [Tên nhóm] — [Tên lát cắt]
+# flyingcockroach — SmartBuy: thu hẹp còn tối đa 3 tai nghe, chuột, bàn phím theo nhu cầu, có nguồn review
 
 **Thành viên, lớp, track:** xem [TEAMS.md](TEAMS.md). **Điền TEAMS.md đúng format**: khi chấm và đánh giá, BTC quét file này để ghép điểm cho từng người.
 
@@ -84,14 +84,16 @@ Nhóm dùng stack khác (Node, Streamlit, notebook…): sửa hàm `run_app()` t
 
 | Thành phần | Thật / Giả | Ghi chú |
 |---|---|---|
-| Lời gọi AI ở quyết định trung tâm | **Thật** (bắt buộc từ CP3) | Model: ____ |
-|  |  |  |
+| Lời gọi AI ở quyết định trung tâm | **Thật** (bắt buộc từ CP3) | Model: `gemini-3.1-flash-lite` (Google Gemini API), token lấy từ `usage` |
+| Catalog sản phẩm và review | **Thật** | Amazon Reviews 2023 · Electronics, 422 sản phẩm (tai nghe, chuột, bàn phím) — `data/DATA_CARD.md` |
+| Giá bán | **Giả lập một phần** | Giá Amazon (Mỹ) lúc thu thập, quy đổi 26.000đ/USD *(tự ước tính)* — không phải giá shop Việt Nam hiện tại |
+| Lọc điều kiện, kiểm shortlist, hỏi lại khi thiếu thông tin | **Thật** (code) | `codebase/tools.py`, `codebase/agent.py` — chạy trước và sau model |
+| Đặt hàng, thanh toán | **Không có** | SmartBuy chỉ gợi ý, người dùng tự quyết và tự mua |
+| Số người dùng, tần suất dùng trong mô phỏng chi phí | **Tự ước tính** | `cost/personas.yaml`, theo `spec.md` §2 |
 
 ## Dùng AI vào việc gì
 
-2–3 dòng (bắt buộc): nhóm dùng công cụ AI nào để làm gì, người kiểm lại phần nào. Chi tiết: [docs/ai-usage.md](docs/ai-usage.md). Coding agent đọc [AGENTS.md](AGENTS.md).
-
-____
+Nhóm dùng Claude Code để viết backend agent / công cụ (Lý Thành Lập) và để setup repo, merge nhánh, chạy `eval`, soạn nháp spec, `eval/report.md` (Nguyễn Trung Anh). Cột `pass` do người chấm theo `eval/metric_spec.yaml`; lượt 2 Claude Code đề xuất từng ô kèm ghi chú, Nguyễn Trung Anh duyệt. Mọi nháp AI được đọc lại trước khi commit và `python run.py check` phải sạch. Chi tiết: [docs/ai-usage.md](docs/ai-usage.md). Coding agent đọc [AGENTS.md](AGENTS.md).
 
 ## File mẫu — điền ở bước nào
 
@@ -123,6 +125,6 @@ ____
 | 4 | Bản chạy thử làm trọn lát cắt | `codebase/` · lệnh ở mục "Lệnh" |
 | 5 | Định nghĩa "tốt" + bộ câu thử | `data/DATA_CARD.md` · `eval/` |
 | 6 | Mô phỏng chi phí khi dùng thật | `cost/` |
-| 7 | Slide + demo + video dự phòng | `demo-slides.pdf` ở thư mục gốc · link video: ____ |
+| 7 | Slide + demo + video dự phòng | `demo-slides.pdf` ở thư mục gốc · link video: https://youtu.be/vWNzK0EBt5Q |
 | + | *Bonus:* người dùng thử | `validation/log.md` |
 # K5-Day15-L3A-flyingcockroach
