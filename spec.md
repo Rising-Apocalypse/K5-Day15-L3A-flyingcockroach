@@ -260,7 +260,7 @@ flowchart TD
 
 ## §10. Phân công & changelog
 - Phân công có tên (theo chặng, chia cặp — guide "Cách chia việc"):
-  - **Nguyễn Trung Anh** (đội trưởng): tạo repo, điền `TEAMS.md` và canvas; merge `develop` vào `main` (PR #9); chạy lượt 1, commit kết quả và bản chấm; bổ sung `spec.md` đầu file, nửa sau §4, §5, §6, §9 và changelog §10.
+  - **Nguyễn Trung Anh** (đội trưởng): tạo repo, điền `TEAMS.md` và canvas; merge `develop` vào `main` (PR #9); chạy lượt 1, commit kết quả và bản chấm; bổ sung `spec.md` đầu file, nửa sau §4, §5, §6, §9 và changelog §10; merge `develop` vào `main` lần 2 (PR #14), chạy và duyệt chấm lượt 2, viết `eval/report.md`, chạy `simulate` và điền §8 / `cost/cost-estimate.md`, đưa `demo-slides.pdf` lên và cập nhật trang 4–7.
   - Nguyễn Tiến Cường: __
   - Lý Thành Lập: __
   - Nguyễn Thị Thùy Dung: __
@@ -281,6 +281,7 @@ flowchart TD
 | 28/11 14:03–14:10 | Chạy lượt 2: 24/24 (100%), run `run-2@20261128-140317`; Claude Code đề xuất cột `pass`, Nguyễn Trung Anh duyệt | Đo sau cải tiến, cùng bộ câu và cách chấm |
 | 28/11 14:08–14:20 | `cost/personas.yaml`: thay dòng "(ví dụ)" bằng số theo §2 (100 người cơ sở; 1/2/4 phiên), ghi "(tự ước tính)"; chạy `simulate --rate-from eval/run-2.csv` (50 phiên) → $0.0013 / task thành công; điền `cost/cost-estimate.md`, §8 | Mô phỏng chi phí cho CP4 |
 | 28/11 14:12–14:21 | Thêm `demo-slides.pdf`; cập nhật trang 4–7 theo lượt 2, chi phí và link video | Slide nhóm làm trước khi có lượt 2 và mô phỏng |
+| 28/11 14:23 | Thêm `reflection/nguyen-trung-anh.md`; cập nhật phần việc của Nguyễn Trung Anh ở `TEAMS.md` và §10 | Hạn reflection 23:59; phần việc phải khớp với phần có tên trong repo |
 
 **Sau CP4 (đến 23:59 Thứ Bảy 28/11)** (sửa theo góp ý — không sửa chuẩn "đạt", câu thử, số bằng chứng, kết quả các lượt đã chạy)
 
