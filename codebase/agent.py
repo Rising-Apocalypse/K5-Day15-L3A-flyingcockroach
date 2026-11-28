@@ -8,14 +8,17 @@ Luồng một lượt (workflow cố định, model chỉ ở 2 chỗ):
   0. parse_constraints (CODE): loại, ngân sách, điều kiện CỨNG (Bluetooth, có dây, ANC, switch, pin ≥ N giờ…),
      tiêu chí MỀM theo thứ tự ưu tiên, ý định (tìm / giải thích / so sánh / đặt hàng / bịa dữ liệu).
   1. Chặn & thu hẹp (G10): bịa sản phẩm/review → từ chối · đặt hàng → nói rõ không làm · ngoài 3 loại → nói rõ ·
-     thiếu loại / nhiều loại / điều kiện mâu thuẫn → hỏi lại 1 câu. Thiếu ngân sách KHÔNG hỏi, KHÔNG tự đặt.
+     thiếu loại / nhiều loại / điều kiện mâu thuẫn → hỏi lại 1 câu. Ngân sách KHÔNG BAO GIỜ tự đặt; chỉ HỎI khi
+     người dùng nhắc tới giá mà không nêu số ("vừa túi tiền", "giá hợp lý", "mẫu rẻ") hoặc yêu cầu chỉ nêu loại, không
+     có mục đích / tiêu chí nào. Nêu tiêu chí mà không nhắc giá → tìm không lọc giá. Hỏi tối đa 1 lần mỗi loại.
   2. Câu hỏi kiến thức ("ANC là gì") → MODEL giải thích (dự phòng: bảng thuật ngữ viết tay), không biến thành điều kiện.
   3. search_catalog (CODE): lọc cứng loại + ngân sách + điều kiện cứng trên thuộc tính ĐÃ XÁC MINH.
      UNKNOWN / CONFLICT không được tính là khớp → để riêng "chưa xác minh", không đề xuất chính thức.
      Không còn ứng viên → NO_MATCH có căn cứ (đếm), gợi ý hướng điều chỉnh, KHÔNG tự nới điều kiện cứng / ngân sách.
   4. get_evidence: thuộc tính + review theo từng tiêu chí mềm (mã R…/D…/F…/T).
   5. MODEL xếp hạng tối đa 3 (hoặc số người dùng xin), lý do + mã bằng chứng. Model hỏng / chế độ giả → luật dự phòng.
-  6. check_shortlist (CODE): bịa sản phẩm, ngoài ngân sách, vi phạm điều kiện cứng, mã bằng chứng lạ → loại.
+  6. check_shortlist (CODE): bịa sản phẩm, ngoài ngân sách, vi phạm điều kiện cứng, mã bằng chứng lạ → loại;
+     vế câu nhắc tiêu chí mà không có mã đỡ, vế suy từ thương hiệu / giá → gỡ (cả "note" của model).
   7. Trả kết quả; người dùng tự quyết định — agent không đặt hàng / thanh toán.
 Nhiều lượt: "Lượt 1: … Lượt 2: …" trong cùng tin nhắn (bộ câu thử) hoặc context.shopping_context.agent_state (web)
 → lượt sau kế thừa loại / điều kiện cứng / ngân sách, chỉ đổi phần người dùng nói; yêu cầu so sánh các mẫu đã gợi ý dùng
@@ -27,11 +30,12 @@ import time
 
 import ai
 from ai import call_model
-from tools import (CATEGORIES, HARD_LABEL, SOFT, WEAR_LABEL, catalog_info, check_hard, check_shortlist, display_name,
+from tools import (CATEGORIES, HARD_LABEL, SOFT, WEAR_LABEL, audit_claims, catalog_info, check_hard, check_shortlist,
+                   claim_snippet, display_name,
                    compare_products, find_product_by_name, get_evidence, parse_constraints, product, search_catalog)
 from tracing import note
 
-PROMPT_VERSION = "smartbuy-v2 · 2026-11-27"
+PROMPT_VERSION = "smartbuy-v2.2 · 2026-11-28"
 MAX_CANDIDATES = 6
 CATEGORY_LABEL = {"headphones": "Tai nghe", "mouse": "Chuột", "keyboard": "Bàn phím"}
 # mục đích → tiêu chí mềm mặc định khi người dùng không nêu ưu tiên (luôn hiện là "suy từ mục đích")
@@ -54,7 +58,13 @@ Luật:
   và chỉ dùng mã xuất hiện trong hard_checks / attributes / review_aspects / top_reviews của sản phẩm đó.
 - Mã trích phải ĐỠ đúng nhận định: nói về micro thì trích review nhắc tới micro (review_aspects "Micro") hoặc thuộc tính
   microphone; không có review nào nhắc tới tiêu chí thì ghi "chưa có review nhắc tới <tiêu chí>" thay vì khen.
+- Mỗi câu nhắc tới một tiêu chí (âm thanh, pin, micro, độ bền, click êm, thoải mái…) phải trích mã của review hoặc
+  thuộc tính nói ĐÚNG tiêu chí đó. Hệ thống tự xoá câu nào không có mã đỡ, nên đừng viết câu khen chung chung.
+- Không suy chất lượng từ thương hiệu, độ nổi tiếng, giá cao hay thấp, hay số lượt đánh giá: không viết "uy tín",
+  "đảm bảo chất lượng", "cao cấp", "tiền nào của nấy", "mẫu đắt thường tốt hơn".
+- Không kể việc hệ thống đã làm (vd "đã lọc bỏ review trái chiều"); chỉ nói điều dữ liệu cho thấy.
 - Có thể nêu số review nhắc tới (n, pos = số review ≥4★, neg = số review ≤2★) để người dùng thấy độ chắc.
+- "note" chỉ ghi lưu ý chung về dữ liệu (vd số review ít, review trái chiều), không nhận định về sản phẩm cụ thể.
 - Ưu tiên đứng trước quan trọng hơn ưu tiên đứng sau. Không chỉ xếp theo rating.
 - Tiêu chí nào không có review/thuộc tính nhắc tới thì nói "chưa có dữ liệu", không suy đoán.
 - Nếu review trái chiều, nêu điểm trừ trong "tradeoff".
@@ -144,7 +154,7 @@ class _Plan:
 
 def _empty_state():
     return {"category": None, "min_price": None, "max_price": None, "hard": [], "soft": [], "purpose": None,
-            "count": None, "last_ids": [], "soft_inferred": False, "pending": None}
+            "count": None, "last_ids": [], "soft_inferred": False, "pending": None, "budget_asked": False}
 
 
 def _clean_pending(pc):
@@ -179,6 +189,7 @@ def _clean_state(st):
         "last_ids": [str(i) for i in st.get("last_ids") or [] if isinstance(i, str)][:3] if isinstance(st.get("last_ids"), list) else [],
         "soft_inferred": bool(st.get("soft_inferred")),
         "pending": _clean_pending(st.get("pending")),
+        "budget_asked": bool(st.get("budget_asked")),
     }
 
 
@@ -586,7 +597,8 @@ def _fallback_rank(cands, soft, n):
         for k in soft:
             a = ev["aspects"].get(k)
             if a and a["n"]:
-                pos = next((e for e in a["evidence"] if (e["rating"] or 0) >= 4), None)
+                # mỗi tiêu chí được nêu phải có một mã trích đỡ (check_shortlist kiểm): review khen nếu có, không thì review đầu
+                pos = next((e for e in a["evidence"] if (e["rating"] or 0) >= 4), None) or (a["evidence"] or [None])[0]
                 reasons.append("%s: %d review nhắc tới (%d review ≥4★, %d review ≤2★)" % (
                     SOFT[k]["label"], a["n"], a["pos"], a["neg"]))
                 if pos and pos["id"] not in ids:
@@ -638,6 +650,89 @@ def _rank_with_ai(text, s, cands, n):
     return data["shortlist"], str(data.get("note") or "")
 
 
+def _head(s, budget=None):
+    pri = " > ".join(SOFT[x]["label"] for x in s["soft"]) or "không nêu cụ thể"
+    if s.get("soft_inferred"):
+        pri += " (mình suy từ mục đích \"%s\" — bạn chỉnh nếu khác)" % s["purpose"]
+    return "Mình hiểu: %s%s · ngân sách %s · điều kiện bắt buộc: %s · ưu tiên: %s" % (
+        CATEGORIES[s["category"]], (" cho " + s["purpose"].lower()) if s["purpose"] else "", budget or _budget_label(s),
+        ", ".join(h["label"] for h in s["hard"]) or "không có", pri)
+
+
+# gợi ý câu hỏi nhu cầu theo loại (chỉ là ví dụ để người dùng trả lời, không phải điều kiện)
+NEED_EXAMPLES = {"headphones": "học online, nghe nhạc, chơi game, chạy bộ", "mouse": "văn phòng, chơi game, mang theo laptop",
+                 "keyboard": "gõ văn bản, văn phòng, chơi game"}
+ASK_SOFT = {"headphones": ["am_thanh", "chong_on", "pin", "mic", "thoai_mai"],
+            "mouse": ["thoai_mai", "click_em", "ben", "nho_gon"],
+            "keyboard": ["go_phim", "click_em", "ben", "phim_so", "nho_gon"]}
+
+
+def _round10k(x):
+    return int(round(x / 10_000.0)) * 10_000
+
+
+def _ask_needs(s, c, plan):
+    """Hỏi ngân sách / nhu cầu TRƯỚC khi đề xuất (không tự gán số cho "rẻ", "vừa túi tiền"; không đưa 3 mẫu chung chung
+    khi chưa biết gì về nhu cầu). Khoảng giá in ra lấy thật từ catalog, chỉ để người dùng ước lượng — không dùng để lọc."""
+    cat = s["category"]
+    res = plan.run("Xem khoảng giá trong catalog (không lọc)", "search_catalog", search_catalog, cat, None, None, [],
+                   detail=lambda r: "%d %s" % (r["counts"]["category_total"], CATEGORIES[cat]))
+    prices = sorted(r["price_vnd"] for r in res["matches"] if r.get("price_vnd"))
+    lines = [_head(s, budget="chưa nêu"), ""]
+    if c["price_concern"]:
+        note("dừng: người dùng nhắc tới giá nhưng không nêu con số → hỏi ngân sách (không tự gán số)")
+        why = ("Bạn có nhắc tới giá nhưng chưa nêu con số. Mình không tự gán một mức tiền cho những cách nói như "
+               "\"rẻ\", \"hợp lý\" hay \"vừa túi tiền\", và khi chưa biết giới hạn thì mình không thể nói mẫu nào "
+               "vừa ngân sách của bạn — nên mình chưa đề xuất sản phẩm nào.")
+    else:
+        note("dừng: yêu cầu chỉ nêu loại, chưa có ngân sách / mục đích / tiêu chí → hỏi nhu cầu trước khi đề xuất")
+        why = ("Yêu cầu còn khá chung (chưa có ngân sách, mục đích hay tiêu chí nào). Gợi ý ngay lúc này chỉ là các "
+               "mẫu được đánh giá cao nói chung, chưa chắc hợp với bạn — nên mình hỏi thêm trước khi đề xuất.")
+    lines += [why, ""]
+    qs = ["Ngân sách tối đa của bạn khoảng bao nhiêu (VNĐ)? Nếu không giới hạn, bạn cứ nói \"không giới hạn ngân sách\"."]
+    if not s["purpose"]:
+        qs.append("Bạn dùng %s chủ yếu để làm gì (vd %s)?" % (CATEGORIES[cat], NEED_EXAMPLES[cat]))
+    if not s["soft"] and not s["hard"]:
+        qs.append("Tiêu chí nào quan trọng nhất với bạn (vd %s), và tiêu chí nào là BẮT BUỘC, tiêu chí nào chỉ là ưu tiên?"
+                  % ", ".join(SOFT[k]["label"].lower() for k in ASK_SOFT[cat]))
+    elif s["hard"]:
+        qs.append("Mình đang hiểu là BẮT BUỘC: %s. Nếu đó chỉ là tiêu chí ưu tiên, bạn nói để mình không loại bớt mẫu."
+                  % ", ".join(h["label"] for h in s["hard"]))
+    lines.append("Bạn cho mình biết thêm:")
+    lines += ["%d. %s" % (i, q) for i, q in enumerate(qs, 1)]
+    ask_ids = ("Nếu bạn đang phân vân giữa vài mẫu cụ thể, gửi tên hoặc mã sản phẩm — mình kiểm đúng các mẫu đó, "
+               "không tự chọn mẫu khác thay.")
+    lines.append(ask_ids)
+    hint = qs[1:] + [ask_ids]
+    options = []
+    if prices:
+        mid = _round10k(prices[len(prices) // 2])
+        band = ("Để bạn dễ hình dung: catalog có %d/%d %s có giá, từ %s đến %s; một nửa số mẫu có giá ≤ %s. Đây là giá "
+                "Amazon (Mỹ) lúc thu thập, quy đổi tham khảo — không phải giá ở shop bạn đang xem."
+                % (len(prices), res["counts"]["category_total"], CATEGORIES[cat], _vnd(prices[0]), _vnd(prices[-1]),
+                   _vnd(mid)))
+        lines += ["", band]
+        hint.append(band)
+        for f in (0.25, 0.5, 0.75):
+            v = _round10k(prices[min(len(prices) - 1, int(f * len(prices)))])
+            if v and all(o["value"] != v for o in options):
+                options.append({"label": "≤ %s" % _vnd(v), "text": "Ngân sách tối đa %s" % _vnd(v), "value": v})
+    options = [{"label": o["label"], "text": o["text"]} for o in options]
+    options.append({"label": "Không giới hạn", "text": "Không giới hạn ngân sách"})
+    no_try = ("Mình chỉ dựa trên thông số và review Amazon đã thu thập: mình không thử sản phẩm trực tiếp, và cảm giác "
+              "khi dùng (đeo / cầm / gõ) mỗi người một khác.")
+    lines.append(no_try)
+    lines.append(_data_note())
+    s["budget_asked"] = True
+    s["pending"] = None
+    # giao diện web chỉ in message + khối clarify (câu hỏi, nút, hint) + limits → đưa đủ lý do / câu hỏi / khoảng giá vào đó
+    return _reply("\n".join(lines), {
+        "state": "ST-02", "final_status": "NEEDS_CLARIFICATION", "intent": "CLARIFY", "message": why,
+        "clarify": {"question": qs[0], "options": options, "hint": " ".join(hint)},
+        "limits": ["Không tự đặt ngân sách; không khẳng định mẫu nào vừa ngân sách khi chưa biết giới hạn.", no_try],
+        "context": _ctx_payload(s)})
+
+
 def _find(text, s, c, plan):
     cat = s["category"]
     n = min(s["count"] or 3, 3)
@@ -646,13 +741,8 @@ def _find(text, s, c, plan):
                    detail=lambda r: "%d trong ngân sách · %d đạt · %d chưa xác minh" % (
                        r["counts"]["in_budget"], r["counts"]["matches"], r["counts"]["unverified"]))
     k = res["counts"]
-    pri = " > ".join(SOFT[x]["label"] for x in s["soft"]) or "không nêu cụ thể"
-    if s.get("soft_inferred"):
-        pri += " (mình suy từ mục đích \"%s\" — bạn chỉnh nếu khác)" % s["purpose"]
-    head = "Mình hiểu: %s%s · ngân sách %s · điều kiện bắt buộc: %s · ưu tiên: %s" % (
-        CATEGORIES[cat], (" cho " + s["purpose"].lower()) if s["purpose"] else "", _budget_label(s),
-        ", ".join(h["label"] for h in s["hard"]) or "không có", pri)
-    excluded = [{"id": r["id"], "name": _name(r), "reason": "; ".join(
+    head = _head(s)
+    excluded =[{"id": r["id"], "name": _name(r), "reason": "; ".join(
         "%s: %s" % (h["label"], h["value"] or "chưa xác minh") for h in r["hard_results"] if h["result"] == "UNKNOWN")}
         for r in res["unverified"][:3]]
     limits = []
@@ -726,6 +816,12 @@ def _find(text, s, c, plan):
             "allowed_evidence": {ev["id"]: _shown_ids(ev) for ev in cands}}
     ids = [ev["id"] for ev in cands]
     checked = check_shortlist(shortlist, cons, ids)
+    if ai_note:  # "note" của model không gắn sản phẩm / mã nào → mọi nhận định theo tiêu chí và câu suy diễn đều bị gỡ
+        a = audit_claims(ai_note, None, [])
+        if a["removed"] or a["banned"]:
+            checked["violations"].append("note: gỡ câu suy diễn / nhận định không có mã đỡ (%d câu: %s)" % (
+                a["banned"] + len(a["removed"]), ", ".join(a["removed"]) or "thương hiệu / giá"))
+        ai_note = a["text"]
     if checked["violations"]:
         note("check_shortlist loại / sửa: " + "; ".join(checked["violations"]))
     final = checked["ok"]
@@ -768,7 +864,9 @@ def _validation(recs, violations, n_topup, from_ai):
         "hard_violations": sum(1 for v in violations if re.search(r"ngoài ngân sách|điều kiện cứng|sai loại", v)),
         "invented_items": sum(1 for v in violations if re.search(r"bịa sản phẩm|không nằm trong kết quả", v)),
         "evidence_codes_removed": sum(1 for v in violations if "gỡ mã" in v),
-        "items_rejected": sum(1 for v in violations if "gỡ mã" not in v and "cắt còn" not in v),
+        "claims_removed": sum(1 for v in violations if re.search(r"gỡ (nhận định|câu)", v)),
+        "evidence_codes_added": sum(1 for v in violations if "bổ sung mã" in v),
+        "items_rejected": sum(1 for v in violations if not re.search(r": (gỡ|bổ sung) |cắt còn", v)),
         "items_filled_by_rules": n_topup,
         "ranked_by": "model" if from_ai else "luật dự phòng",
     }
@@ -777,8 +875,11 @@ def _validation(recs, violations, n_topup, from_ai):
 def _format(head, s, final, evs, res, excluded, limits, ai_note, n, violations, n_topup=0, from_ai=True):
     lines = [head, ""]
     k = res["counts"]
-    lines.append("%d/%d %s trong ngân sách đạt đủ điều kiện bắt buộc (đã kiểm trên thuộc tính có nguồn). Gợi ý %d mẫu, "
-                 "xếp từ phù hợp nhất:" % (k["matches"], k["in_budget"], CATEGORIES[s["category"]], len(final)))
+    no_budget = s["max_price"] is None and s["min_price"] is None
+    lines.append("%d/%d %s%s đạt đủ điều kiện bắt buộc (đã kiểm trên thuộc tính có nguồn). Gợi ý %d mẫu, "
+                 "xếp từ phù hợp nhất:" % (k["matches"], k["in_budget"], CATEGORIES[s["category"]],
+                                          " trong catalog (chưa lọc theo giá)" if no_budget else " trong ngân sách",
+                                          len(final)))
     recs = []
     for i, item in enumerate(final, 1):
         ev = evs[item["product_id"]]
@@ -799,7 +900,9 @@ def _format(head, s, final, evs, res, excluded, limits, ai_note, n, violations, 
             e = by_id.get(rid)
             if e and e.get("kind") == "review" and len(quotes) < 2:
                 quotes.append(rid)
-                lines.append("   Bằng chứng [%s · %s★]: \"%s\"" % (rid, _star(e.get("rating")), _quote(e.get("text"))))
+                said = "%s %s" % (item.get("reason") or "", item.get("tradeoff") or "")
+                lines.append("   Bằng chứng [%s · %s★]: \"%s\"" % (rid, _star(e.get("rating")),
+                                                                 claim_snippet(e.get("text"), said) or _quote(e.get("text"))))
         missing = [SOFT[x]["label"] for x in s["soft"] if x in SOFT and SOFT[x]["kw"] and not (ev["aspects"].get(x) or {}).get("n")]
         if missing:
             lines.append("   Chưa có dữ liệu về: %s." % ", ".join(missing))
@@ -1019,6 +1122,12 @@ def _turn(text, s, plan, scope=None, meta=None):
         lab = CATEGORY_LABEL[s["category"]]
         return _wrap(prefix, _clarify(q, [{"label": "%s không dây" % lab, "text": "Tìm %s Bluetooth" % CATEGORIES[s["category"]]},
                                           {"label": "%s có dây" % lab, "text": "Tìm %s có dây" % CATEGORIES[s["category"]]}])), s
+    if c["budget_open"]:
+        s["budget_asked"] = True  # người dùng nói rõ không giới hạn giá → không hỏi lại
+    no_budget = s["max_price"] is None and s["min_price"] is None
+    too_vague = not (s["hard"] or s["soft"] or s["purpose"])
+    if no_budget and not s.get("budget_asked") and not c["wants_purchase"] and (c["price_concern"] or too_vague):
+        return _wrap(prefix, _ask_needs(s, c, plan)), s
     return _wrap(prefix, _find(text, s, c, plan)), s
 
 

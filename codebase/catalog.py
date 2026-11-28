@@ -271,6 +271,42 @@ def _norm(text):
     return "".join(ch for ch in text if unicodedata.category(ch) != "Mn")
 
 
+# Ô tìm của web: tiêu đề Amazon là tiếng Anh, nên người dùng gõ tiếng Việt ("tai nghe", "không dây") sẽ không khớp chữ nào.
+# Cụm tên NGÀNH → chọn ngành (bỏ khỏi chuỗi tìm); cụm mô tả → khớp nếu tiêu đề có MỘT trong các từ tiếng Anh tương ứng.
+# Viết ở dạng đã _norm (không dấu). Cụm dài xét trước ("ban phim co" trước "ban phim").
+QUERY_CATEGORY = [
+    ("ban phim co day", "keyboard", ["wired"]),   # "có dây" mất dấu thành "co day" — phải xét trước "ban phim co"
+    ("ban phim co", "keyboard", ["mechanical"]),
+    ("tai nghe", "headphones", None), ("headphones", "headphones", None), ("headphone", "headphones", None),
+    ("ban phim", "keyboard", None), ("keyboards", "keyboard", None), ("keyboard", "keyboard", None),
+    ("chuot", "mouse", None), ("mouse", "mouse", None), ("mice", "mouse", None),
+]
+QUERY_SYNONYMS = [
+    ("khong day", ["wireless", "bluetooth"]), ("co day", ["wired"]), ("chong on", ["noise cancel", "anc"]),
+    ("cong thai hoc", ["ergonomic"]), ("choi game", ["gaming", "gamer"]), ("nhet tai", ["in-ear", "in ear", "earbud"]),
+    ("trum tai", ["over-ear", "over ear"]), ("chong nuoc", ["waterproof", "water resistant", "ipx"]),
+]
+
+
+def parse_query(q):
+    """Chuỗi tìm đã _norm → (ngành nhắc tới [list], nhóm từ cần khớp [list các list: khớp nếu có 1 từ trong nhóm])."""
+    q = " %s " % re.sub(r"\s+", " ", q)
+    cats, groups = [], []
+    for phrase, cat, extra in QUERY_CATEGORY:
+        if " %s " % phrase in q:
+            q = q.replace(" %s " % phrase, " ")
+            if cat not in cats:
+                cats.append(cat)
+            if extra:
+                groups.append(extra)
+    for phrase, words in QUERY_SYNONYMS:
+        if " %s " % phrase in q:
+            q = q.replace(" %s " % phrase, " ")
+            groups.append(words)
+    groups += [[t] for t in q.split()]
+    return cats, groups
+
+
 def published(data=None):
     """Chỉ sản phẩm APPROVED mới được công bố (BR-CAT, AC-DATA-01)."""
     data = data or load()
@@ -359,15 +395,21 @@ def search(params):
     if sort not in SORTS:
         sort = "relevance"
 
+    q = _norm(params.get("q") or "").strip()
+    q_cats, groups = parse_query(q)
+    switched_from = None
+    if len(q_cats) == 1 and q_cats[0] in cats and q_cats[0] != category:
+        # ô tìm gọi tên đúng một ngành khác ngành đang chọn ("tai nghe" khi đang ở Chuột) → tìm trong ngành đó.
+        # Hãng và thuộc tính kỹ thuật là của ngành cũ → bỏ (BR-CTX-11); giá, số sao, sắp xếp giữ nguyên.
+        switched_from, category = category or None, q_cats[0]
+        params = {k: v for k, v in params.items() if k in ("q", "min_vnd", "max_vnd", "min_rating", "sort")}
+
     in_cat = [p for p in published(data) if not category or p.get("category") == category]
     gates = (cats.get(category) or {}).get("filters") or {}
 
-    q = _norm(params.get("q") or "").strip()
-    tokens = q.split()
-
     def text_ok(p):
         hay = _norm(" ".join(str(p.get(k) or "") for k in ("title", "brand", "store", "model", "id")))
-        return all(t in hay for t in tokens)
+        return all(any(w in hay for w in g) for g in groups)
 
     def price_ok(p):
         if min_vnd is None and max_vnd is None:
@@ -410,6 +452,7 @@ def search(params):
         "items": [summary(p) for p in items],
         "total": len(items),
         "category": category,
+        "category_switched_from": switched_from,
         "category_total": len(in_cat),
         "facets": {
             "brands": sorted(({"name": b, "count": c} for b, c in brand_counts.items()), key=lambda x: x["name"] or ""),

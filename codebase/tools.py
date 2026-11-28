@@ -44,6 +44,14 @@ EXPLAIN_PATTERNS = [r"\blà gì\b", r"\bnghĩa là\b", r"\bkhác (gì|nhau)\b", 
                     r"\bhoạt động (thế|như) nào\b", r"\bcó tác dụng gì\b"]
 FIND_WORDS = ["tìm", "gợi ý", "đề xuất", "giới thiệu", "chọn", "mua", "tư vấn", "muốn", "cần một", "cần mua", "cần bàn",
               "cần chuột", "cần tai"]
+# người dùng quan tâm tới giá nhưng KHÔNG nêu con số ("vừa túi tiền", "tầm giá hợp lý", "mẫu rẻ", "trả thêm tiền"…)
+# → agent hỏi ngân sách, không tự gán một con số. "đánh giá", "giá trị" không tính là nói về giá.
+PRICE_WORDS = ["tiền", "rẻ", "đắt", "ngân sách", "kinh phí", "chi phí", "phân khúc", "tiết kiệm", "túi tiền"]
+PRICE_RX = r"(?<!đánh )(?<![a-zà-ỹ])giá(?![a-zà-ỹ])(?!\s*trị)"
+# người dùng nói rõ không giới hạn giá → không hỏi lại ngân sách
+BUDGET_OPEN_RX = (r"không (giới hạn|quan trọng|quan tâm|cần quan tâm|bận tâm)[^,.;|]{0,12}(giá|ngân sách|tiền)"
+                  r"|(giá|ngân sách|tiền)[^,.;|]{0,12}(không giới hạn|không quan trọng|nào cũng được|bao nhiêu cũng được)"
+                  r"|bao nhiêu cũng được|chưa có ngân sách|không có ngân sách|bỏ qua (giá|ngân sách)")
 COMPARE_WORDS = ["so sánh", "so với", "khác nhau thế nào", "đối chiếu"]
 COMPARE_REF = ["vừa tìm", "vừa gợi ý", "ở trên", "mẫu trên", "hai mẫu", "2 mẫu", "ba mẫu", "3 mẫu", "các mẫu này", "hai con", "kết quả trước"]
 
@@ -199,7 +207,8 @@ def parse_constraints(text: str) -> dict:
     Input: tin nhắn người dùng (str).
     Output: {"categories", "out_of_scope", "min_price", "max_price", "hard": [{key, value?, label}], "negated": [...],
              "soft": [key theo thứ tự ưu tiên], "purpose", "count", "wants_purchase", "fabricate", "explain", "compare",
-             "find", "assume_unknown"}.
+             "find", "assume_unknown", "price_concern" (nói tới giá nhưng không có con số), "budget_open" (nói rõ
+             không giới hạn giá)}.
     Không tác động ra ngoài."""
     t = " " + _restore_accents(text.lower().replace("\u00a0", " ")) + " "
     t = t.replace("cơ bản", "cơbản")  # "bàn phím cơ bản" ≠ bàn phím cơ (dính liền để ranh giới từ không khớp)
@@ -280,6 +289,8 @@ def parse_constraints(text: str) -> dict:
 
     explain = any(re.search(p, t) for p in EXPLAIN_PATTERNS)
     find = _has(t, FIND_WORDS)
+    budget_open = bool(re.search(BUDGET_OPEN_RX, t))
+    price_concern = (not amounts and not budget_open and (_has(t, PRICE_WORDS) or bool(re.search(PRICE_RX, t))))
     return {
         "categories": cats,
         "out_of_scope": oos,
@@ -299,6 +310,8 @@ def parse_constraints(text: str) -> dict:
         "question": "?" in text or bool(re.search(r"\bcó\b.{0,40}\b(không|chưa)\s*$|\bbao nhiêu\b|\bthế nào\b|\bra sao\b", t.strip())),
         "find": find,
         "assume_unknown": bool(re.search(r"(không ghi|không rõ|chưa rõ|không nêu).{0,40}(mặc định|coi như|cứ cho là|giả sử)", t)),
+        "price_concern": price_concern,
+        "budget_open": budget_open,
     }
 
 
@@ -504,6 +517,183 @@ def find_product_by_name(text: str) -> dict:
     return {"id": best["id"], "name": display_name(best), "category": best["category"]} if best else {}
 
 
+# ───────── kiểm nhận định ↔ bằng chứng (check_shortlist dùng) ─────────
+# Một vế câu trong lý do / điểm trừ nhắc tới tiêu chí nào thì phải có ít nhất một mã ĐÃ TRÍCH đỡ đúng tiêu chí đó:
+# review / dòng mô tả / tiêu đề có từ khoá của tiêu chí, hoặc nguồn của thuộc tính đã xác minh. Không có → gỡ vế đó.
+CLAIM_EXTRA = {"click_em": ["click"], "thoai_mai": ["đeo", "cầm nắm"], "ben": ["hỏng", "chắc chắn", "bền bỉ"],
+               "am_thanh": ["âm trầm", "âm cao", "treble"], "pin": ["sạc"], "chong_on": ["tạp âm", "cách âm", "ồn ào"]}
+# suy chất lượng từ thương hiệu / độ nổi tiếng / giá, hoặc kể việc hệ thống "đã lọc" — không có dữ liệu nào đỡ được
+BANNED_CLAIMS = [
+    r"uy tín", r"nổi tiếng", r"danh tiếng", r"thương hiệu (lớn|có tiếng|hàng đầu|mạnh)",
+    r"(đảm bảo|bảo đảm) (về )?chất lượng", r"chất lượng (được |rất )?(đảm bảo|bảo đảm)",
+    r"cao cấp", r"(dòng|hàng|phân khúc) (giá rẻ|bình dân)", r"tiền nào của nấy",
+    r"(giá cao|đắt)( hơn)? (thì|nên|thường|sẽ)", r"(giá rẻ|rẻ)( hơn)? (thì|nên|thường|sẽ)",
+    r"(tin dùng|ưa chuộng|bán chạy)", r"hàng đầu", r"kiểm chứng (qua|bởi) (rất )?nhiều", r"đã (lọc|loại)( bỏ)? (các |những )?(sản phẩm|mẫu|review|đánh giá)",
+]
+# vế câu tự nói là thiếu dữ liệu → không phải nhận định, giữ nguyên
+DISCLAIMER_RX = (r"chưa có|chưa (rõ|đủ|xác minh|thấy)|không (có|thấy) (review|dữ liệu|bằng chứng|thông tin|nguồn)"
+                 r"|không (nhắc|đề cập)|thiếu (dữ liệu|bằng chứng|thông tin)")
+_CLAIM_PHRASES = []
+
+
+def _claim_phrases():
+    """(cụm từ, tiêu chí) sắp theo độ dài giảm dần — cụm dài khớp trước ("gõ êm" là click_em, không phải "gõ")."""
+    if not _CLAIM_PHRASES:
+        seen = set()
+        for key, s in SOFT.items():
+            if not s["kw"]:  # danh_gia: rating là số liệu catalog, không cần review đỡ
+                continue
+            for ph in s["vi"] + [s["label"].lower()] + CLAIM_EXTRA.get(key, []):
+                if (ph, key) not in seen:
+                    seen.add((ph, key))
+                    _CLAIM_PHRASES.append((ph, key))
+        _CLAIM_PHRASES.sort(key=lambda x: -len(x[0]))
+    return _CLAIM_PHRASES
+
+
+def _claim_keys(segment):
+    t, keys = segment.lower(), []
+    for ph, key in _claim_phrases():
+        rx = r"(?<![a-zà-ỹ])%s(?![a-zà-ỹ])" % re.escape(ph)
+        if re.search(rx, t):
+            if key not in keys:
+                keys.append(key)
+            t = re.sub(rx, " ", t)
+    return keys
+
+
+def _support_ids(p, key):
+    """Mã nguồn của sản phẩm p nói về tiêu chí key: thuộc tính đã xác minh + mọi dòng bằng chứng có từ khoá tiêu chí."""
+    s = SOFT.get(key) or {}
+    ids = set()
+    a = _attr(p, s["attr"]) if s.get("attr") else {}
+    if a.get("status") == "VERIFIED" and a.get("source"):
+        ids.add(a["source"])
+    kws = s.get("kw") or []
+    for e in p.get("evidence") or []:
+        if e.get("kind") == "title":  # tiêu đề là tên bán hàng ("Comfortable…"), không đỡ được nhận định về trải nghiệm
+            continue
+        t = ("%s %s %s" % (e.get("field") or "", e.get("title") or "", e.get("text") or "")).lower()
+        if any(re.search(r"\b%s" % re.escape(k), t) for k in kws):
+            ids.add(e["id"])
+    return ids
+
+
+def audit_claims(text, p, cited, pool=None):
+    """Gỡ khỏi `text` các câu nhắc tới một tiêu chí mà không mã nào trong `cited` (hoặc mã ghi trong câu) đỡ, và các
+    câu suy chất lượng từ thương hiệu / giá / độ nổi tiếng. p=None (lưu ý chung, không gắn sản phẩm) → mọi nhận định
+    theo tiêu chí đều bị gỡ. `pool`: mã model đã được xem — nhận định đúng dữ liệu nhưng quên trích mã thì gắn mã từ
+    đây (ưu tiên thuộc tính / mô tả) thay vì gỡ. Hàm phụ của check_shortlist, không phải công cụ.
+    Trả {"text", "removed": [nhãn tiêu chí bị gỡ], "banned": số câu suy diễn bị gỡ, "used": mã đã đỡ một nhận định,
+         "attached": mã code gắn thêm, "claims": số câu có nhận định theo tiêu chí còn giữ,
+         "had_claims": bản gốc có nhận định theo tiêu chí}."""
+    raw = str(text or "").strip()
+    cited = set(cited or [])
+    if p:  # mã ghi ngay trong câu ("… 50 giờ (F1)") cũng là mã được trích, nếu có thật trong bằng chứng của sản phẩm
+        own = {e["id"] for e in p.get("evidence") or []}
+        cited |= {x for x in re.findall(r"(?<![A-Za-z0-9])([RDF]\d+)(?![A-Za-z0-9])", raw) if x in own}
+    # gỡ theo CẢ CÂU (tách theo . ; ! ?) để phần còn lại không cụt nghĩa; xét nhận định theo từng vế (", " / "nhưng")
+    # để vế tự nói "chưa có review…" không che vế khen bên cạnh
+    parts = re.split(r"(\s*[;.!?]\s+)", raw)
+    kept, removed, banned, used, attached, claims, had = [], [], 0, set(), [], 0, False
+    for i in range(0, len(parts), 2):
+        seg, sep = parts[i], (parts[i + 1] if i + 1 < len(parts) else "")
+        if not seg.strip():
+            continue
+        if any(re.search(rx, seg.lower()) for rx in BANNED_CLAIMS):
+            banned += 1
+            continue
+        keys, bad = [], []
+        for clause in re.split(r",\s+(?![^(\[]*[)\]])|\s+nhưng\s+", seg):
+            if re.search(DISCLAIMER_RX, clause.lower()):
+                continue
+            for k in _claim_keys(clause):
+                if k in keys:
+                    continue
+                keys.append(k)
+                support = _support_ids(p, k) if p else set()
+                sup = support & cited
+                if not sup and pool:
+                    extra = sorted(support & set(pool), key=lambda x: (x.startswith("R"), len(x), x))
+                    if extra:
+                        sup = {extra[0]}
+                        cited.add(extra[0])
+                        attached.append(extra[0])
+                if sup:
+                    used |= sup
+                else:
+                    bad.append(k)
+        had = had or bool(keys)
+        if bad:
+            removed += [SOFT[k]["label"] for k in bad if SOFT[k]["label"] not in removed]
+            continue
+        claims += bool(keys)
+        kept.append(seg + sep)
+    out = "".join(kept).strip()
+    out = re.sub(r"[\s,;]+$", "", out)
+    if out:
+        out = out[0].upper() + out[1:]
+        if out[-1] not in ".!?…":
+            out += "."
+    return {"text": out, "removed": removed, "banned": banned, "used": used, "attached": attached, "claims": claims,
+            "had_claims": had}
+
+
+def claim_snippet(text, claim_text, limit=200):
+    """Đoạn review (≤ 2 câu, ≤ limit ký tự) chứa từ khoá của tiêu chí mà `claim_text` nhận định — để người đọc thấy
+    đúng chỗ review đỡ nhận định, thay vì 2 câu đầu có thể lạc đề. Không có tiêu chí / không khớp → None."""
+    text = re.sub(r"\[\[VIDEOID:[^\]]*\]\]\s*", "", str(text or "")).strip()
+    sents = re.split(r"(?<=[.!?])\s+", text)
+    for k in _claim_keys(claim_text or ""):
+        rx = "|".join(r"\b%s" % re.escape(w) for w in SOFT[k]["kw"])
+        i = next((j for j, s in enumerate(sents) if re.search(rx, s.lower())), None)
+        if i is not None:
+            q = " ".join(sents[i:i + 2])
+            q = q if len(q) <= limit else q[:limit - 1].rstrip() + "…"
+            return ("…" if i > 0 else "") + q
+    return None
+
+
+def _audit_item(item, p, pid, bad, pool=None):
+    """Kiểm nhận định của một mục đã qua các luật khác. Ghi lỗi vào `bad`; trả (mục đã sửa, lý do loại hoặc None)."""
+    ev = list(item["evidence"])
+    r = audit_claims(item.get("reason"), p, ev, pool)
+    t = audit_claims(item.get("tradeoff"), p, ev + r["attached"], pool)
+    added = list(dict.fromkeys(r["attached"] + t["attached"]))
+    if added:
+        bad.append("%s: bổ sung mã đỡ nhận định model quên trích (%s)" % (pid, ", ".join(added)))
+        ev += [x for x in added if x not in ev]
+    removed = r["removed"] + [x for x in t["removed"] if x not in r["removed"]]
+    if removed:
+        bad.append("%s: gỡ nhận định không có mã đỡ (%s)" % (pid, ", ".join(removed)))
+    if r["banned"] + t["banned"]:
+        bad.append("%s: gỡ câu suy từ thương hiệu / giá / độ nổi tiếng (%d câu)" % (pid, r["banned"] + t["banned"]))
+    if (r["had_claims"] or r["banned"]) and not r["claims"] and not r["text"]:
+        return item, "không còn nhận định nào có bằng chứng"
+    reason = r["text"]
+    if removed:
+        reason = (reason + " " if reason else "") + "Chưa có bằng chứng trong các mã đã trích về: %s." % ", ".join(
+            x.lower() for x in removed)
+    used = r["used"] | t["used"]
+    if used:  # có nhận định được đỡ → bỏ các review được trích mà không đỡ nhận định nào (tránh trích lạc đề)
+        reviews = {e["id"] for e in p.get("evidence") or [] if e.get("kind") == "review"}
+        stray = [x for x in ev if x in reviews and x not in used]
+        if stray:
+            bad.append("%s: gỡ mã không đỡ nhận định nào (%s)" % (pid, ", ".join(stray)))
+            ev = [x for x in ev if x not in stray]
+            reason, tt = _drop_ids(reason, stray), _drop_ids(t["text"], stray)
+            return dict(item, reason=reason, tradeoff=tt, evidence=ev), None
+    return dict(item, reason=reason, tradeoff=t["text"], evidence=ev), None
+
+
+def _drop_ids(text, ids):
+    """Bỏ mã đã gỡ khỏi phần trích trong câu: "(R6, R2)" → "(R6)", "[R2]" → ""."""
+    rx = r"(?<![A-Za-z0-9])(%s)(?![A-Za-z0-9])" % "|".join(re.escape(x) for x in ids)
+    out = re.sub(r"[(\[][^)\]]*[)\]]", lambda m: re.sub(r"\s*,\s*(?=[)\]])|(?<=[(\[])\s*,\s*", "",
+                                                         re.sub(r"(,\s*)?" + rx, "", m.group(0))), text or "")
+    return re.sub(r"\s*[(\[]\s*[)\]]", "", out)
+
+
 @tool
 def check_shortlist(shortlist: list, constraints: dict, candidate_ids: list) -> dict:
     """check_shortlist — KIỂM BẰNG CODE danh sách AI đề xuất trước khi đưa cho người dùng.
@@ -512,7 +702,10 @@ def check_shortlist(shortlist: list, constraints: dict, candidate_ids: list) -> 
            trả về là đạt mọi điều kiện cứng).
     Output: {"ok": [mục hợp lệ], "violations": [mô tả lỗi]}. Luật: ≤ count (mặc định 3) · không trùng · có trong catalog
             và trong candidate_ids · đúng loại · trong ngân sách · mọi điều kiện cứng MATCH · có ≥1 mã bằng chứng và mọi mã
-            đều tồn tại trong bằng chứng CỦA CHÍNH sản phẩm đó.
+            đều tồn tại trong bằng chứng CỦA CHÍNH sản phẩm đó · mỗi vế câu nhắc tới một tiêu chí (âm thanh, pin, độ
+            bền…) phải có mã trích đỡ đúng tiêu chí đó, không thì gỡ vế đó và ghi "chưa có bằng chứng" · gỡ vế suy chất
+            lượng từ thương hiệu / giá / độ nổi tiếng · gỡ review được trích mà không đỡ nhận định nào · mục không còn
+            nhận định nào có bằng chứng thì loại.
     Không tác động ra ngoài."""
     pub = {p["id"]: p for p in catalog.published()}
     limit = constraints.get("count") or 3
@@ -555,6 +748,8 @@ def check_shortlist(shortlist: list, constraints: dict, candidate_ids: list) -> 
                     bad.append("%s: gỡ mã bằng chứng không có trong dữ liệu đã đưa (%s)" % (pid, ", ".join(stray)))
                     if not item["evidence"]:
                         why = "không còn mã bằng chứng hợp lệ"
+            if not why:
+                item, why = _audit_item(item, p, pid, bad, (constraints.get("allowed_evidence") or {}).get(pid))
         if why:
             bad.append("%s: %s" % (pid or "?", why))
         else:

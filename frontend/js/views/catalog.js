@@ -45,8 +45,15 @@ export async function loadCatalog() {
     const data = await api.catalog(catalogParams());
     if (my !== seq) return;
     api.remember(data.items);
+    if (data.category && data.category !== state.category) {
+      // Ô tìm gọi tên ngành khác ("tai nghe" khi đang ở Chuột): máy chủ đã tìm trong ngành đó → đổi theo, bỏ hãng /
+      // thuộc tính của ngành cũ (BR-CTX-11), giữ chuỗi tìm, giá, số sao.
+      state.category = data.category;
+      state.filters = { ...state.filters, brands: [], attrs: {} };
+      save();
+    }
     state.catalog = { status: "ready", data, error: null };
-    announce(`${data.total} sản phẩm ${catLabel(state.category).toLowerCase()} khớp bộ lọc`);
+    announce(`${data.category_switched_from ? `Đã chuyển sang ngành ${catLabel(state.category).toLowerCase()} theo ô tìm. ` : ""}${data.total} sản phẩm ${catLabel(state.category).toLowerCase()} khớp bộ lọc`);
   } catch (e) {
     if (my !== seq) return;
     state.catalog = { status: "error", data: state.catalog.data, error: e };
@@ -65,6 +72,8 @@ export function updateCatalog(full = false) {
   if (!head) return;
   if (full || head.dataset.cat !== state.category || !head.dataset.ready) {
     render(head, masthead());
+    const q = document.getElementById("q");
+    if (q && document.activeElement === q) q.setSelectionRange(q.value.length, q.value.length); // vẽ lại khi đang gõ
     head.dataset.cat = state.category;
     head.dataset.ready = state.catalog.data ? "1" : "";
   } else {
